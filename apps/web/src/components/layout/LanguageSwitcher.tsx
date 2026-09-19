@@ -7,7 +7,7 @@ import { LANGUAGES } from "@/lib/config";
 import type { Locale } from "@/i18n/routing";
 import { Select } from "@/components/ui/Select";
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ size }: { size?: "sm" | "md" }) {
   const locale = useLocale();
   const t = useTranslations("nav");
   const router = useRouter();
@@ -23,7 +23,8 @@ export function LanguageSwitcher() {
       value={locale}
       onChange={(e) => change(e.target.value)}
       options={options}
-      icon={<Languages size={14} strokeWidth={2} />}
+      icon={<Languages size={size === "md" ? 16 : 14} strokeWidth={2} />}
+      size={size}
     />
   );
 }

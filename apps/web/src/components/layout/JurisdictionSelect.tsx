@@ -7,7 +7,7 @@ import { useJurisdiction } from "./JurisdictionProvider";
 import { Select } from "@/components/ui/Select";
 
 /** Which Act the assistant answers from. Sits where a model picker would. */
-export function JurisdictionSelect() {
+export function JurisdictionSelect({ size }: { size?: "sm" | "md" }) {
   const t = useTranslations("nav");
   const { jurisdiction, setJurisdiction } = useJurisdiction();
 
@@ -17,7 +17,8 @@ export function JurisdictionSelect() {
       value={jurisdiction}
       onChange={(e) => setJurisdiction(e.target.value)}
       options={JURISDICTIONS.map((j) => ({ value: j.id, label: j.short }))}
-      icon={<Scale size={14} strokeWidth={2} />}
+      icon={<Scale size={size === "md" ? 16 : 14} strokeWidth={2} />}
+      size={size}
       className="max-w-[11rem] sm:max-w-none"
     />
   );
