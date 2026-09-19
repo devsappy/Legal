@@ -20,8 +20,8 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
   const t = await getTranslations();
 
   return (
-    <main className="flex-1 flex flex-col bg-paper landing-glow">
-      <header className="mx-auto w-full max-w-6xl px-5 h-16 flex items-center gap-3">
+    <main className="flex-1 flex flex-col bg-paper">
+      <header className="mx-auto w-full max-w-6xl px-5 sm:px-6 h-16 flex items-center gap-3 border-b border-rule">
         <Link href="/" className="min-w-0 flex items-center gap-2.5 font-semibold tracking-tight text-[15px] text-ink">
           <BrandMark />
           <span className="truncate">{t("app.name")}</span>
@@ -33,10 +33,10 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
 
       <div className="flex-1 flex items-center justify-center px-4 py-10">
         <div className="rise w-full max-w-[420px]">
-          <div className="rounded-2xl border border-rule bg-sheet p-6 sm:p-8 shadow-[0_1px_2px_rgba(9,9,11,0.04),0_24px_60px_-30px_color-mix(in_srgb,var(--violet)_45%,transparent)]">
-            <div className="orb orb--sm mb-5" aria-hidden />
-            <h1 className="text-[26px] text-ink mb-1.5">{t("login.title")}</h1>
-            <p className="text-[14px] text-ink-2 mb-6">{t("login.subtitle")}</p>
+          <div className="rounded-2xl border border-rule bg-sheet p-6 sm:p-8">
+            <BrandMark size={40} className="mb-6" />
+            <h1 className="text-[28px] font-medium tracking-[-0.03em] text-ink mb-1.5">{t("login.title")}</h1>
+            <p className="text-[14.5px] text-ink-2 mb-7">{t("login.subtitle")}</p>
             <LoginForm demo={{ email: DEMO_ACCOUNT.email, password: DEMO_ACCOUNT.password }} />
           </div>
           <p className="mt-5 text-center text-[13px]">

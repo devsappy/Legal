@@ -6,7 +6,7 @@ export function BrandMark({ size = 28, className }: { size?: number; className?:
   return (
     <span
       className={clsx(
-        "shrink-0 rounded-lg bg-gradient-to-br from-[var(--orb-3)] to-[var(--orb-2)] text-white flex items-center justify-center shadow-[0_2px_8px_-2px_var(--orb-3)]",
+        "shrink-0 rounded-lg bg-violet text-primary-foreground flex items-center justify-center",
         className,
       )}
       style={{ width: size, height: size }}
