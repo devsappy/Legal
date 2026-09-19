@@ -50,10 +50,10 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
     <main className="landing relative flex-1 flex flex-col bg-white dark:bg-paper">
 
       {/* Header: brand, who-you-are picker, sign in, language */}
-      <header className="sticky top-0 z-30 bg-white/90 dark:bg-paper/90 backdrop-blur">
-        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-20 flex items-center gap-2 sm:gap-3">
-          <Link href="/" className="min-w-0 flex items-center gap-3 font-semibold tracking-tight text-[17px] text-ink">
-            <BrandMark size={34} />
+      <header className="nav-dark sticky top-0 z-30 bg-ink/75 backdrop-blur-md text-paper">
+        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-[68px] flex items-center gap-2 sm:gap-3">
+          <Link href="/" className="min-w-0 flex items-center gap-3 font-semibold tracking-tight text-[16px] text-paper">
+            <BrandMark size={30} className="!bg-paper !text-ink" />
             <span className="hidden sm:inline truncate">{t("app.name")}</span>
           </Link>
           <div className="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
@@ -62,7 +62,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             </span>
             <Link
               href="/login"
-              className="h-10 px-6 inline-flex items-center whitespace-nowrap rounded-full border border-rule-strong text-[14px] font-medium text-ink hover:bg-muted transition-colors"
+              className="h-9 px-5 inline-flex items-center whitespace-nowrap rounded-full border border-white/30 text-[14px] font-medium text-paper hover:bg-white/10 transition-colors"
             >
               {t("login.title")}
             </Link>
@@ -72,7 +72,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </header>
 
       {/* 1 · Hero: centred claim over a line-art streetscape, benefits band below */}
-      <section className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 min-h-[calc(100dvh-5rem-3.5rem)] flex flex-col overflow-hidden">
+      <section className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 min-h-[calc(100dvh-68px-3.5rem)] flex flex-col overflow-hidden">
         <div className="my-auto pt-10 sm:pt-14 pb-6 flex flex-col items-center text-center">
           <Reveal>
             <p className={KICKER}>{t("landing.eyebrow")}</p>

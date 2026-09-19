@@ -262,6 +262,24 @@ html[lang="ta"] h2 {
   }
 }
 
+/* Select pills inside a black-tinted nav: outlined, light on dark */
+.nav-dark .select-pill select {
+  background: transparent;
+  color: var(--paper);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.nav-dark .select-pill select:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.nav-dark .select-pill select option {
+  color: var(--ink);
+  background: var(--sheet);
+}
+.nav-dark .select-pill > span,
+.nav-dark .select-pill > svg {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 /* Fields whose container already shows the focus state (focus-within). */
 .focus-quiet:focus-visible {
   outline: none;

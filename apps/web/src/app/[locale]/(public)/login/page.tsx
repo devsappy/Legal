@@ -21,13 +21,15 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
 
   return (
     <main className="flex-1 flex flex-col bg-paper">
-      <header className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-16 flex items-center gap-3 border-b border-rule">
-        <Link href="/" className="min-w-0 flex items-center gap-3 font-semibold tracking-tight text-[17px] text-ink">
-          <BrandMark size={34} />
-          <span className="truncate">{t("app.name")}</span>
-        </Link>
-        <div className="ml-auto">
-          <LanguageSwitcher size="md" />
+      <header className="nav-dark bg-ink/75 backdrop-blur-md text-paper">
+        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-[68px] flex items-center gap-3">
+          <Link href="/" className="min-w-0 flex items-center gap-3 font-semibold tracking-tight text-[16px] text-paper">
+            <BrandMark size={30} className="!bg-paper !text-ink" />
+            <span className="truncate">{t("app.name")}</span>
+          </Link>
+          <div className="ml-auto">
+            <LanguageSwitcher size="md" />
+          </div>
         </div>
       </header>
 

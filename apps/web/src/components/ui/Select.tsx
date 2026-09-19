@@ -11,7 +11,7 @@ type Props = Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> & {
 
 export function Select({ options, icon, size = "sm", className, ...rest }: Props) {
   return (
-    <span className={clsx("relative inline-flex", className)}>
+    <span className={clsx("select-pill relative inline-flex", className)}>
       {icon && (
         <span
           className={clsx("pointer-events-none absolute top-1/2 -translate-y-1/2 text-brand flex", size === "sm" ? "left-2.5" : "left-3")}
@@ -24,7 +24,7 @@ export function Select({ options, icon, size = "sm", className, ...rest }: Props
         {...rest}
         className={clsx(
           "appearance-none pr-7 rounded-full bg-sheet border border-rule font-medium text-ink hover:bg-muted transition-colors cursor-pointer truncate w-full",
-          size === "sm" ? "h-8 text-[13px]" : "h-10 text-[14px] pr-8",
+          size === "sm" ? "h-8 text-[13px]" : "h-9 text-[13.5px] pr-8",
           icon ? (size === "sm" ? "pl-8" : "pl-9") : size === "sm" ? "pl-3" : "pl-4",
         )}
       >
