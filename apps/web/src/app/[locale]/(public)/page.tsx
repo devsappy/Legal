@@ -16,7 +16,7 @@ const FEATURES = ["cites", "languages", "jurisdictions", "procedures"] as const;
    every cell is outlined without doubling borders. White cells on white
    paper, with the stronger rule so the grid reads crisply. */
 const BOX = "grid gap-px bg-rule-strong border border-rule-strong rounded-md overflow-hidden";
-const CELL = "bg-white dark:bg-sheet p-5 sm:p-6 transition-colors hover:bg-muted/50";
+const CELL = "cell bg-white dark:bg-sheet p-5 sm:p-6";
 const SECTION = "relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 py-12 sm:py-16 min-h-dvh flex flex-col justify-center";
 const KICKER = "text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-3 mb-3";
 const H2 = "text-[clamp(26px,3vw,36px)] font-semibold tracking-[-0.03em] leading-[1.1] text-ink";
@@ -123,7 +123,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           <ol className="grid sm:grid-cols-3 gap-px bg-rule-strong" data-stagger>
             {steps.map((s, i) => (
               <li key={s.title} className={CELL}>
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-brand text-primary-foreground font-mono text-[12px] font-semibold">
+                <span className="cell-badge inline-flex h-7 w-7 items-center justify-center rounded-md bg-brand text-primary-foreground font-mono text-[12px] font-semibold">
                   {i + 1}
                 </span>
                 <h2 className="mt-7 text-[19px] font-semibold tracking-tight text-ink">{s.title}</h2>
@@ -154,7 +154,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             {topics.map((tp) => (
               <li key={tp.name} className={`${CELL} group`}>
                 <h2 className="flex items-center gap-2 text-[16px] font-semibold tracking-tight text-ink">
-                  <span className="h-2 w-2 rounded-sm bg-brand transition-transform group-hover:scale-125" aria-hidden />
+                  <span className="cell-badge h-2 w-2 rounded-sm bg-brand transition-transform group-hover:scale-125" aria-hidden />
                   {tp.name}
                 </h2>
                 <p className="mt-2 text-[14px] text-ink-2 leading-[1.55]">“{tp.example}”</p>
@@ -165,7 +165,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
         <Reveal as="ul" delay={250} className={`${BOX} sm:grid-cols-2 lg:grid-cols-4 mt-3`}>
           <>
             {FEATURES.map((key) => (
-              <li key={key} className={`${CELL} !bg-muted/40 hover:!bg-muted/70`}>
+              <li key={key} className={`${CELL} cell--tint`}>
                 <h3 className="text-[15px] font-semibold tracking-tight text-ink">{t(`landing.features.${key}.title`)}</h3>
                 <p className="mt-1.5 text-[13.5px] text-ink-2 leading-[1.55]">{t(`landing.features.${key}.body`)}</p>
               </li>
@@ -244,7 +244,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
               <ul className="space-y-2.5">
                 {does.map((d) => (
                   <li key={d} className="flex gap-2.5 text-[14px] text-ink-2 leading-snug">
-                    <span className="mt-0.5 h-5 w-5 shrink-0 rounded-sm bg-ink text-paper inline-flex items-center justify-center">
+                    <span className="cell-badge mt-0.5 h-5 w-5 shrink-0 rounded-sm bg-ink text-paper inline-flex items-center justify-center">
                       <Check size={13} strokeWidth={2.5} aria-hidden />
                     </span>
                     {d}
@@ -257,7 +257,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
               <ul className="space-y-2.5">
                 {doesNot.map((d) => (
                   <li key={d} className="flex gap-2.5 text-[14px] text-ink-2 leading-snug">
-                    <span className="mt-0.5 h-5 w-5 shrink-0 rounded-sm border border-rule-strong text-ink inline-flex items-center justify-center">
+                    <span className="cell-outline mt-0.5 h-5 w-5 shrink-0 rounded-sm border border-rule-strong text-ink inline-flex items-center justify-center">
                       <X size={13} strokeWidth={2.5} aria-hidden />
                     </span>
                     {d}

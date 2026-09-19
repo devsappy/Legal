@@ -280,6 +280,39 @@ html[lang="ta"] h2 {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* Landing grid cells: invert to dark on hover */
+.cell {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+.cell--tint {
+  background: color-mix(in srgb, var(--muted) 60%, var(--sheet));
+}
+.cell:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.cell:hover :is(h2, h3, p, span, a, dt, dd, th, td, li) {
+  color: inherit;
+}
+.cell:hover :is(.text-ink-2, .text-ink-3, dt, .font-mono) {
+  color: color-mix(in srgb, var(--paper) 72%, transparent);
+}
+.cell:hover :is(.border-rule, .border-rule-strong, .border-t, .border-b, tr) {
+  border-color: color-mix(in srgb, var(--paper) 22%, transparent);
+}
+.cell:hover .cell-badge {
+  background: var(--paper);
+  color: var(--ink);
+}
+.cell:hover .cell-outline {
+  border-color: color-mix(in srgb, var(--paper) 45%, transparent);
+}
+.cell:hover li:hover {
+  background: color-mix(in srgb, var(--paper) 10%, transparent);
+}
+
 /* Fields whose container already shows the focus state (focus-within). */
 .focus-quiet:focus-visible {
   outline: none;
