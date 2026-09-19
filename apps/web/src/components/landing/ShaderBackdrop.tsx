@@ -69,8 +69,8 @@ const FRAG = /* glsl */ `
     float n = fbm(p + 1.2 * q + vec2(t * 0.3, -t * 0.2));
     float light = smoothstep(-0.1, 0.7, n);
 
-    // Lives in the hero only: fully paper again before the feature list
-    float fade = smoothstep(0.3, 0.8, uv.y);
+    // Lives in the hero only: fully paper again by its lower edge
+    float fade = smoothstep(0.08, 0.6, uv.y);
     // Keep the left column, where the headline sits, a touch quieter
     float side = 0.6 + 0.4 * smoothstep(0.15, 0.85, uv.x);
 
@@ -190,7 +190,7 @@ export function ShaderBackdrop() {
     <canvas
       ref={ref}
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 top-0 h-[120vh] w-full"
+      className="pointer-events-none absolute inset-x-0 top-0 h-dvh w-full"
     />
   );
 }

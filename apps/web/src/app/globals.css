@@ -201,6 +201,15 @@ html[lang="ta"] h2 {
   background: var(--accent);
 }
 
+/* Landing: one section per screen, settling on each as you scroll */
+html:has(main.landing) {
+  scroll-snap-type: y proximity;
+}
+.landing > section {
+  scroll-snap-align: start;
+  scroll-margin-top: 4rem; /* the sticky header */
+}
+
 /* Fields whose container already shows the focus state (focus-within). */
 .focus-quiet:focus-visible {
   outline: none;

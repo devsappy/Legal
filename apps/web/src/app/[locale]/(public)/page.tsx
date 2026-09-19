@@ -36,7 +36,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
   const language = LANGUAGES.find((l) => l.code === locale)?.native;
 
   return (
-    <main className="relative flex-1 flex flex-col bg-paper">
+    <main className="landing relative flex-1 flex flex-col bg-paper">
       <ShaderBackdrop />
 
       {/* Header */}
@@ -68,7 +68,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </header>
 
       {/* Hero: the claim on the left, the proof on the right */}
-      <section className="relative rise mx-auto w-full max-w-[1400px] px-5 sm:px-8 pt-16 sm:pt-24 pb-16 sm:pb-24 grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 items-center">
+      <section className="relative rise mx-auto w-full max-w-[1400px] px-5 sm:px-8 py-12 sm:py-16 min-h-[calc(100dvh-4rem)] grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 items-center content-center">
         <div>
           <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-violet mb-5">{t("landing.eyebrow")}</p>
           <h1 className="text-[clamp(36px,4.6vw,58px)] font-medium tracking-[-0.035em] leading-[1.04] text-ink text-balance">
@@ -131,8 +131,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </section>
 
       {/* What it does: a ruled list, not boxes */}
-      <section className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 pb-16 sm:pb-24">
-        <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8">
+      <section className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 py-12 sm:py-16 min-h-dvh flex flex-col justify-center">
+        <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
           {FEATURES.map((key) => (
             <li key={key} className="border-t border-rule-strong pt-5">
               <h2 className="text-[17px] font-medium tracking-tight text-ink mb-2">{t(`landing.features.${key}.title`)}</h2>
@@ -143,7 +143,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </section>
 
       {/* Acts */}
-      <section className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 pb-20 sm:pb-28 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+      <section className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 py-12 sm:py-16 min-h-dvh grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] content-center">
         <h2 className="text-[13px] font-semibold uppercase tracking-[0.1em] text-ink-3 pt-1">{t("landing.actsTitle")}</h2>
         <ul className="border-t border-rule">
           {JURISDICTIONS.map((j) => (
