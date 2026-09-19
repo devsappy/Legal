@@ -1,0 +1,2289 @@
+## Integrate the <CallChip /> component from React Bits
+
+You are helping integrate an open-source React component into an existing application.
+
+### Component: CallChip
+### Variant: JavaScript + CSS
+### Dependencies: @hugeicons/react @hugeicons/core-free-icons
+
+---
+
+### Usage Example
+```jsx
+import CallChip from './CallChip';
+
+<CallChip
+  icon="terminal"
+  name="bash"
+  argument="npm test"
+  status="done"
+  expectedMs={2500}
+  size={34}
+  radius={10}
+  color="currentColor"
+  surfaceColor="#27272a"
+  progressColor="currentColor"
+  progressOpacity={0.08}
+  doneColor="#22c55e"
+  errorColor="#ef4444"
+  washOpacity={0.14}
+  shake={6}
+  showTimer
+  onRetry={() => rerun(call.id)}
+/>
+```
+
+### Props
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| icon | "terminal" | "file" | "search" | "edit" | ReactNode | "terminal" | The tool glyph. It rolls out when the call resolves. |
+| name | string | "bash" | The tool name. |
+| argument | string | "npm test" | The argument. |
+| status | "idle" | "running" | "done" | "error" | "running" | Running wipes the fill across and ticks the counter. Done completes it with a wash. Error stops it, tints and shakes. |
+| expectedMs | number | 2500 | Milliseconds the fill takes to reach its 90% park, the time you expect the call to take. |
+| size | number | 34 | Chip height in pixels. Font, padding and glyph follow. |
+| radius | number | 10 | Corner radius in pixels. Half the height is a pill. |
+| color | string | "currentColor" | Ink for the text and the tool glyph. |
+| surfaceColor | string | "#27272a" | The chip surface. |
+| progressColor | string | "currentColor" | The fill that wipes across while running. |
+| progressOpacity | number | 0.08 | How strong that fill is. |
+| doneColor | string | "#22c55e" | The success wash and the check. |
+| errorColor | string | "#ef4444" | The stopped fill and the retry glyph on error. |
+| washOpacity | number | 0.14 | Strength of the success wash and of the error tint. |
+| shake | number | 6 | Error shake amplitude in pixels. 0 tints only. |
+| showTimer | boolean | true | Shows the millisecond counter. |
+| onRetry | () => void | - | When set, the failed chip becomes a retry button. |
+| className | string | "" | Extra classes for the root. |
+| style | CSSProperties | undefined | Inline styles merged onto the root. |
+
+### Full Component Source
+```jsx
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import {
+  CommandLineIcon,
+  File02Icon,
+  PencilEdit01Icon,
+  RefreshIcon,
+  Search01Icon,
+  Tick02Icon
+} from '@hugeicons/core-free-icons';
+
+import './CallChip.css';
+
+const HOLD_AT = 0.9;
+const SHAKE = [0, -1, 1, -0.66, 0.66, -0.33, 0];
+const ICONS = { terminal: CommandLineIcon, file: File02Icon, search: Search01Icon, edit: PencilEdit01Icon };
+const WORDS = { running: 'running', done: 'done', error: 'failed', idle: 'queued' };
+
+const fmt = ms => (ms < 10000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1)} s`);
+const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+const glyphOf = s => (s === 'done' ? 'check' : s === 'error' ? 'retry' : 'tool');
+
+export default function CallChip({
+  icon = 'terminal',
+  name = 'bash',
+  argument = 'npm test',
+  status = 'running',
+  expectedMs = 2500,
+  size = 34,
+  radius = 10,
+  color = 'currentColor',
+  surfaceColor = '#27272a',
+  progressColor = 'currentColor',
+  progressOpacity = 0.08,
+  doneColor = '#22c55e',
+  errorColor = '#ef4444',
+  washOpacity = 0.14,
+  shake = 6,
+  showTimer = true,
+  onRetry,
+  className = '',
+  style
+}) {
+  const rootRef = useRef(null);
+  const fillRef = useRef(null);
+  const timerRef = useRef(null);
+  const mountedRef = useRef(false);
+  const fraction = useRef(0);
+  const clock = useRef({ ms: 0 });
+  const shakeAnim = useRef(null);
+  const statusRef = useRef(status);
+  statusRef.current = status;
+  const [mounted, setMounted] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const [announce, setAnnounce] = useState('');
+  const roll = useRef({ cur: glyphOf(status), prev: null });
+  if (glyphOf(status) !== roll.current.cur) roll.current = { cur: glyphOf(status), prev: roll.current.cur };
+
+  const setFraction = (f, instant) => {
+    const fill = fillRef.current;
+    if (!fill) return;
+    fraction.current = f;
+    if (instant) fill.style.transition = 'none';
+    fill.style.transform = `scaleX(${f})`;
+    if (instant) {
+      void fill.getBoundingClientRect();
+      fill.style.transition = '';
+    }
+  };
+  const apply = (s, animate) => {
+    if (s === 'running') {
+      shakeAnim.current?.cancel();
+      setFraction(0, true);
+      if (animate) setFraction(HOLD_AT, false);
+    } else if (s === 'done') {
+      setFraction(1, !animate);
+    } else if (s === 'error') {
+      const fill = fillRef.current;
+      const live = fill ? new DOMMatrix(getComputedStyle(fill).transform).a : fraction.current;
+      setFraction(Math.min(1, Math.max(0, live)), true);
+      if (animate && shake > 0 && !reduceMotion() && rootRef.current) {
+        shakeAnim.current = rootRef.current.animate(
+          SHAKE.map(k => ({ transform: `translateX(${k * shake}px)`, easing: 'cubic-bezier(0.77, 0, 0.175, 1)' })),
+          { duration: 450, composite: 'add' }
+        );
+      }
+    } else setFraction(0, true);
+  };
+
+  useEffect(() => {
+    mountedRef.current = true;
+    setMounted(true);
+    apply(statusRef.current, statusRef.current === 'running');
+    return () => {
+      mountedRef.current = false;
+      shakeAnim.current?.cancel();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useLayoutEffect(() => {
+    if (mountedRef.current) apply(status, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  useEffect(() => {
+    const write = ms => {
+      clock.current.ms = ms;
+      if (timerRef.current) timerRef.current.textContent = fmt(ms);
+    };
+    if (status !== 'running') {
+      if ((status === 'idle' || !clock.current.ms) && timerRef.current) timerRef.current.textContent = '—';
+      return undefined;
+    }
+    const startedAt = performance.now();
+    write(0);
+    if (reduceMotion()) {
+      const id = setInterval(() => write(performance.now() - startedAt), 100);
+      return () => {
+        clearInterval(id);
+        write(performance.now() - startedAt);
+      };
+    }
+    let raf = 0;
+    const tick = () => {
+      write(performance.now() - startedAt);
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+    return () => {
+      cancelAnimationFrame(raf);
+      write(performance.now() - startedAt);
+    };
+  }, [status]);
+  useEffect(() => {
+    const ms = showTimer && clock.current.ms ? Math.round(clock.current.ms) : 0;
+    const when = status === 'done' && ms ? ` in ${ms} ms` : status === 'error' && ms ? ` after ${ms} ms` : '';
+    setAnnounce(`${name} ${argument}, ${WORDS[status] ?? status}${when}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  const font = Math.max(11, Math.round(size * 0.38));
+  const glyphState = g => (g === roll.current.cur ? 'in' : g === roll.current.prev ? 'out' : undefined);
+  const toolIcon = typeof icon === 'string' ? (ICONS[icon] ?? ICONS.terminal) : null;
+  const iconSize = font + 2;
+
+  return (
+    <span
+      ref={rootRef}
+      role="status"
+      aria-busy={status === 'running' || undefined}
+      data-status={status}
+      data-mounted={mounted ? '' : undefined}
+      data-pressed={pressed ? '' : undefined}
+      className={`call-chip${className ? ` ${className}` : ''}`}
+      style={{
+        '--cc-size': `${size}px`,
+        '--cc-font': `${font}px`,
+        '--cc-pad': `${Math.round(size * 0.35)}px`,
+        '--cc-gap': `${Math.round(font * 0.55)}px`,
+        '--cc-radius': `${radius}px`,
+        '--cc-color': color,
+        '--cc-surface': surfaceColor,
+        '--cc-progress': progressColor,
+        '--cc-progress-pct': `${progressOpacity * 100}%`,
+        '--cc-done': doneColor,
+        '--cc-error': errorColor,
+        '--cc-wash-pct': `${washOpacity * 100}%`,
+        '--cc-expected': `${expectedMs}ms`,
+        ...style
+      }}
+    >
+      <span ref={fillRef} className="call-chip__fill" aria-hidden="true" />
+      <span className="call-chip__slot" aria-hidden="true">
+        <span className="call-chip__glyph" data-state={glyphState('tool')}>
+          {toolIcon ? <HugeiconsIcon icon={toolIcon} size={iconSize} strokeWidth={1.8} /> : icon}
+        </span>
+        <span className="call-chip__glyph" data-state={glyphState('check')}>
+          <HugeiconsIcon icon={Tick02Icon} size={iconSize} strokeWidth={2.2} />
+        </span>
+        <span className="call-chip__glyph" data-state={glyphState('retry')}>
+          <HugeiconsIcon icon={RefreshIcon} size={iconSize} strokeWidth={2} />
+        </span>
+      </span>
+      <span className="call-chip__name" aria-hidden="true">
+        {name}
+      </span>
+      <span className="call-chip__arg" aria-hidden="true">
+        {argument}
+      </span>
+      {showTimer ? (
+        <span ref={timerRef} className="call-chip__timer" aria-hidden="true">
+          0 ms
+        </span>
+      ) : null}
+      {status === 'error' && onRetry ? (
+        <button
+          type="button"
+          className="call-chip__retry"
+          aria-label={`Retry ${name} ${argument}`}
+          onClick={() => onRetry()}
+          onPointerDown={() => setPressed(true)}
+          onPointerUp={() => setPressed(false)}
+          onPointerCancel={() => setPressed(false)}
+        />
+      ) : null}
+      <span className="call-chip__sr">{announce}</span>
+    </span>
+  );
+}
+
+```
+
+### Component CSS
+```css
+.call-chip {
+  --cc-size: 34px;
+  --cc-font: 13px;
+  --cc-pad: 12px;
+  --cc-gap: 7px;
+  --cc-radius: 10px;
+  --cc-color: currentColor;
+  --cc-surface: #27272a;
+  --cc-progress: currentColor;
+  --cc-progress-pct: 8%;
+  --cc-done: #22c55e;
+  --cc-error: #ef4444;
+  --cc-wash-pct: 14%;
+  --cc-expected: 2500ms;
+  --cc-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cc-gap);
+  box-sizing: border-box;
+  height: var(--cc-size);
+  padding: 0 var(--cc-pad);
+  border-radius: var(--cc-radius);
+  overflow: hidden;
+  background: var(--cc-surface);
+  color: var(--cc-color);
+  font-size: var(--cc-font);
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 160ms var(--cc-ease-out);
+}
+
+.call-chip[data-status='error'] {
+  cursor: pointer;
+}
+
+.call-chip[data-pressed] {
+  transform: scale(0.97);
+}
+
+.call-chip__fill {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--cc-progress) var(--cc-progress-pct), transparent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  clip-path: inset(0 0 0 0);
+  pointer-events: none;
+}
+
+.call-chip[data-status='running'] .call-chip__fill {
+  transition: transform var(--cc-expected) linear;
+}
+
+.call-chip[data-status='done'] .call-chip__fill {
+  background: color-mix(in srgb, var(--cc-done) var(--cc-wash-pct), transparent);
+  clip-path: inset(100% 0 0 0);
+  transition:
+    transform 200ms var(--cc-ease-out),
+    background-color 120ms ease,
+    clip-path 400ms var(--cc-ease-out) 200ms;
+}
+
+.call-chip[data-status='error'] .call-chip__fill {
+  background: color-mix(in srgb, var(--cc-error) var(--cc-wash-pct), transparent);
+  transition: background-color 200ms ease;
+}
+
+.call-chip:not([data-mounted]) .call-chip__fill,
+.call-chip:not([data-mounted]) .call-chip__glyph {
+  transition: none !important;
+}
+
+.call-chip__slot {
+  position: relative;
+  flex: none;
+  width: calc(var(--cc-font) + 2px);
+  height: calc(var(--cc-font) + 2px);
+  overflow: hidden;
+}
+
+.call-chip__glyph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: translateY(70%);
+  filter: blur(3px);
+}
+
+.call-chip__glyph[data-state='in'] {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+  transition:
+    opacity 240ms var(--cc-ease-out),
+    transform 240ms var(--cc-ease-out),
+    filter 240ms var(--cc-ease-out);
+}
+
+.call-chip__glyph[data-state='out'] {
+  transform: translateY(-70%);
+  transition:
+    opacity 160ms var(--cc-ease-out),
+    transform 160ms var(--cc-ease-out),
+    filter 160ms var(--cc-ease-out);
+}
+
+.call-chip[data-status='done'] .call-chip__glyph[data-state='in'] {
+  color: var(--cc-done);
+}
+
+.call-chip[data-status='error'] .call-chip__glyph[data-state='in'] {
+  color: var(--cc-error);
+}
+
+.call-chip__name,
+.call-chip__arg,
+.call-chip__timer {
+  position: relative;
+}
+
+.call-chip__name {
+  font-weight: 500;
+}
+
+.call-chip__arg {
+  opacity: 0.72;
+}
+
+.call-chip__timer {
+  min-width: 6ch;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  opacity: 0.5;
+}
+
+.call-chip__retry {
+  position: absolute;
+  inset: -5px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cc-radius);
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.call-chip__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .call-chip[data-status='done'] .call-chip__fill {
+    clip-path: inset(0 0 0 0);
+    transition: background-color 120ms ease;
+  }
+
+  .call-chip__glyph {
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .call-chip[data-pressed] {
+    transform: none;
+  }
+}
+
+```
+
+### Integration Instructions
+1. Install any listed dependencies.
+2. Copy the component source into the appropriate directory in the project.
+3. Import the CSS file alongside the component.
+4. Import and render the component using the usage example above as a starting point.
+5. Adjust props as needed for the specific use case — refer to the props table for all available options.
+
+### More from React Bits
+The full library index, including everything reactbits.dev offers, is at https://reactbits.dev/llms.txt — fetch it if this component is not the right fit or the project needs more pieces.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Integrate the <undefined /> component from React Bits
+
+You are helping integrate an open-source React component into an existing application.
+
+### Component: undefined
+### Variant: JavaScript + CSS
+### Dependencies: @hugeicons/react @hugeicons/core-free-icons
+
+---
+
+### Usage Example
+```jsx
+import VoicePill from './VoicePill';
+
+<VoicePill
+  accentColor="#f5f5f5"
+  iconColor="#a1a1aa"
+  background="#27272a"
+  size={28}
+  shape="pill"
+  reach={8}
+  showTime
+  waveform
+  slideToCancel
+  cancelDistance={64}
+  attack={40}
+  release={240}
+  sensitivity={1}
+  floor={0.1}
+  openDuration={200}
+  pressScale={0.95}
+  mode="auto"
+  holdAfter={300}
+  reactive="simulated"
+  onStart={({ source }) => startRecording(source)}
+  onStop={({ reason, duration }) => stopRecording(reason, duration)}
+/>
+```
+
+### Props
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| accentColor | string | "#f5f5f5" | The waveform, the clock and the stop mark. |
+| iconColor | string | "#a1a1aa" | The mic at rest, and the hover wash. |
+| background | string | "#27272a" | The capsule surface. |
+| size | number | 28 | Footprint in px. The icon, the stop mark and the clock scale with it. |
+| shape | 'pill' | 'rounded' | 'pill' | A circle that opens into a capsule, or a rounded square. |
+| reach | number | 8 | The room the capsule leaves before the waveform, in px. |
+| showTime | boolean | true | An elapsed clock in the capsule, which grows to the left to hold it. |
+| waveform | boolean | true | A history of the level scrolling through the capsule, past the clock. |
+| slideToCancel | boolean | true | While held, sliding left drags the capsule contents along and reveals Cancel. Crossing the distance scatters the bars and stops without a result. |
+| cancelDistance | number | 64 | How far left a held pointer slides before it cancels, in px. |
+| attack | number | 40 | How fast the level rises to a louder signal, in ms. |
+| release | number | 240 | How long the level hangs after the sound drops, in ms. |
+| sensitivity | number | 1 | Gain on the signal before the envelope. |
+| floor | number | 0.1 | Waveform bar height when silent, as a fraction of its box. |
+| openDuration | number | 200 | The capsule open and close, in ms. |
+| pressScale | number | 0.95 | Scale of the button while a pointer is down. |
+| mode | 'auto' | 'hold' | 'toggle' | 'auto' | Auto: a tap latches, a hold stops on release. Hold: release always stops. Toggle: release never stops. |
+| holdAfter | number | 300 | In auto, the press length after which a release stops instead of latching, in ms. |
+| reactive | 'simulated' | 'mic' | 'simulated' | What drives the level. Mic asks for microphone permission on the first press and stops if it is refused. |
+| disabled | boolean | false | Dimmed and inert. A listening pill stops. |
+| ariaLabel | string | "Dictate" | Accessible name. The state is carried by aria-pressed. |
+| onStart | ({ source }) => void | - | Listening began, with the requested source. |
+| onStop | ({ reason, duration }) => void | - | Listening ended. Reason is release, tap, key, escape, blur, cancel, disabled, mic-denied or unmount; duration in ms. |
+| className | string | "" | Extra classes for the button. |
+
+### Full Component Source
+```jsx
+import { useEffect, useRef, useState } from 'react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowLeft01Icon, Mic01Icon } from '@hugeicons/core-free-icons';
+import './VoicePill.css';
+
+const LOOP = 4.8;
+const SYLLABLES = [
+  [0.1, 0.16, 0.9],
+  [0.3, 0.12, 0.7],
+  [0.5, 0.2, 1],
+  [0.95, 0.14, 0.8],
+  [1.15, 0.1, 0.6],
+  [1.3, 0.22, 0.95],
+  [1.9, 0.16, 0.85],
+  [2.12, 0.12, 0.7],
+  [2.3, 0.18, 0.9],
+  [2.55, 0.1, 0.5],
+  [3.05, 0.24, 1],
+  [3.4, 0.12, 0.75],
+  [3.6, 0.16, 0.9]
+];
+const MIC_BINS = [
+  [1, 4],
+  [4, 11],
+  [11, 33]
+];
+const MIC_GAIN = 2.2;
+const DT_MAX = 0.05;
+const SLIDE_MIN = 4;
+const WAVE_EVERY = 4;
+const WAVE_MAX = 80;
+
+const simulatedLevel = t => {
+  const u = t % LOOP;
+  let a = 0.06;
+  for (const [s, d, p] of SYLLABLES) {
+    const x = (u - s) / d;
+    if (x >= 0 && x <= 1) a = Math.max(a, p * 0.5 * (1 - Math.cos(2 * Math.PI * x)));
+  }
+  return a * (0.7 + 0.3 * Math.abs(Math.sin(2 * Math.PI * 7.1 * u)));
+};
+const micLevel = (analyser, buf) => {
+  analyser.getByteFrequencyData(buf);
+  let total = 0;
+  for (const [lo, hi] of MIC_BINS) {
+    let s = 0;
+    for (let i = lo; i < hi; i += 1) s += buf[i];
+    total += s / ((hi - lo) * 255);
+  }
+  return (total / MIC_BINS.length) * MIC_GAIN;
+};
+const drawWave = (s, canvas, level, color, floor) => {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const rect = canvas.getBoundingClientRect();
+  const W = Math.max(1, Math.round(rect.width * dpr));
+  const H = Math.max(1, Math.round(rect.height * dpr));
+  if (canvas.width !== W || canvas.height !== H) {
+    canvas.width = W;
+    canvas.height = H;
+  }
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  s.acc = Math.max(s.acc, level);
+  s.tick = (s.tick + 1) % WAVE_EVERY;
+  if (s.tick === 0) {
+    s.hist.push(s.acc);
+    s.acc = 0;
+    if (s.hist.length > WAVE_MAX) s.hist.shift();
+  }
+  const bw = 2 * dpr;
+  const step = 3 * dpr;
+  const shift = (s.tick / WAVE_EVERY) * step;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = color;
+  for (let i = 0; i < s.hist.length; i += 1) {
+    const v = s.hist[s.hist.length - 1 - i];
+    const x = W - (i + 1) * step - shift;
+    if (x + bw < 0) break;
+    const h = Math.max(bw, (floor + (1 - floor) * v) * H);
+    const t = Math.min(1, Math.max(0, (x + bw / 2) / (W * 0.55)));
+    const fade = t * t * (3 - 2 * t);
+    ctx.globalAlpha = (0.35 + 0.65 * v) * fade;
+    ctx.beginPath();
+    ctx.roundRect(x, (H - h) / 2, bw, h, bw / 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+};
+const clock = ms => {
+  const s = Math.floor(ms / 1000);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+};
+
+const openMic = async s => {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx || !navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
+  s.audio ??= { ctx: new Ctx() };
+  const a = s.audio;
+  if (a.ctx.state === 'suspended') a.ctx.resume();
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  if (!s.listening) {
+    stream.getTracks().forEach(t => t.stop());
+    return;
+  }
+  a.stream = stream;
+  a.src = a.ctx.createMediaStreamSource(stream);
+  a.analyser = a.ctx.createAnalyser();
+  a.analyser.fftSize = 256;
+  a.analyser.smoothingTimeConstant = 0;
+  a.src.connect(a.analyser);
+  a.buf = new Uint8Array(a.analyser.frequencyBinCount);
+};
+const closeMic = s => {
+  const a = s.audio;
+  if (!a?.stream) return;
+  a.stream.getTracks().forEach(t => t.stop());
+  a.src?.disconnect();
+  a.stream = null;
+  a.src = null;
+  a.analyser = null;
+  a.buf = null;
+};
+
+export default function VoicePill({
+  accentColor = '#f5f5f5',
+  iconColor = '#a1a1aa',
+  background = '#27272a',
+  size = 28,
+  shape = 'pill',
+  reach = 8,
+  showTime = true,
+  waveform = true,
+  slideToCancel = true,
+  cancelDistance = 64,
+  attack = 40,
+  release = 240,
+  sensitivity = 1,
+  floor = 0.1,
+  openDuration = 200,
+  pressScale = 0.95,
+  mode = 'auto',
+  holdAfter = 300,
+  reactive = 'simulated',
+  disabled = false,
+  ariaLabel = 'Dictate',
+  onStart,
+  onStop,
+  className = ''
+}) {
+  const [listening, setListening] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const [input, setInput] = useState('pointer');
+  const timeRef = useRef(null);
+  const rootRef = useRef(null);
+  const waveRef = useRef(null);
+  const st = useRef({
+    listening: false,
+    pointerId: null,
+    ownPress: false,
+    downX: 0,
+    sliding: false,
+    hist: [],
+    tick: 0,
+    acc: 0,
+    downAt: 0,
+    startedAt: 0,
+    raf: 0,
+    last: 0,
+    env: 0,
+    t0: 0,
+    audio: null
+  });
+  const cfg = useRef({});
+  cfg.current = {
+    attack,
+    release,
+    sensitivity,
+    floor,
+    mode,
+    holdAfter,
+    reactive,
+    showTime,
+    waveform,
+    slideToCancel,
+    cancelDistance,
+    accentColor,
+    onStart,
+    onStop
+  };
+
+  const frame = now => {
+    const s = st.current;
+    const c = cfg.current;
+    const dt = Math.min((now - s.last) / 1000, DT_MAX);
+    s.last = now;
+    let target = 0;
+    if (s.listening) {
+      if (s.audio?.analyser) target = micLevel(s.audio.analyser, s.audio.buf);
+      else if (c.reactive !== 'mic') target = simulatedLevel((now - s.t0) / 1000);
+    }
+    target = Math.min(1, target * c.sensitivity);
+    const tau = Math.max(1, target > s.env ? c.attack : c.release) / 1000;
+    s.env += (target - s.env) * (1 - Math.exp(-dt / tau));
+    if (s.listening && c.showTime && timeRef.current) {
+      const text = clock(now - s.startedAt);
+      if (timeRef.current.textContent !== text) timeRef.current.textContent = text;
+    }
+    if (s.listening && c.waveform && waveRef.current) drawWave(s, waveRef.current, s.env, c.accentColor, c.floor);
+    s.raf = s.listening ? requestAnimationFrame(frame) : 0;
+  };
+
+  const begin = kind => {
+    const s = st.current;
+    const c = cfg.current;
+    if (s.listening || disabled) return;
+    s.listening = true;
+    s.hist = [];
+    s.tick = 0;
+    s.acc = 0;
+    s.env = 0;
+    s.startedAt = performance.now();
+    s.t0 = s.startedAt;
+    s.last = s.startedAt;
+    if (timeRef.current) timeRef.current.textContent = '0:00';
+    setListening(true);
+    setInput(kind);
+    if (!s.raf) s.raf = requestAnimationFrame(frame);
+    c.onStart?.({ source: c.reactive });
+    if (c.reactive === 'mic') openMic(s).catch(() => end('mic-denied'));
+  };
+  const end = reason => {
+    const s = st.current;
+    const c = cfg.current;
+    if (!s.listening) return;
+    s.listening = false;
+    closeMic(s);
+    setListening(false);
+    setInput(reason === 'key' || reason === 'escape' ? 'key' : 'pointer');
+    c.onStop?.({ reason, duration: Math.round(performance.now() - s.startedAt) });
+  };
+
+  const settleSlide = () => {
+    const s = st.current;
+    const root = rootRef.current;
+    s.sliding = false;
+    if (!root) return;
+    delete root.dataset.sliding;
+    root.style.setProperty('--vp-slide', '0px');
+    root.style.setProperty('--vp-cancel', '0');
+  };
+  const onPointerMove = e => {
+    const s = st.current;
+    const c = cfg.current;
+    const root = rootRef.current;
+    if (!root || s.pointerId !== e.pointerId || !c.slideToCancel || !s.listening || !s.ownPress) return;
+    const dx = e.clientX - s.downX;
+    if (!s.sliding && dx > -SLIDE_MIN) return;
+    s.sliding = true;
+    root.dataset.sliding = '';
+    const pull = Math.min(c.cancelDistance + 24, Math.max(0, -dx));
+    root.style.setProperty('--vp-slide', `${-pull}px`);
+    const progress = Math.min(1, pull / c.cancelDistance);
+    root.style.setProperty('--vp-cancel', progress.toFixed(3));
+    if (progress >= 1) {
+      settleSlide();
+      end('cancel');
+    }
+  };
+  const onPointerDown = e => {
+    const s = st.current;
+    if (disabled || e.button !== 0 || !e.isPrimary || s.pointerId !== null) return;
+    s.pointerId = e.pointerId;
+    s.downX = e.clientX;
+    s.downAt = performance.now();
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {}
+    setPressed(true);
+    s.ownPress = !s.listening;
+    if (!s.listening) begin('pointer');
+  };
+  const onPointerUp = e => {
+    const s = st.current;
+    const c = cfg.current;
+    if (e.pointerId !== s.pointerId) return;
+    s.pointerId = null;
+    setPressed(false);
+    if (s.sliding) settleSlide();
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {}
+    if (!s.listening) return;
+    const held = performance.now() - s.downAt;
+    const isHold = c.mode === 'hold' || (c.mode === 'auto' && held >= c.holdAfter);
+    if (s.ownPress) {
+      if (isHold) end('release');
+    } else {
+      end(held < c.holdAfter ? 'tap' : 'release');
+    }
+  };
+  const onKeyDown = e => {
+    if (e.key === 'Escape') {
+      end('escape');
+      return;
+    }
+    if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) {
+      e.preventDefault();
+      if (st.current.listening) end('key');
+      else begin('key');
+    }
+  };
+  const onClick = e => {
+    if (e.detail === 0 && st.current.pointerId === null && !e.nativeEvent.pointerType) {
+      if (st.current.listening) end('key');
+      else begin('key');
+    }
+  };
+
+  useEffect(() => {
+    if (!pressed) return undefined;
+    const stop = () => end('blur');
+    const onVis = () => {
+      if (document.hidden) stop();
+    };
+    window.addEventListener('blur', stop);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      window.removeEventListener('blur', stop);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pressed]);
+  useEffect(() => {
+    if (disabled) end('disabled');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
+  useEffect(() => {
+    const s = st.current;
+    return () => {
+      end('unmount');
+      cancelAnimationFrame(s.raf);
+      s.audio?.ctx.close();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const radius = shape === 'rounded' ? Math.round(size * 0.29) : size / 2;
+  const hit = Math.max(0, Math.min(10, (44 - size) / 2));
+  const timeSize = Math.max(10, Math.round(size * 0.36));
+  const clockW = showTime ? Math.round(timeSize * 2.5) + 4 : 0;
+  const waveW = waveform ? Math.round(size * 1.9) : 0;
+  const extra = clockW + waveW;
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      aria-label={ariaLabel}
+      aria-pressed={listening}
+      className={`voice-pill${className ? ` ${className}` : ''}`}
+      data-state={listening ? 'listening' : 'idle'}
+      data-pressed={pressed ? '' : undefined}
+      data-input={input}
+      data-time={showTime ? '' : undefined}
+      ref={rootRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      onLostPointerCapture={onPointerUp}
+      onKeyDown={onKeyDown}
+      onClick={onClick}
+      onContextMenu={e => e.preventDefault()}
+      style={{
+        '--vp-accent': accentColor,
+        '--vp-icon': iconColor,
+        '--vp-bg': background,
+        '--vp-size': `${size}px`,
+        '--vp-radius': `${radius}px`,
+        '--vp-reach': `${reach}px`,
+        '--vp-extra': `${extra}px`,
+        '--vp-clock-w': `${clockW}px`,
+        '--vp-wave-w': `${waveW}px`,
+        '--vp-stop': `${Math.round(size * 0.32)}px`,
+        '--vp-icon-size': `${Math.round(size * 0.54)}px`,
+        '--vp-time-size': `${timeSize}px`,
+        '--vp-open': `${openDuration}ms`,
+        '--vp-press': pressScale,
+        '--vp-hit': `${hit}px`
+      }}
+    >
+      <span className="voice-pill__capsule" aria-hidden="true" />
+      {waveform ? <canvas ref={waveRef} className="voice-pill__wave" aria-hidden="true" /> : null}
+      {slideToCancel ? (
+        <span className="voice-pill__cancel" aria-hidden="true">
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={12} strokeWidth={2.2} />
+          <span>Cancel</span>
+        </span>
+      ) : null}
+      {showTime ? (
+        <span ref={timeRef} className="voice-pill__time" aria-hidden="true">
+          0:00
+        </span>
+      ) : null}
+      <span className="voice-pill__glyph">
+        <span className="voice-pill__mic">
+          <HugeiconsIcon icon={Mic01Icon} size={Math.round(size * 0.54)} strokeWidth={2} />
+        </span>
+        <span className="voice-pill__stop" aria-hidden="true" />
+      </span>
+    </button>
+  );
+}
+
+```
+
+### Component CSS
+```css
+.voice-pill {
+  --vp-accent: #f5f5f5;
+  --vp-icon: #a1a1aa;
+  --vp-bg: #27272a;
+  --vp-size: 28px;
+  --vp-radius: 14px;
+  --vp-reach: 8px;
+  --vp-extra: 0px;
+  --vp-clock-w: 0px;
+  --vp-wave-w: 0px;
+  --vp-slide: 0px;
+  --vp-cancel: 0;
+  --vp-stop: 9px;
+  --vp-icon-size: 15px;
+  --vp-time-size: 10px;
+  --vp-open: 200ms;
+  --vp-press: 0.95;
+  --vp-hit: 8px;
+  --vp-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  isolation: isolate;
+  width: var(--vp-size);
+  height: var(--vp-size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--vp-radius);
+  background: transparent;
+  color: var(--vp-icon);
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  transition:
+    transform 160ms var(--vp-ease-out),
+    color 150ms ease;
+}
+
+.voice-pill::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--vp-hit));
+}
+
+.voice-pill[data-state='listening'] {
+  z-index: 1;
+  color: var(--vp-accent);
+}
+
+.voice-pill[data-pressed] {
+  transform: scale(var(--vp-press));
+}
+
+.voice-pill:disabled {
+  opacity: 0.55;
+  cursor: default;
+  pointer-events: none;
+}
+
+.voice-pill__capsule {
+  position: absolute;
+  inset: 0 0 0 calc(-1 * (var(--vp-reach) + var(--vp-extra)));
+  border-radius: var(--vp-radius);
+  background: var(--vp-bg);
+  clip-path: inset(0 0 0 calc(var(--vp-reach) + var(--vp-extra)) round var(--vp-radius));
+  pointer-events: none;
+  transition:
+    clip-path var(--vp-open) var(--vp-ease-out),
+    background-color 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .voice-pill[data-state='idle']:not(:disabled):hover .voice-pill__capsule {
+    background: color-mix(in srgb, var(--vp-icon) 10%, var(--vp-bg));
+  }
+}
+
+.voice-pill[data-state='listening'] .voice-pill__capsule {
+  clip-path: inset(0 0 round var(--vp-radius));
+}
+
+.voice-pill__time {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  display: grid;
+  place-items: center;
+  width: var(--vp-clock-w);
+  box-sizing: border-box;
+  color: var(--vp-accent);
+  font-size: var(--vp-time-size);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  opacity: 0;
+  filter: blur(2px);
+  transform: translateX(var(--vp-slide));
+  pointer-events: none;
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease,
+    transform 240ms var(--vp-ease-out);
+}
+
+.voice-pill[data-state='listening'] .voice-pill__time {
+  opacity: calc(1 - var(--vp-cancel));
+  filter: blur(0);
+}
+
+.voice-pill__wave {
+  position: absolute;
+  top: 18%;
+  right: calc(100% + var(--vp-clock-w));
+  width: var(--vp-wave-w);
+  height: 64%;
+  opacity: 0;
+  filter: blur(2px);
+  transform: translateX(var(--vp-slide));
+  pointer-events: none;
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease,
+    transform 240ms var(--vp-ease-out);
+}
+
+.voice-pill[data-state='listening'] .voice-pill__wave {
+  opacity: calc(1 - var(--vp-cancel));
+  filter: blur(0);
+}
+
+.voice-pill__cancel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: var(--vp-extra);
+  color: var(--vp-accent);
+  font-size: var(--vp-time-size);
+  font-weight: 500;
+  line-height: 1;
+  opacity: var(--vp-cancel);
+  pointer-events: none;
+}
+
+.voice-pill[data-sliding] .voice-pill__time,
+.voice-pill[data-sliding] .voice-pill__wave,
+.voice-pill[data-sliding] .voice-pill__glyph {
+  transition-property: opacity, filter;
+}
+
+.voice-pill__glyph {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--vp-size);
+  height: var(--vp-size);
+  transform: translateX(var(--vp-slide));
+  transition: transform 240ms var(--vp-ease-out);
+}
+
+.voice-pill__glyph > * {
+  grid-area: 1 / 1;
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease,
+    transform 200ms var(--vp-ease-out);
+}
+
+.voice-pill__mic {
+  display: inline-flex;
+}
+
+.voice-pill__stop {
+  width: var(--vp-stop);
+  height: var(--vp-stop);
+  border-radius: 22%;
+  background: currentColor;
+  opacity: 0;
+  filter: blur(2px);
+  transform: scale(0.6);
+}
+
+.voice-pill[data-state='listening'] .voice-pill__mic {
+  opacity: 0;
+  filter: blur(2px);
+  transform: scale(0.7);
+}
+
+.voice-pill[data-state='listening'] .voice-pill__stop {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+
+.voice-pill[data-input='key'] .voice-pill__capsule,
+.voice-pill[data-input='key'] .voice-pill__time,
+.voice-pill[data-input='key'] .voice-pill__glyph > * {
+  transition-duration: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-pill {
+    transform: none !important;
+    transition: color 150ms ease;
+  }
+
+  .voice-pill__capsule {
+    transition: background-color 150ms ease;
+  }
+
+  .voice-pill__glyph > * {
+    filter: none !important;
+    transform: none !important;
+    transition: opacity 200ms ease;
+  }
+
+  .voice-pill__time,
+  .voice-pill__wave,
+  .voice-pill__glyph {
+    filter: none !important;
+    transition-property: opacity;
+  }
+}
+
+```
+
+### Integration Instructions
+1. Install any listed dependencies.
+2. Copy the component source into the appropriate directory in the project.
+3. Import the CSS file alongside the component.
+4. Import and render the component using the usage example above as a starting point.
+5. Adjust props as needed for the specific use case — refer to the props table for all available options.
+
+### More from React Bits
+The full library index, including everything reactbits.dev offers, is at https://reactbits.dev/llms.txt — fetch it if this component is not the right fit or the project needs more pieces.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Integrate the <undefined /> component from React Bits
+
+You are helping integrate an open-source React component into an existing application.
+
+### Component: undefined
+### Variant: JavaScript + CSS
+### Dependencies: motion @hugeicons/react @hugeicons/core-free-icons
+
+---
+
+### Usage Example
+```jsx
+import ThoughtLine from './ThoughtLine';
+
+<ThoughtLine
+  working={isStreaming}
+  steps={['Reading the question', 'Searching your notes', 'Drafting an answer']}
+  label="Thinking…"
+  doneLabel="Thought for"
+  glyph="sparkle"
+  fontSize={16}
+  breathPeriod={1.6}
+  breathDepth={0.45}
+  settleDuration={350}
+  settleBlur={2}
+  collapsible
+  collapseOnSettle
+  showTimer
+  onSettle={seconds => console.log(`thought for ${seconds}s`)}
+/>
+```
+
+### Props
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| label | string | "Thinking…" | The working line. It breathes, and it is the spoken text. |
+| doneLabel | string | "" | The settled line. Empty gives "Thought for", or "Done thinking" without the timer. |
+| renderLabel | (text, working) => ReactNode | - | Wraps either string, for a sheen or a link. Inline content only. |
+| glyph | 'sparkle' | 'dot' | 'none' | ReactNode | 'sparkle' | The mark that breathes and dims. |
+| steps | string[] | [] | The trace beneath the line. Append as the agent progresses; the last step is current, earlier ones tick. |
+| collapsible | boolean | true | The line becomes a toggle for the trace, with a chevron. |
+| collapseOnSettle | boolean | true | Fold the trace into the line when it settles. |
+| color | string | "currentColor" | The ink of the line and the trace. |
+| glyphColor | string | "" | The glyph alone. Empty follows the ink. |
+| fontSize | number | 16 | Type size in px. Everything scales in em. |
+| breathPeriod | number | 1.6 | One breath, up and down, in seconds. |
+| breathDepth | number | 0.45 | How far the glyph and label dim at the trough. 0 is no breath. |
+| shimmer | boolean | true | A band of ink sweeps the working label. The label then leaves the breath to the glyph. |
+| shimmerDuration | number | 1.8 | One sweep, in seconds. |
+| settleDuration | number | 350 | The settle chord, in ms: crossfade, dim, glide, fold. |
+| settleBlur | number | 2 | Blur through the crossfade seam, in px. |
+| working | boolean | true | Working or settled. True again starts a new clock. |
+| settleAfter | number | 0 | Seconds after which the line settles by itself. 0 waits for working. |
+| elapsed | number | undefined | Controlled seconds. The internal clock never runs. |
+| showTimer | boolean | true | The live clock that freezes into the sentence. |
+| onSettle | (seconds) => void | - | Once per settle, with the frozen time. |
+| className | string | "" | Extra classes for the root. |
+| style | CSSProperties | - | Inline styles for the root. |
+
+### Full Component Source
+```jsx
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { animate, useReducedMotion } from 'motion/react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowDown01Icon, SparklesIcon, Tick02Icon } from '@hugeicons/core-free-icons';
+import './ThoughtLine.css';
+
+const EASE_OUT = [0.23, 1, 0.32, 1];
+const EASE_IN_OUT = [0.77, 0, 0.175, 1];
+const GLYPH_DONE = 0.55;
+const EMPTY_STEPS = [];
+
+const fmt = ds => (ds < 600 ? `${(ds / 10).toFixed(1)}s` : `${Math.floor(ds / 600)}m ${((ds % 600) / 10).toFixed(1)}s`);
+const spoken = ds =>
+  ds < 600
+    ? `${(ds / 10).toFixed(1)} seconds`
+    : `${Math.floor(ds / 600)} minutes ${((ds % 600) / 10).toFixed(1)} seconds`;
+
+export default function ThoughtLine({
+  label = 'Thinking…',
+  doneLabel = '',
+  renderLabel,
+  glyph = 'sparkle',
+  steps = EMPTY_STEPS,
+  collapsible = true,
+  collapseOnSettle = true,
+  color = 'currentColor',
+  glyphColor = '',
+  fontSize = 16,
+  breathPeriod = 1.6,
+  breathDepth = 0.45,
+  shimmer = true,
+  shimmerDuration = 1.8,
+  settleDuration = 350,
+  settleBlur = 2,
+  working = true,
+  settleAfter = 0,
+  elapsed,
+  showTimer = true,
+  onSettle,
+  className = '',
+  style
+}) {
+  const reduce = useReducedMotion();
+  const [autoSettled, setAutoSettled] = useState(false);
+  const [open, setOpen] = useState(true);
+  const isWorking = working && !autoSettled;
+  const doneText = doneLabel || (showTimer ? 'Thought for' : 'Done thinking');
+  const hasTrace = steps.length > 0;
+  const depth = reduce ? Math.min(breathDepth, 0.2) : breathDepth;
+  const period = reduce ? breathPeriod * 1.5 : breathPeriod;
+  const trough = 1 - depth;
+  const sheen = shimmer && !reduce;
+
+  const glyphRef = useRef(null);
+  const breathRef = useRef(null);
+  const timerRef = useRef(null);
+  const stackRef = useRef(null);
+  const workRef = useRef(null);
+  const doneRef = useRef(null);
+  const dsRef = useRef(0);
+  const prevWorking = useRef(isWorking);
+  const latest = useRef({});
+  latest.current = { onSettle };
+  const [announce, setAnnounce] = useState(label);
+
+  useEffect(() => {
+    if (working) setAutoSettled(false);
+  }, [working]);
+  useEffect(() => {
+    if (isWorking) setOpen(true);
+    else if (collapseOnSettle) setOpen(false);
+  }, [isWorking, collapseOnSettle]);
+
+  useEffect(() => {
+    const glyphEl = glyphRef.current;
+    const breathEl = breathRef.current;
+    if (!breathEl) return undefined;
+    const s = settleDuration / 1000;
+    const loop = (el, delay) =>
+      animate(el, { opacity: [trough, 1, trough] }, { duration: period, ease: EASE_IN_OUT, repeat: Infinity, delay });
+    let cancelled = false;
+    const running = [];
+    if (isWorking) {
+      if (depth > 0) {
+        if (sheen) running.push(animate(breathEl, { opacity: 1 }, { duration: 0.2, ease: EASE_OUT }));
+        if (glyphEl) {
+          const lead = animate(glyphEl, { opacity: trough }, { duration: 0.2, ease: EASE_OUT });
+          running.push(lead);
+          lead.then(() => {
+            if (cancelled) return;
+            running.push(loop(glyphEl, 0));
+            if (!sheen) running.push(loop(breathEl, 0.14));
+          });
+        } else if (!sheen) {
+          running.push(loop(breathEl, 0.14));
+        }
+      } else {
+        if (glyphEl) running.push(animate(glyphEl, { opacity: 1 }, { duration: 0.2, ease: EASE_OUT }));
+        running.push(animate(breathEl, { opacity: 1 }, { duration: 0.2, ease: EASE_OUT }));
+      }
+    } else {
+      if (glyphEl) running.push(animate(glyphEl, { opacity: GLYPH_DONE }, { duration: s, ease: EASE_OUT }));
+      running.push(animate(breathEl, { opacity: 1 }, { duration: s, ease: EASE_OUT }));
+    }
+    return () => {
+      cancelled = true;
+      running.forEach(a => a.stop());
+    };
+  }, [isWorking, period, depth, trough, settleDuration, glyph, sheen]);
+
+  const paint = ds => {
+    dsRef.current = ds;
+    if (timerRef.current) timerRef.current.textContent = fmt(ds);
+  };
+  useLayoutEffect(() => {
+    if (elapsed != null) {
+      paint(Math.round(elapsed * 10));
+      return undefined;
+    }
+    if (!isWorking) return undefined;
+    const startedAt = performance.now();
+    paint(0);
+    const id = setInterval(() => {
+      const ds = Math.floor((performance.now() - startedAt) / 100);
+      paint(ds);
+      if (settleAfter > 0 && ds >= Math.round(settleAfter * 10)) setAutoSettled(true);
+    }, 100);
+    return () => clearInterval(id);
+  }, [isWorking, elapsed, settleAfter]);
+
+  useLayoutEffect(() => {
+    const t = timerRef.current;
+    const stack = stackRef.current;
+    if (!t || !stack) return undefined;
+    const place = glide => {
+      const active = isWorking ? workRef.current : doneRef.current;
+      if (!active) return;
+      const shift = active.offsetWidth - stack.offsetWidth;
+      if (!glide) t.style.transition = 'none';
+      t.style.transform = `translateX(${shift}px)`;
+      if (!glide) {
+        void t.offsetWidth;
+        t.style.transition = '';
+      }
+    };
+    place(prevWorking.current !== isWorking);
+    prevWorking.current = isWorking;
+    const ro = new ResizeObserver(() => place(false));
+    if (workRef.current) ro.observe(workRef.current);
+    if (doneRef.current) ro.observe(doneRef.current);
+    return () => ro.disconnect();
+  }, [isWorking, label, doneText, fontSize, showTimer]);
+
+  useEffect(() => {
+    if (isWorking) {
+      setAnnounce(label);
+      return;
+    }
+    setAnnounce(showTimer ? `${doneText} ${spoken(dsRef.current)}` : doneText);
+    latest.current.onSettle?.(dsRef.current / 10);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWorking]);
+
+  const toggle = hasTrace && collapsible;
+  const head = (
+    <>
+      {glyph !== 'none' ? (
+        <span ref={glyphRef} className="thought-line__glyph" aria-hidden="true">
+          {glyph === 'sparkle' ? (
+            <HugeiconsIcon icon={SparklesIcon} size="100%" strokeWidth={2} />
+          ) : glyph === 'dot' ? (
+            <span className="thought-line__dot" />
+          ) : (
+            glyph
+          )}
+        </span>
+      ) : null}
+      <span ref={stackRef} className="thought-line__label" aria-hidden="true">
+        <span ref={workRef} className="thought-line__text" data-active={isWorking ? '' : undefined}>
+          <span ref={breathRef} className="thought-line__breath" data-shimmer={sheen ? '' : undefined}>
+            {renderLabel ? renderLabel(label, true) : label}
+          </span>
+        </span>
+        <span
+          ref={doneRef}
+          className="thought-line__text thought-line__text--done"
+          data-active={isWorking ? undefined : ''}
+        >
+          {renderLabel ? renderLabel(doneText, false) : doneText}
+        </span>
+      </span>
+      {showTimer ? (
+        <span ref={timerRef} className="thought-line__timer" data-done={isWorking ? undefined : ''} aria-hidden="true">
+          0.0s
+        </span>
+      ) : null}
+      {collapsible ? (
+        <span className="thought-line__chevron" data-on={hasTrace ? '' : undefined} aria-hidden="true">
+          <HugeiconsIcon icon={ArrowDown01Icon} size="1em" strokeWidth={2.2} />
+        </span>
+      ) : null}
+      <span className="thought-line__sr" role="status">
+        {announce}
+      </span>
+    </>
+  );
+
+  return (
+    <div
+      className={`thought-line${className ? ` ${className}` : ''}`}
+      data-working={isWorking ? '' : undefined}
+      data-open={open && hasTrace ? '' : undefined}
+      style={{
+        '--tl-font': `${fontSize}px`,
+        '--tl-color': color,
+        '--tl-glyph': glyphColor || color,
+        '--tl-settle': `${settleDuration}ms`,
+        '--tl-blur': `${settleBlur}px`,
+        '--tl-shimmer': `${shimmerDuration}s`,
+        ...style
+      }}
+    >
+      {collapsible ? (
+        <button
+          type="button"
+          className="thought-line__head"
+          data-toggle={toggle ? '' : undefined}
+          aria-expanded={toggle ? open : undefined}
+          tabIndex={toggle ? 0 : -1}
+          onClick={() => {
+            if (toggle) setOpen(v => !v);
+          }}
+        >
+          {head}
+        </button>
+      ) : (
+        <div className="thought-line__head">{head}</div>
+      )}
+      {hasTrace ? (
+        <div className="thought-line__trace" data-open={open ? '' : undefined} aria-hidden={!open}>
+          <div className="thought-line__fold">
+            <div className="thought-line__steps">
+              {steps.map((text, i) => {
+                const done = !isWorking || i < steps.length - 1;
+                return (
+                  <div key={`${i}-${text}`} className="thought-line__step" data-done={done ? '' : undefined}>
+                    <span className="thought-line__mark" aria-hidden="true">
+                      {done ? (
+                        <HugeiconsIcon icon={Tick02Icon} size="1em" strokeWidth={2.5} />
+                      ) : (
+                        <i className="thought-line__pulse" />
+                      )}
+                    </span>
+                    <span className="thought-line__step-text">{text}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+```
+
+### Component CSS
+```css
+.thought-line {
+  --tl-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --tl-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --tl-font: 16px;
+  --tl-color: currentColor;
+  --tl-glyph: currentColor;
+  --tl-settle: 350ms;
+  --tl-blur: 2px;
+  --tl-shimmer: 1.8s;
+  --tl-done: 0.75;
+  --tl-timer: 0.55;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: var(--tl-color);
+  font-family: inherit;
+  font-size: var(--tl-font);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.thought-line__head {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  outline: none;
+  cursor: default;
+}
+
+.thought-line__head[data-toggle] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.thought-line__glyph {
+  display: inline-flex;
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.2em;
+  color: var(--tl-glyph);
+}
+
+.thought-line__glyph svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.thought-line__dot {
+  width: 0.5em;
+  height: 0.5em;
+  margin: auto;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.thought-line__label {
+  display: inline-grid;
+}
+
+.thought-line__text {
+  grid-area: 1 / 1;
+  width: max-content;
+  opacity: 0;
+  filter: blur(var(--tl-blur));
+  transition:
+    opacity var(--tl-settle) var(--tl-ease-out),
+    filter var(--tl-settle) var(--tl-ease-out);
+}
+
+.thought-line__text[data-active] {
+  opacity: 1;
+  filter: blur(0);
+}
+
+.thought-line__text--done[data-active] {
+  opacity: var(--tl-done);
+}
+
+.thought-line__breath {
+  display: inline-block;
+}
+
+.thought-line[data-working] .thought-line__breath[data-shimmer] {
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--tl-color) 50%, transparent) 30%,
+    var(--tl-color) 50%,
+    color-mix(in srgb, var(--tl-color) 50%, transparent) 70%
+  );
+  background-size: 250% 100%;
+  background-position: 125% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: thought-line-shimmer var(--tl-shimmer) linear infinite;
+}
+
+@keyframes thought-line-shimmer {
+  to {
+    background-position: -125% 0;
+  }
+}
+
+.thought-line__timer {
+  font-variant-numeric: tabular-nums;
+  opacity: var(--tl-timer);
+  transition:
+    opacity var(--tl-settle) ease,
+    transform var(--tl-settle) var(--tl-ease-in-out);
+}
+
+.thought-line__timer[data-done] {
+  opacity: var(--tl-done);
+}
+
+.thought-line__chevron {
+  display: inline-flex;
+  margin-left: 0.1em;
+  opacity: 0;
+  transition:
+    opacity 200ms ease,
+    transform 200ms var(--tl-ease-out);
+}
+
+.thought-line__chevron[data-on] {
+  opacity: 0.55;
+}
+
+.thought-line[data-open] .thought-line__chevron {
+  transform: rotate(180deg);
+}
+
+.thought-line__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.thought-line__trace {
+  display: grid;
+  grid-template-rows: 0fr;
+  width: 0;
+  min-width: 100%;
+  transition: grid-template-rows var(--tl-settle) var(--tl-ease-out);
+}
+
+.thought-line__trace[data-open] {
+  grid-template-rows: 1fr;
+}
+
+.thought-line__fold {
+  min-height: 0;
+  overflow-x: visible;
+  overflow-y: clip;
+}
+
+.thought-line__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45em;
+  width: max-content;
+  padding: 0.6em 0 0.2em 1.6em;
+  font-size: 0.875em;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.thought-line__step {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 200ms var(--tl-ease-out),
+    transform 200ms var(--tl-ease-out);
+}
+
+@starting-style {
+  .thought-line__step {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.thought-line__mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1em;
+  height: 1em;
+  opacity: 0.55;
+}
+
+.thought-line__pulse {
+  display: block;
+  width: 0.4em;
+  height: 0.4em;
+  border-radius: 50%;
+  background: currentColor;
+  animation: thought-line-pulse 1.6s var(--tl-ease-in-out) infinite;
+}
+
+@keyframes thought-line-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.thought-line__step-text {
+  transition: opacity var(--tl-settle) ease;
+}
+
+.thought-line__step[data-done] .thought-line__step-text {
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thought-line__text {
+    filter: none !important;
+    transition: opacity var(--tl-settle) ease;
+  }
+
+  .thought-line__timer {
+    transition: opacity var(--tl-settle) ease;
+  }
+
+  .thought-line__step {
+    transform: none !important;
+    transition: opacity 200ms ease;
+  }
+
+  .thought-line__pulse {
+    animation-duration: 2.4s;
+  }
+}
+
+```
+
+### Integration Instructions
+1. Install any listed dependencies.
+2. Copy the component source into the appropriate directory in the project.
+3. Import the CSS file alongside the component.
+4. Import and render the component using the usage example above as a starting point.
+5. Adjust props as needed for the specific use case — refer to the props table for all available options.
+
+### More from React Bits
+The full library index, including everything reactbits.dev offers, is at https://reactbits.dev/llms.txt — fetch it if this component is not the right fit or the project needs more pieces.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## Integrate the <LatticeLoader /> component from React Bits
+
+You are helping integrate an open-source React component into an existing application.
+
+### Component: LatticeLoader
+### Variant: JavaScript + CSS
+
+
+---
+
+### Usage Example
+```jsx
+import LatticeLoader from './LatticeLoader';
+
+<LatticeLoader
+  status={isDone ? 'done' : 'working'}
+  label="Thinking"
+  doneLabel="Done in"
+  errorLabel="Failed after"
+  pattern="orbit"
+  grid={3}
+  shape="round"
+  doneColor="#22c55e"
+  errorColor="#ef4444"
+  cellSize={6}
+  gap={2}
+  fontSize={14}
+  step={90}
+  idleOpacity={0.15}
+  glow={false}
+  glowColor=""
+  showTimer
+/>
+```
+
+### Props
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| label | string | "Thinking" | The verb while working. |
+| doneLabel | string | "Done in" | The verb after status turns to done; the frozen time follows it. |
+| errorLabel | string | "Failed after" | The verb after status turns to error. |
+| status | "working" | "done" | "error" | "working" | Drives everything: the wave runs, or freezes and dissolves into a check or a cross while the stopwatch stops. |
+| pattern | string | { cells, loop?, scale? } | "orbit" | The wave geometry. At 3 x 3: arrow, dots, orbit, ripple, snake, spiral. At 4 x 4: sweep, spin, rain, pulse, orbit, snake. A custom object gives one delay per cell in step units (null for a hole), an optional loop and scale, and lit: the share of the cycle a cell stays bright, 0.25, 0.35, 0.45 or 0.62. |
+| grid | 3 | 4 | 3 | Cells per side. Each size has its own set of patterns and its own check and cross. |
+| shape | "square" | "round" | "round" | Rounded tiles or dots. |
+| color | string | "currentColor" | Ink for the cells, the verb and the stopwatch. Inherits the page colour by default. |
+| doneColor | string | "#22c55e" | Colour of the check. |
+| errorColor | string | "#ef4444" | Colour of the cross. |
+| cellSize | number | 6 | Cell side in pixels; the lattice is three cells and two gaps. |
+| gap | number | 2 | Seam between cells in pixels. |
+| fontSize | number | 14 | Verb size in pixels; the stopwatch and row gap scale with it. |
+| step | number | 90 | Milliseconds between neighbouring cells lighting; the whole loop scales with it. |
+| idleOpacity | number | 0.15 | How visible the dark silhouette is. |
+| glow | boolean | false | A halo on the lit cells and the mark. |
+| glowColor | string | "" | The halo colour. Empty follows the ink, and the mark colour for the mark. |
+| showTimer | boolean | true | Shows the live stopwatch. |
+| elapsed | number | undefined | Controlled elapsed seconds. When set, the internal clock never runs. |
+| className | string | "" | Extra classes for the row. |
+| style | CSSProperties | undefined | Inline styles merged onto the row. |
+
+### Full Component Source
+```jsx
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+
+import './LatticeLoader.css';
+
+const PATTERNS = {
+  arrow: { 3: { cells: [1, 2, 3, 0, 1, 2, 1, 2, 3], loop: 7.2, scale: 1 } },
+  dots: { 3: { cells: [0, 1, 2, 0, 1, 2, 0, 1, 2], loop: 3, scale: 2.4 } },
+  ripple: { 3: { cells: [2, 1, 2, 1, 0, 1, 2, 1, 2], loop: 4.8, scale: 1.5 } },
+  spiral: { 3: { cells: [0, 1, 2, 7, 8, 3, 6, 5, 4], loop: 9, scale: 1.2, lit: 0.35 } },
+  orbit: {
+    3: { cells: [0, 1, 2, 7, null, 3, 6, 5, 4], loop: 8, scale: 1.2 },
+    4: { cells: [0, 1, 2, 3, 11, null, null, 4, 10, null, null, 5, 9, 8, 7, 6], loop: 6, scale: 1.2, lit: 0.45 }
+  },
+  snake: {
+    3: { cells: [0, 1, 2, 5, 4, 3, 6, 7, 8], loop: 9, scale: 1, lit: 0.35 },
+    4: { cells: [0, 1, 2, 3, 7, 6, 5, 4, 8, 9, 10, 11, 15, 14, 13, 12], loop: 16, scale: 1, lit: 0.25 }
+  },
+  sweep: { 4: { cells: [0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6], loop: 5, scale: 1, lit: 0.45 } },
+  spin: { 4: { cells: [0, 0, 1, 1, 0, 0, 1, 1, 3, 3, 2, 2, 3, 3, 2, 2], loop: 4, scale: 1.6, lit: 0.35 } },
+  rain: { 4: { cells: [0, 2, 1, 3, 1, 3, 2, 4, 2, 4, 3, 5, 3, 5, 4, 6], loop: 4, scale: 1.2, lit: 0.35 } },
+  pulse: { 4: { cells: [2, 1, 1, 2, 1, 0, 0, 1, 1, 0, 0, 1, 2, 1, 1, 2], loop: 2.4, scale: 2.5, lit: 0.45 } }
+};
+const DEFAULT_PATTERN = { 3: 'orbit', 4: 'sweep' };
+const MARKS = {
+  3: { done: [2, 3, 5, 7], error: [0, 2, 4, 6, 8] },
+  4: { done: [7, 8, 10, 13], error: [0, 3, 5, 6, 9, 10, 12, 15] }
+};
+
+const resolvePattern = (pattern, grid) => {
+  if (typeof pattern === 'string') {
+    const named = PATTERNS[pattern];
+    return (named && named[grid]) || PATTERNS[DEFAULT_PATTERN[grid]][grid];
+  }
+  const cells = Array.from({ length: grid * grid }, (_, i) => pattern.cells[i] ?? null);
+  const max = Math.max(0, ...cells.filter(v => v != null));
+  return { cells, loop: pattern.loop ?? max + 4.2, scale: pattern.scale ?? 1, lit: pattern.lit ?? 0.62 };
+};
+const fmt = ds => (ds < 600 ? `${(ds / 10).toFixed(1)}s` : `${Math.floor(ds / 600)}m ${((ds % 600) / 10).toFixed(1)}s`);
+const spoken = ds =>
+  ds < 600
+    ? `${(ds / 10).toFixed(1)} seconds`
+    : `${Math.floor(ds / 600)} minutes ${((ds % 600) / 10).toFixed(1)} seconds`;
+
+export default function LatticeLoader({
+  label = 'Thinking',
+  doneLabel = 'Done in',
+  errorLabel = 'Failed after',
+  status = 'working',
+  pattern = 'orbit',
+  grid = 3,
+  shape = 'round',
+  color = 'currentColor',
+  doneColor = '#22c55e',
+  errorColor = '#ef4444',
+  cellSize = 6,
+  gap = 2,
+  fontSize = 14,
+  step = 90,
+  idleOpacity = 0.15,
+  glow = false,
+  glowColor = '',
+  showTimer = true,
+  elapsed,
+  className = '',
+  style
+}) {
+  const n = grid === 4 ? 4 : 3;
+  const pat = resolvePattern(pattern, n);
+  const marks = MARKS[n];
+  const d = step * pat.scale;
+  const cycle = Math.round(pat.loop * d);
+
+  const timerRef = useRef(null);
+  const dsRef = useRef(0);
+  const markRef = useRef('done');
+  const mark = status === 'working' ? markRef.current : status;
+  markRef.current = mark;
+  const [announce, setAnnounce] = useState(`${label}, in progress`);
+
+  const paint = ds => {
+    dsRef.current = ds;
+    if (timerRef.current) timerRef.current.textContent = fmt(ds);
+  };
+
+  useLayoutEffect(() => {
+    if (elapsed != null) {
+      paint(Math.round(elapsed * 10));
+      return undefined;
+    }
+    if (status !== 'working') return undefined;
+    const startedAt = performance.now();
+    paint(0);
+    const id = setInterval(() => paint(Math.floor((performance.now() - startedAt) / 100)), 100);
+    return () => clearInterval(id);
+  }, [status, elapsed]);
+
+  useEffect(() => {
+    if (status === 'working') setAnnounce(`${label}, in progress`);
+    else setAnnounce(`${status === 'done' ? doneLabel : errorLabel}${showTimer ? ` ${spoken(dsRef.current)}` : ''}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  return (
+    <span
+      role="status"
+      className={`lattice-loader${className ? ` ${className}` : ''}`}
+      data-status={status}
+      data-shape={shape}
+      data-glow={glow ? '' : undefined}
+      style={{
+        '--ll-n': n,
+        '--ll-cell': `${cellSize}px`,
+        '--ll-gap': `${gap}px`,
+        '--ll-font': `${fontSize}px`,
+        '--ll-color': color,
+        '--ll-mark': status === 'error' ? errorColor : doneColor,
+        '--ll-idle': idleOpacity,
+        '--ll-glow': glowColor || color,
+        '--ll-mark-glow': glowColor || (status === 'error' ? errorColor : doneColor),
+        '--ll-cycle': `${cycle}ms`,
+        ...style
+      }}
+    >
+      <span className="lattice-loader__grid" aria-hidden="true">
+        <span className="lattice-loader__layer lattice-loader__run">
+          {pat.cells.map((unit, i) => (
+            <span
+              key={i}
+              className="lattice-loader__cell"
+              data-hole={unit == null ? '' : undefined}
+              data-lit={pat.lit && pat.lit !== 0.62 ? Math.round(pat.lit * 100) : undefined}
+              style={unit == null ? undefined : { animationDelay: `${Math.round(unit * d)}ms` }}
+            />
+          ))}
+        </span>
+        <span className="lattice-loader__layer lattice-loader__mark">
+          {pat.cells.map((_, i) => (
+            <span key={i} className="lattice-loader__cell" data-on={marks[mark].includes(i) ? '' : undefined} />
+          ))}
+        </span>
+      </span>
+      <span className="lattice-loader__label" aria-hidden="true">
+        <span className="lattice-loader__text" data-active={status === 'working' ? '' : undefined}>
+          {label}
+        </span>
+        <span className="lattice-loader__text" data-active={status === 'done' ? '' : undefined}>
+          {doneLabel}
+        </span>
+        <span className="lattice-loader__text" data-active={status === 'error' ? '' : undefined}>
+          {errorLabel}
+        </span>
+      </span>
+      {showTimer ? (
+        <span ref={timerRef} className="lattice-loader__timer" aria-hidden="true">
+          0.0s
+        </span>
+      ) : null}
+      <span className="lattice-loader__sr">{announce}</span>
+    </span>
+  );
+}
+
+```
+
+### Component CSS
+```css
+.lattice-loader {
+  --ll-n: 3;
+  --ll-cell: 6px;
+  --ll-gap: 2px;
+  --ll-font: 14px;
+  --ll-color: currentColor;
+  --ll-mark: #22c55e;
+  --ll-idle: 0.15;
+  --ll-glow: currentColor;
+  --ll-mark-glow: #22c55e;
+  --ll-peak: 1;
+  --ll-cycle: 864ms;
+  --ll-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ll-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--ll-font) * 0.625);
+  font-family: inherit;
+  font-size: var(--ll-font);
+  line-height: 1;
+}
+
+.lattice-loader__grid {
+  display: grid;
+  flex: none;
+}
+
+.lattice-loader__layer {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns: repeat(var(--ll-n), var(--ll-cell));
+  gap: var(--ll-gap);
+}
+
+.lattice-loader__cell {
+  width: var(--ll-cell);
+  height: var(--ll-cell);
+  border-radius: max(1px, calc(var(--ll-cell) * 0.25));
+  background: var(--ll-color);
+  opacity: var(--ll-idle);
+}
+
+.lattice-loader[data-shape='round'] .lattice-loader__cell {
+  border-radius: 50%;
+}
+
+.lattice-loader[data-glow] .lattice-loader__run .lattice-loader__cell:not([data-hole]) {
+  box-shadow: 0 0 calc(var(--ll-cell) * 1.2) calc(var(--ll-cell) * 0.12) var(--ll-glow);
+}
+
+.lattice-loader[data-glow] .lattice-loader__mark .lattice-loader__cell[data-on] {
+  box-shadow: 0 0 calc(var(--ll-cell) * 1.2) calc(var(--ll-cell) * 0.12) var(--ll-mark-glow);
+}
+
+.lattice-loader__run {
+  transition: opacity 200ms ease;
+}
+
+.lattice-loader__run .lattice-loader__cell {
+  animation: lattice-on var(--ll-cycle) var(--ll-ease-in-out) infinite;
+}
+
+.lattice-loader__run .lattice-loader__cell[data-lit='45'] {
+  animation-name: lattice-on-45;
+}
+
+.lattice-loader__run .lattice-loader__cell[data-lit='35'] {
+  animation-name: lattice-on-35;
+}
+
+.lattice-loader__run .lattice-loader__cell[data-lit='25'] {
+  animation-name: lattice-on-25;
+}
+
+.lattice-loader__run .lattice-loader__cell[data-hole] {
+  animation: none;
+  opacity: calc(var(--ll-idle) * 0.47);
+}
+
+.lattice-loader__mark {
+  opacity: 0;
+  transform: scale(0.9);
+  transform-origin: center;
+  transition:
+    opacity 160ms var(--ll-ease-out),
+    transform 160ms var(--ll-ease-out);
+}
+
+.lattice-loader__mark .lattice-loader__cell {
+  transition:
+    opacity 200ms ease,
+    background-color 200ms ease;
+}
+
+.lattice-loader__mark .lattice-loader__cell[data-on] {
+  background: var(--ll-mark);
+  opacity: var(--ll-peak);
+}
+
+.lattice-loader:not([data-status='working']) .lattice-loader__run {
+  opacity: 0;
+}
+
+.lattice-loader:not([data-status='working']) .lattice-loader__run .lattice-loader__cell {
+  animation-play-state: paused;
+}
+
+.lattice-loader:not([data-status='working']) .lattice-loader__mark {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 200ms ease,
+    transform 200ms var(--ll-ease-out);
+}
+
+.lattice-loader__label {
+  position: relative;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.lattice-loader__text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  opacity: 0;
+  filter: blur(2px);
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease;
+}
+
+.lattice-loader__text[data-active] {
+  position: static;
+  opacity: 1;
+  filter: blur(0);
+}
+
+.lattice-loader__timer {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: calc(var(--ll-font) * 0.875);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+.lattice-loader__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@keyframes lattice-on {
+  0%,
+  100% {
+    opacity: var(--ll-idle);
+  }
+
+  18%,
+  42% {
+    opacity: var(--ll-peak);
+  }
+
+  62% {
+    opacity: var(--ll-idle);
+  }
+}
+
+@keyframes lattice-on-45 {
+  0%,
+  100% {
+    opacity: var(--ll-idle);
+  }
+
+  13%,
+  31% {
+    opacity: var(--ll-peak);
+  }
+
+  45% {
+    opacity: var(--ll-idle);
+  }
+}
+
+@keyframes lattice-on-35 {
+  0%,
+  100% {
+    opacity: var(--ll-idle);
+  }
+
+  10%,
+  24% {
+    opacity: var(--ll-peak);
+  }
+
+  35% {
+    opacity: var(--ll-idle);
+  }
+}
+
+@keyframes lattice-on-25 {
+  0%,
+  100% {
+    opacity: var(--ll-idle);
+  }
+
+  7%,
+  17% {
+    opacity: var(--ll-peak);
+  }
+
+  25% {
+    opacity: var(--ll-idle);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lattice-loader__run {
+    --ll-peak: 0.7;
+  }
+
+  .lattice-loader__run .lattice-loader__cell {
+    animation-delay: 0ms !important;
+    animation-duration: 1400ms !important;
+  }
+
+  .lattice-loader .lattice-loader__mark {
+    transform: none;
+  }
+
+  .lattice-loader .lattice-loader__text {
+    filter: none;
+  }
+}
+
+```
+
+### Integration Instructions
+1. Install any listed dependencies.
+2. Copy the component source into the appropriate directory in the project.
+3. Import the CSS file alongside the component.
+4. Import and render the component using the usage example above as a starting point.
+5. Adjust props as needed for the specific use case — refer to the props table for all available options.
+
+### More from React Bits
+The full library index, including everything reactbits.dev offers, is at https://reactbits.dev/llms.txt — fetch it if this component is not the right fit or the project needs more pieces.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,146 @@
+{
+  "app": {
+    "name": "Sahakar Sahayak",
+    "tagline": "Cooperative governance & legal assistance",
+    "notice": "Information about cooperative law, not legal advice."
+  },
+  "nav": {
+    "chat": "Ask",
+    "checklists": "Procedures",
+    "admin": "Admin",
+    "language": "Language",
+    "jurisdiction": "Jurisdiction",
+    "skip": "Skip to conversation"
+  },
+  "shell": {
+    "search": "Search conversations",
+    "collapse": "Hide sidebar",
+    "expand": "Show sidebar",
+    "menu": "Open menu",
+    "close": "Close menu",
+    "export": "Export chat",
+    "delete": "Delete conversation",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "week": "Previous 7 days",
+    "older": "Older",
+    "noHistory": "Conversations you start will be listed here.",
+    "noMatches": "No conversations match."
+  },
+  "chat": {
+    "placeholder": "Ask about membership, elections, audits, bylaws…",
+    "send": "Send",
+    "stop": "Stop",
+    "voice": "Speak your question",
+    "voiceUnsupported": "Voice input needs Chrome or Edge",
+    "listening": "Listening…",
+    "newChat": "New conversation",
+    "thinking": "Reading the Act…",
+    "you": "You",
+    "assistant": "Sahayak",
+    "emptyTitle": "What do you need to know?",
+    "greeting": "Namaste",
+    "answeringFrom": "Answering from",
+    "hint": "Enter to send · Shift + Enter for a new line",
+    "examples": [
+      {
+        "topic": "Registration",
+        "question": "How many members do we need to register a new society?"
+      },
+      {
+        "topic": "Meetings",
+        "question": "What is the quorum for an annual general meeting?"
+      },
+      {
+        "topic": "Board term",
+        "question": "Can the board extend its own term?"
+      },
+      {
+        "topic": "Complaints",
+        "question": "How do I file a complaint against the managing committee?"
+      }
+    ],
+    "sources": "Sources",
+    "verified": "Matches indexed text",
+    "unverified": "Could not verify — check the Act",
+    "stamp": "Not legal advice",
+    "escalate": "This involves a dispute or a deadline. Confirm with the Registrar's office or a lawyer before acting.",
+    "lowConfidence": "The Act is not clear on this. Treat the answer as a starting point.",
+    "helpful": "Helpful",
+    "notHelpful": "Not helpful",
+    "thanks": "Thanks — this improves future answers.",
+    "error": "The answer could not be generated. Check that the service is running and try again.",
+    "retry": "Try again",
+    "openSources": "Sources ({count})",
+    "answeredIn": "Answered in",
+    "trace": {
+      "detect": "Reading the question",
+      "detected": "Understood as {lang}",
+      "search": "Searching {act}",
+      "found": "Found {count} sections",
+      "verify": "Checking each section exists",
+      "draft": "Drafting the answer"
+    },
+    "tools": {
+      "search": "search",
+      "verify": "verify",
+      "draft": "draft",
+      "sections": "{count} sections",
+      "retry": "Retry"
+    },
+    "verifiedShort": "verified"
+  },
+  "checklists": {
+    "title": "Procedures",
+    "subtitle": "Step-by-step guides with the forms, fees and deadlines each one needs.",
+    "steps": "Steps",
+    "forms": "Forms",
+    "deadline": "Deadline",
+    "fee": "Fee",
+    "authority": "Authority",
+    "basis": "Legal basis",
+    "back": "All procedures",
+    "stepCount": "{count} steps"
+  },
+  "admin": {
+    "title": "Admin",
+    "documents": "Documents",
+    "glossary": "Glossary",
+    "queries": "Review queue",
+    "upload": "Upload document",
+    "reindex": "Rebuild index",
+    "documentsIntro": "Every Act, rule and circular the assistant can cite. Re-index after uploading a new version.",
+    "glossaryIntro": "Legal terms and their translations. The assistant uses these to keep wording consistent across languages.",
+    "queriesIntro": "Questions where the assistant was unsure or the member said the answer was wrong.",
+    "columns": {
+      "title": "Title",
+      "jurisdiction": "Jurisdiction",
+      "version": "Version",
+      "effective": "In force from",
+      "chunks": "Sections",
+      "status": "Status",
+      "term": "Term",
+      "source": "Source",
+      "question": "Question",
+      "language": "Language",
+      "confidence": "Confidence",
+      "reason": "Reason",
+      "asked": "Asked"
+    },
+    "status": {
+      "indexed": "Indexed",
+      "processing": "Processing",
+      "superseded": "Superseded",
+      "failed": "Failed"
+    },
+    "reasons": {
+      "low_confidence": "Low confidence",
+      "thumbs_down": "Marked not helpful",
+      "no_citation": "No citation found"
+    },
+    "addTerm": "Add term",
+    "review": "Review",
+    "empty": "Nothing to review.",
+    "processingLabel": "Indexing"
+  }
+}

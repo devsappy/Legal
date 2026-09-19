@@ -1,0 +1,411 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Tokens — lavender-grey neutrals on near-white, one violet accent.
+   The shell sits on a soft grey (--shell); content lives on a white
+   card (--sheet). App-level names (paper/sheet/ink/rule/...) map onto
+   the theme's background/card/foreground/border/primary tokens below.
+   --------------------------------------------------------------------------- */
+:root {
+  /* theme */
+  --background: #fdfdff;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --muted: #f1f1f8;
+  --muted-foreground: #6f6f80;
+  --secondary: #e2e2ee;
+  --secondary-foreground: #18181b;
+  --accent: #efeafd;
+  --accent-foreground: #6d4ff0;
+  --primary: #6d4ff0;
+  --primary-foreground: #ffffff;
+  --border: #e6e6ef;
+  --input: #e6e6ef;
+  --ring: #6d4ff0;
+  --destructive: #d92d20;
+  --success: #12805c;
+  --radius: 0.625rem;
+
+  /* app aliases */
+  --paper: var(--background);
+  --shell: #f3f3f9;
+  --sheet: var(--card);
+  --ink: var(--foreground);
+  --ink-2: #4a4a58;
+  --ink-3: var(--muted-foreground);
+  --rule: var(--border);
+  --rule-strong: #c8c8dc;
+  --violet: var(--primary);
+  --violet-soft: var(--accent);
+
+  /* hero orb, light → deep */
+  --orb-1: #f1edff;
+  --orb-2: #c9b8ff;
+  --orb-3: #8f6cff;
+  --seal: var(--destructive);
+  --seal-soft: #fdecea;
+  --verified: var(--success);
+  --verified-soft: #e6f4ee;
+
+  --ledger-line: 28px;
+
+  --font-display-stack: var(--font-body), system-ui, sans-serif;
+  --font-body-stack: var(--font-body), system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #09090b;
+    --foreground: #fafafa;
+    --card: #111114;
+    --card-foreground: #fafafa;
+    --muted: #17171c;
+    --muted-foreground: #8a8a9a;
+    --secondary: #202027;
+    --secondary-foreground: #fafafa;
+    --accent: #241b48;
+    --accent-foreground: #b8a3ff;
+    --primary: #a78bfa;
+    --primary-foreground: #14102a;
+    --border: #26262e;
+    --input: #26262e;
+    --ring: #a78bfa;
+    --destructive: #f0605a;
+    --success: #3ec48a;
+
+    --ink-2: #b4b4c2;
+    --rule-strong: #3a3a48;
+    --seal-soft: #3a1c1c;
+    --verified-soft: #10291e;
+    --shell: #09090b;
+    --orb-1: #2a2150;
+    --orb-2: #6d4ff0;
+    --orb-3: #c9b8ff;
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #111114;
+  --card-foreground: #fafafa;
+  --muted: #17171c;
+  --muted-foreground: #8a8a9a;
+  --secondary: #202027;
+  --secondary-foreground: #fafafa;
+  --accent: #241b48;
+  --accent-foreground: #b8a3ff;
+  --primary: #a78bfa;
+  --primary-foreground: #14102a;
+  --border: #26262e;
+  --input: #26262e;
+  --ring: #a78bfa;
+  --destructive: #f0605a;
+  --success: #3ec48a;
+
+  --ink-2: #b4b4c2;
+  --rule-strong: #3a3a48;
+  --seal-soft: #3a1c1c;
+  --verified-soft: #10291e;
+  --shell: #09090b;
+  --orb-1: #2a2150;
+  --orb-2: #6d4ff0;
+  --orb-3: #c9b8ff;
+}
+
+/* Indic locales: the display serif has no Devanagari/Tamil glyphs,
+   so headings fall back to the body face at a heavier weight. */
+html[lang="hi"],
+html[lang="mr"] {
+  --font-body-stack: var(--font-devanagari), var(--font-body), system-ui, sans-serif;
+  --font-display-stack: var(--font-devanagari), var(--font-body), sans-serif;
+}
+html[lang="ta"] {
+  --font-body-stack: var(--font-tamil), var(--font-body), system-ui, sans-serif;
+  --font-display-stack: var(--font-tamil), var(--font-body), sans-serif;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-seal: var(--seal);
+  --color-seal-soft: var(--seal-soft);
+  --color-verified: var(--verified);
+  --color-verified-soft: var(--verified-soft);
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+  --color-shell: var(--shell);
+  --color-muted: var(--muted);
+  --color-secondary: var(--secondary);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --font-display: var(--font-display-stack);
+  --font-sans: var(--font-body-stack);
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------- */
+html {
+  color-scheme: light dark;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body-stack);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display-stack);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+html[lang="hi"] h1,
+html[lang="hi"] h2,
+html[lang="mr"] h1,
+html[lang="mr"] h2,
+html[lang="ta"] h1,
+html[lang="ta"] h2 {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+::selection {
+  background: var(--accent);
+}
+
+/* Fields whose container already shows the focus state (focus-within). */
+.focus-quiet:focus-visible {
+  outline: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Ledger: ruled lines that line up with the citation entries.
+   --------------------------------------------------------------------------- */
+.ledger {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--ledger-line) - 1px),
+    var(--rule) calc(var(--ledger-line) - 1px),
+    var(--rule) var(--ledger-line)
+  );
+  background-size: 100% var(--ledger-line);
+  background-attachment: local;
+}
+
+.ledger-line {
+  line-height: var(--ledger-line);
+}
+
+/* Left margin rule, like the red line on ledger paper */
+.margin-rule {
+  position: relative;
+}
+.margin-rule::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--violet);
+  opacity: 0.6;
+}
+
+/* ---------------------------------------------------------------------------
+   Rubber stamp
+   --------------------------------------------------------------------------- */
+.stamp {
+  display: inline-block;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  padding: 3px 9px 2px;
+  transform: rotate(-2.5deg);
+  opacity: 0.82;
+  box-shadow: inset 0 0 0 1.5px var(--sheet), inset 0 0 0 2.5px currentColor;
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='40'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 1.9'/></filter><rect width='120' height='40' fill='white' filter='url(%23n)' opacity='0.92'/></svg>");
+  mask-size: 120px 40px;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='40'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 1.9'/></filter><rect width='120' height='40' fill='white' filter='url(%23n)' opacity='0.92'/></svg>");
+  -webkit-mask-size: 120px 40px;
+}
+
+/* ---------------------------------------------------------------------------
+   Citation marker inside answer text
+   --------------------------------------------------------------------------- */
+.cite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35em;
+  height: 1.35em;
+  padding: 0 0.3em;
+  margin: 0 0.12em;
+  vertical-align: 0.15em;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72em;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--violet-soft);
+  border: 1px solid color-mix(in srgb, var(--violet) 45%, transparent);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.cite:hover,
+.cite[data-active="true"] {
+  background: var(--violet);
+  border-color: var(--violet);
+  color: var(--primary-foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   Hero orb and greeting on the empty Ask page
+   --------------------------------------------------------------------------- */
+.orb {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0, rgba(255, 255, 255, 0) 38%),
+    radial-gradient(circle at 70% 75%, var(--orb-3) 0, transparent 55%),
+    radial-gradient(circle at 50% 50%, var(--orb-2) 0, var(--orb-1) 72%);
+  box-shadow:
+    inset 0 -10px 24px color-mix(in srgb, var(--orb-3) 35%, transparent),
+    0 18px 50px -10px color-mix(in srgb, var(--orb-3) 45%, transparent);
+  animation: orb-breathe 6s ease-in-out infinite;
+}
+.orb::before {
+  content: "";
+  position: absolute;
+  inset: -28px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--orb-2) 55%, transparent) 0, transparent 68%);
+  filter: blur(14px);
+  z-index: -1;
+  animation: orb-halo 6s ease-in-out infinite;
+}
+@keyframes orb-breathe {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.03);
+  }
+}
+@keyframes orb-halo {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.greeting {
+  background: linear-gradient(90deg, var(--orb-3), var(--orb-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   Motion
+   --------------------------------------------------------------------------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--ink-3);
+  animation: caret 900ms steps(1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--seal) 45%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+}
+.listening {
+  animation: pulse-ring 1.2s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .caret::after,
+  .listening,
+  .orb,
+  .orb::before {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Thin scrollbars inside panels */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-strong) transparent;
+}
