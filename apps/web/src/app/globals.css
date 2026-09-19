@@ -54,36 +54,8 @@
   --font-body-stack: var(--font-body), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --background: #09090b;
-    --foreground: #fafafa;
-    --card: #111114;
-    --card-foreground: #fafafa;
-    --muted: #17171c;
-    --muted-foreground: #8a8a9a;
-    --secondary: #202027;
-    --secondary-foreground: #fafafa;
-    --accent: #1f1f24;
-    --accent-foreground: #fafafa;
-    --primary: #fafafa;
-    --primary-foreground: #09090b;
-    --border: #26262e;
-    --input: #26262e;
-    --ring: #fafafa;
-    --destructive: #f0605a;
-    --success: #3ec48a;
-
-    --ink-2: #b4b4c2;
-    --rule-strong: #3a3a48;
-    --seal-soft: #3a1c1c;
-    --verified-soft: #10291e;
-    --shell: #09090b;
-    --orb-1: #1f1f24;
-    --orb-2: #55555f;
-    --orb-3: #c6c6cf;
-  }
-}
+/* Dark mode is opt-in via <html data-theme="dark">; the OS setting is ignored. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root[data-theme="dark"] {
   --background: #09090b;
@@ -160,7 +132,10 @@ html[lang="ta"] {
    Base
    --------------------------------------------------------------------------- */
 html {
-  color-scheme: light dark;
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
