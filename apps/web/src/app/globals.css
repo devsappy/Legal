@@ -239,6 +239,54 @@ html[lang="ta"] h2 {
   }
 }
 
+/* Landing skyline: every shape traces itself in, then the sky drifts */
+.skyline [pathLength] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 1.8s cubic-bezier(0.4, 0, 0.2, 1) var(--d, 0ms) forwards;
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.sky-float {
+  animation: sky-float 7s ease-in-out infinite;
+}
+.sky-drift {
+  animation: sky-drift 16s ease-in-out infinite;
+}
+.sky-sway {
+  transform-origin: 330px 52px;
+  animation: sky-sway 5s ease-in-out infinite;
+}
+@keyframes sky-float {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes sky-drift {
+  50% {
+    transform: translateX(16px);
+  }
+}
+@keyframes sky-sway {
+  50% {
+    transform: rotate(4deg) translateX(6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skyline [pathLength] {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+  .sky-float,
+  .sky-drift,
+  .sky-sway {
+    animation: none;
+  }
+}
+
 /* Fields whose container already shows the focus state (focus-within). */
 .focus-quiet:focus-visible {
   outline: none;

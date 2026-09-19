@@ -1,11 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowRight, Check, X } from "lucide-react";
+import { ArrowRight, BookOpenCheck, Check, Languages, Scale, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { JURISDICTIONS, LANGUAGES } from "@/lib/config";
-import { CHECKLISTS, DOCUMENTS, GLOSSARY, MOCK_ANSWER, pick } from "@/lib/mock-data";
+import { CHECKLISTS, DOCUMENTS, GLOSSARY, pick } from "@/lib/mock-data";
 import { BrandMark } from "@/components/ui/BrandMark";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
-import { ShaderBackdrop } from "@/components/landing/ShaderBackdrop";
+import { Skyline } from "@/components/landing/Skyline";
+import { JurisdictionSelect } from "@/components/layout/JurisdictionSelect";
 import { Reveal } from "@/components/landing/Reveal";
 import { CountUp } from "@/components/landing/CountUp";
 
@@ -23,35 +24,12 @@ const BTN_PRIMARY =
   "group h-11 px-5 inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-[14.5px] font-medium hover:bg-primary/90 transition-colors";
 const BTN_DARK =
   "group h-11 px-5 inline-flex items-center gap-2 rounded-md bg-ink text-paper text-[14.5px] font-medium hover:opacity-90 transition-opacity";
-const BTN_QUIET =
-  "h-11 px-5 inline-flex items-center rounded-md border border-rule-strong bg-white dark:bg-sheet text-[14.5px] font-medium text-ink hover:bg-muted transition-colors";
 const ARROW = "transition-transform group-hover:translate-x-0.5";
-
-/** Turns "[2]" markers into the same citation chips the assistant uses. */
-function withCites(text: string) {
-  return text.split(/(\[\d+\])/).map((part, i) => {
-    const m = /^\[(\d+)\]$/.exec(part);
-    return m ? (
-      <span key={i} className="cite" aria-label={`Source ${m[1]}`}>
-        {m[1]}
-      </span>
-    ) : (
-      <span key={i}>{part}</span>
-    );
-  });
-}
 
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations();
-
-  const examples = t.raw("chat.examples") as { topic: string; question: string }[];
-  const question = examples[1].question;
-  const answer = pick(MOCK_ANSWER.text, locale).split("\n\n")[0];
-  const sources = MOCK_ANSWER.citations.slice(0, 2);
-  const central = JURISDICTIONS[0];
-  const language = LANGUAGES.find((l) => l.code === locale)?.native;
 
   const steps = t.raw("landing.how.steps") as { title: string; body: string }[];
   const topics = t.raw("landing.topics.items") as { name: string; example: string }[];
@@ -70,104 +48,71 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
   return (
     <main className="landing relative flex-1 flex flex-col bg-white dark:bg-paper">
-      <ShaderBackdrop />
 
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/90 dark:bg-paper/90 backdrop-blur border-b border-rule-strong">
-        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-16 flex items-center gap-3">
+      {/* Header: brand, who-you-are picker, sign in, language */}
+      <header className="sticky top-0 z-30 bg-white/90 dark:bg-paper/90 backdrop-blur">
+        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-16 flex items-center gap-2 sm:gap-3">
           <Link href="/" className="min-w-0 flex items-center gap-2.5 font-semibold tracking-tight text-[15px] text-ink">
             <BrandMark />
-            <span className="truncate">{t("app.name")}</span>
+            <span className="hidden sm:inline truncate">{t("app.name")}</span>
           </Link>
-          <div className="ml-auto flex items-center gap-2 shrink-0">
-            <span className="hidden sm:inline-flex">
-              <LanguageSwitcher />
+          <div className="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
+            <span className="hidden md:inline-flex">
+              <JurisdictionSelect />
             </span>
             <Link
               href="/login"
-              className="hidden sm:inline-flex h-9 px-3.5 items-center whitespace-nowrap rounded-md text-[13.5px] font-medium text-ink-2 hover:text-ink hover:bg-muted transition-colors"
+              className="h-8 px-5 inline-flex items-center whitespace-nowrap rounded-full border border-rule-strong text-[13px] font-medium text-ink hover:bg-muted transition-colors"
             >
-              {t("landing.ctaSignIn")}
+              {t("login.title")}
             </Link>
-            <Link
-              href="/login"
-              className="group h-9 px-4 inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-ink text-paper text-[13.5px] font-medium hover:opacity-90 transition-opacity"
-            >
-              {t("landing.ctaDemo")}
-              <ArrowRight size={14} className={ARROW} aria-hidden />
-            </Link>
+            <LanguageSwitcher />
           </div>
         </div>
       </header>
 
-      {/* 1 · Hero: the claim on the left, the proof on the right */}
-      <section className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 py-12 sm:py-16 min-h-[calc(100dvh-4rem)] grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 items-center content-center">
-        <div>
+      {/* 1 · Hero: centred claim over a line-art streetscape, benefits band below */}
+      <section className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 min-h-[calc(100dvh-4rem-3.5rem)] flex flex-col overflow-hidden">
+        <div className="my-auto pt-10 sm:pt-14 pb-6 flex flex-col items-center text-center">
           <Reveal>
             <p className={KICKER}>{t("landing.eyebrow")}</p>
           </Reveal>
           <Reveal delay={80}>
-            <h1 className="text-[clamp(36px,4.6vw,58px)] font-semibold tracking-[-0.035em] leading-[1.04] text-ink text-balance">
+            <h1 className="text-[clamp(30px,4vw,50px)] font-semibold tracking-[-0.03em] leading-[1.08] text-ink text-balance max-w-[22ch]">
               {t("landing.title")}
             </h1>
           </Reveal>
           <Reveal delay={160}>
-            <p className="mt-6 text-[17px] sm:text-[19px] text-ink-2 leading-[1.55] max-w-[50ch] text-pretty">
+            <p className="mt-4 text-[16px] sm:text-[17.5px] text-ink-2 leading-[1.55] max-w-[46ch] text-pretty">
               {t("landing.subtitle")}
             </p>
           </Reveal>
           <Reveal delay={240}>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link href="/login" className={BTN_PRIMARY}>
-                {t("landing.ctaDemo")}
-                <ArrowRight size={16} className={ARROW} aria-hidden />
-              </Link>
-              <Link href="/login" className={BTN_QUIET}>
-                {t("landing.ctaSignIn")}
-              </Link>
-            </div>
-            <p className="mt-8 text-[13px] text-ink-3">{LANGUAGES.map((l) => l.native).join("  ·  ")}</p>
+            <Link href="/login" className={`${BTN_PRIMARY} mt-7 h-12 px-7 text-[15px] shadow-[0_10px_24px_-12px_var(--violet)]`}>
+              {t("landing.ctaDemo")}
+              <ArrowRight size={16} className={ARROW} aria-hidden />
+            </Link>
           </Reveal>
         </div>
-
-        <Reveal as="figure" delay={200} className="w-full rounded-md border border-rule-strong bg-white dark:bg-sheet overflow-hidden shadow-[0_1px_2px_rgba(9,9,11,0.04),0_12px_32px_-16px_rgba(9,9,11,0.18)]">
-          <figcaption className="h-11 px-4 flex items-center gap-3 border-b border-rule-strong bg-muted/60">
-            <span className="flex gap-1.5" aria-hidden>
-              <span className="h-2.5 w-2.5 rounded-sm bg-rule-strong" />
-              <span className="h-2.5 w-2.5 rounded-sm bg-rule-strong" />
-              <span className="h-2.5 w-2.5 rounded-sm bg-rule-strong" />
-            </span>
-            <span className="text-[12.5px] font-medium text-ink-2">{t("landing.sampleLabel")}</span>
-            <span className="ml-auto font-mono text-[11px] text-ink-3 truncate">
-              {central.short} · {language}
-            </span>
-          </figcaption>
-          <div className="p-4 sm:p-6 space-y-5">
-            <div className="flex justify-end">
-              <p className="max-w-[85%] rounded-md bg-violet-soft text-ink px-4 py-2.5 text-[14.5px]">{question}</p>
-            </div>
-            <div className="margin-rule pl-4 sm:pl-5">
-              <p className="text-[12.5px] font-medium text-ink-2 mb-1.5">{t("chat.assistant")}</p>
-              <p className="text-[14.5px] leading-[1.65] text-ink">{withCites(answer)}</p>
-              <ul className="mt-4 space-y-1.5">
-                {sources.map((c) => (
-                  <li key={c.id} className="flex items-baseline gap-2.5 text-[13px]">
-                    <span className="cite">{c.id}</span>
-                    <span className="font-mono text-[12px] text-ink-3 shrink-0">{c.section}</span>
-                    <span className="text-ink-2 truncate">{c.title}</span>
-                    {c.verified && (
-                      <span className="ml-auto shrink-0 inline-flex items-center gap-1 text-[11.5px] text-verified">
-                        <Check size={12} strokeWidth={2.5} aria-hidden /> {t("chat.verifiedShort")}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <span className="stamp mt-4">{t("chat.stamp")}</span>
-            </div>
-          </div>
-        </Reveal>
+        {/* Keeps a minimum width so phones see the centre of the street rather than a thin strip */}
+        <Skyline className="skyline w-[max(100%,880px)] max-w-none h-auto self-center text-rule-strong shrink-0 -mb-px" />
       </section>
+
+      {/* Benefits band */}
+      <div className="relative bg-violet text-primary-foreground">
+        <ul className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 min-h-14 py-3 grid gap-y-3 sm:grid-cols-3 items-center text-[13.5px] font-medium">
+          {[
+            { icon: BookOpenCheck, label: t("landing.features.cites.title") },
+            { icon: Languages, label: LANGUAGES.map((l) => l.native).join(" · ") },
+            { icon: Scale, label: t("landing.features.jurisdictions.title") },
+          ].map(({ icon: Icon, label }) => (
+            <li key={label} className="flex items-center gap-3 sm:justify-center">
+              <Icon size={20} strokeWidth={1.75} className="shrink-0 opacity-90" aria-hidden />
+              <span className="truncate">{label}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {/* 2 · How it works + the numbers */}
       <section className={SECTION}>
