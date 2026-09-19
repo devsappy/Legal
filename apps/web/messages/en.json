@@ -54,7 +54,109 @@
       }
     },
     "actsTitle": "Acts the assistant answers from",
-    "footerSignIn": "Sign in to the demo"
+    "footerSignIn": "Sign in to the demo",
+    "how": {
+      "title": "How it works",
+      "steps": [
+        {
+          "title": "Ask in your own words",
+          "body": "Type or speak the question in English, Hindi, Marathi or Tamil. No legal phrasing needed."
+        },
+        {
+          "title": "It reads the Act",
+          "body": "The assistant searches the Act and rules for your jurisdiction and checks each section it finds against the indexed text."
+        },
+        {
+          "title": "You get the sections",
+          "body": "The answer cites every section it relies on, marks anything it could not verify, and flags matters that need the Registrar or a lawyer."
+        }
+      ]
+    },
+    "stats": {
+      "languages": "Languages",
+      "acts": "Acts covered",
+      "procedures": "Step-by-step procedures",
+      "sections": "Sections indexed"
+    },
+    "topics": {
+      "title": "What you can ask",
+      "items": [
+        {
+          "name": "Membership",
+          "example": "Who is eligible to join, and how is a member removed?"
+        },
+        {
+          "name": "Elections",
+          "example": "How much notice does a board election need?"
+        },
+        {
+          "name": "Meetings",
+          "example": "What business must the AGM transact?"
+        },
+        {
+          "name": "Audits",
+          "example": "When is the annual audit due and who appoints the auditor?"
+        },
+        {
+          "name": "Bylaws",
+          "example": "How are bylaws amended and registered?"
+        },
+        {
+          "name": "Disputes",
+          "example": "Where do I take a dispute with the managing committee?"
+        }
+      ]
+    },
+    "procedures": {
+      "title": "Procedures, step by step",
+      "body": "Each guide lists the forms, fees, deadlines and the authority to approach.",
+      "steps": "{count} steps",
+      "open": "Open in the demo"
+    },
+    "glossary": {
+      "title": "One vocabulary, four languages",
+      "body": "Legal terms keep the same meaning whichever language you ask in."
+    },
+    "trust": {
+      "title": "What it is, and what it isn't",
+      "doesTitle": "It does",
+      "doesNotTitle": "It doesn't",
+      "does": [
+        "Cite the section of the Act behind every answer",
+        "Tell you when a section could not be verified",
+        "Point you to the Registrar or a lawyer when a dispute or deadline is involved"
+      ],
+      "doesNot": [
+        "Give legal advice or represent you",
+        "Guess when the Act is silent — it says so",
+        "Replace your society's registered bylaws"
+      ]
+    },
+    "faq": {
+      "title": "Common questions",
+      "items": [
+        {
+          "q": "Which Act does it answer from?",
+          "a": "The one you pick. The Multi-State Act is the default; switch to a state Act from the picker at the top of the app."
+        },
+        {
+          "q": "Can I ask by voice?",
+          "a": "Yes. Tap the microphone in the composer and speak. Voice input works in Chrome and Edge."
+        },
+        {
+          "q": "Are my questions stored?",
+          "a": "Conversations stay in your browser so you can reopen them. Questions the assistant was unsure about go to a review queue to improve future answers."
+        },
+        {
+          "q": "Is this a lawyer?",
+          "a": "No. It explains cooperative law and cites its sources. For a dispute or a deadline, confirm with the Registrar's office or a lawyer before acting."
+        }
+      ]
+    },
+    "cta": {
+      "title": "See it answer a real question",
+      "body": "Sign in with the demo account and ask about your society."
+    }
   },
   "login": {
     "title": "Sign in",
