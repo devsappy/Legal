@@ -110,7 +110,7 @@ export function ShaderBackdrop() {
       uPaper: { value: cssColor("--paper", "#fdfdff") },
       uSoft: { value: cssColor("--violet-soft", "#efeafd") },
       uTint: { value: cssColor("--orb-2", "#c9b8ff") },
-      uAmount: { value: 0.9 },
+      uAmount: { value: 0.7 },
     };
     const material = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms, depthTest: false });
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
