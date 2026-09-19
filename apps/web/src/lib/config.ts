@@ -1,9 +1,18 @@
 import type { Locale } from "@/i18n/routing";
 
-/** Backend base URL. When unset, the UI talks to the built-in mock stream so it runs standalone. */
+/**
+ * Where answers come from:
+ *  - NEXT_PUBLIC_API_URL set      → an external backend implementing POST {API_URL}/v1/chat
+ *  - NEXT_PUBLIC_CHAT_MODE=mock   → the canned stream in /api/mock/chat (no model needed)
+ *  - otherwise                    → /api/chat, the built-in RAG pipeline over ./corpus via llama.cpp
+ */
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
-export const CHAT_ENDPOINT = API_URL ? `${API_URL}/v1/chat` : "/api/mock/chat";
+export const CHAT_ENDPOINT = API_URL
+  ? `${API_URL}/v1/chat`
+  : process.env.NEXT_PUBLIC_CHAT_MODE === "mock"
+    ? "/api/mock/chat"
+    : "/api/chat";
 
 export const LANGUAGES: { code: Locale; label: string; native: string; speech: string }[] = [
   { code: "en", label: "English", native: "English", speech: "en-IN" },

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "llm": "powershell -ExecutionPolicy Bypass -File scripts/llm.ps1"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.3",

@@ -6,7 +6,29 @@ Next.js 16 frontend for the multilingual cooperative governance & legal assistan
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000  (redirects to /en)
+npm run llm        # terminal 1: local model server (llama.cpp, downloads the model on first run)
+npm run dev        # terminal 2: http://localhost:3000  (redirects to /en)
+```
+
+`npm run llm` needs llama.cpp (`winget install llama.cpp`) and serves
+`unsloth/Qwen3.5-4B-GGUF:Q4_K_M` (2.7 GB, fits a 6 GB GPU) on http://127.0.0.1:8080
+with an OpenAI-compatible API. Pick another GGUF with `LLM_HF_MODEL`, e.g.
+`unsloth/Qwen3.5-9B-GGUF:Q4_K_M` on an 8 GB+ card or `unsloth/gemma-3-4b-it-GGUF:Q4_K_M`.
+
+Answers come from the built-in pipeline in `src/app/api/chat/route.ts`:
+
+1. one small JSON call classifies language, intent and escalation and turns the
+   question into English search terms;
+2. BM25 (`src/lib/rag/search.ts`) picks the top sections from `./corpus` for the
+   chosen jurisdiction (plus `central`);
+3. the model answers from those sections only, citing them as `[n]`.
+
+The corpus ships with short excerpts; add the Acts as Markdown, one `##` per
+section — see `corpus/README.md`. Set `NEXT_PUBLIC_CHAT_MODE=mock` to use the
+canned stream instead, or `NEXT_PUBLIC_API_URL` to talk to an external backend:
+
+```bash
+cp .env.example .env.local
 ```
 
 ## Pages and sign-in
