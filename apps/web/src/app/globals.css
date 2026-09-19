@@ -8,20 +8,20 @@
    --------------------------------------------------------------------------- */
 :root {
   /* theme */
-  --background: #fdfdff;
+  --background: #ffffff;
   --foreground: #09090b;
   --card: #ffffff;
   --card-foreground: #09090b;
-  --muted: #f1f1f8;
-  --muted-foreground: #6f6f80;
-  --secondary: #e2e2ee;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --secondary: #e4e4e7;
   --secondary-foreground: #18181b;
-  --accent: #f1f1f4;
+  --accent: #f4f4f5;
   --accent-foreground: #09090b;
   --primary: #09090b;
   --primary-foreground: #ffffff;
-  --border: #e4e4e9;
-  --input: #e4e4e9;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
   --ring: #09090b;
   --destructive: #d92d20;
   --success: #12805c;
@@ -29,13 +29,13 @@
 
   /* app aliases */
   --paper: var(--background);
-  --shell: #f3f3f9;
+  --shell: #ffffff;
   --sheet: var(--card);
   --ink: var(--foreground);
-  --ink-2: #4a4a58;
+  --ink-2: #3f3f46;
   --ink-3: var(--muted-foreground);
   --rule: var(--border);
-  --rule-strong: #c8c8dc;
+  --rule-strong: #c9c9ce;
   --brand: var(--primary);
   --brand-soft: var(--accent);
 
