@@ -21,7 +21,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
 
   return (
     <main className="flex-1 flex flex-col bg-paper">
-      <header className="mx-auto w-full max-w-6xl px-5 sm:px-6 h-16 flex items-center gap-3 border-b border-rule">
+      <header className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-16 flex items-center gap-3 border-b border-rule">
         <Link href="/" className="min-w-0 flex items-center gap-2.5 font-semibold tracking-tight text-[15px] text-ink">
           <BrandMark />
           <span className="truncate">{t("app.name")}</span>

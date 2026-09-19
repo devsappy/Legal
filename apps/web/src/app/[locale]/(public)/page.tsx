@@ -38,7 +38,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
     <main className="flex-1 flex flex-col bg-paper">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-paper/90 backdrop-blur border-b border-rule">
-        <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 h-16 flex items-center gap-3">
+        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-16 flex items-center gap-3">
           <Link href="/" className="min-w-0 flex items-center gap-2.5 font-semibold tracking-tight text-[15px] text-ink">
             <BrandMark />
             <span className="truncate">{t("app.name")}</span>
@@ -65,7 +65,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </header>
 
       {/* Hero: the claim on the left, the proof on the right */}
-      <section className="rise mx-auto w-full max-w-6xl px-5 sm:px-6 pt-16 sm:pt-24 pb-16 sm:pb-24 grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 items-center">
+      <section className="rise mx-auto w-full max-w-[1400px] px-5 sm:px-8 pt-16 sm:pt-24 pb-16 sm:pb-24 grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 items-center">
         <div>
           <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-violet mb-5">{t("landing.eyebrow")}</p>
           <h1 className="text-[clamp(36px,4.6vw,58px)] font-medium tracking-[-0.035em] leading-[1.04] text-ink text-balance">
@@ -128,7 +128,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </section>
 
       {/* What it does: a ruled list, not boxes */}
-      <section className="mx-auto w-full max-w-6xl px-5 sm:px-6 pb-16 sm:pb-24">
+      <section className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 pb-16 sm:pb-24">
         <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8">
           {FEATURES.map((key) => (
             <li key={key} className="border-t border-rule-strong pt-5">
@@ -140,7 +140,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </section>
 
       {/* Acts */}
-      <section className="mx-auto w-full max-w-6xl px-5 sm:px-6 pb-20 sm:pb-28 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+      <section className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 pb-20 sm:pb-28 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <h2 className="text-[13px] font-semibold uppercase tracking-[0.1em] text-ink-3 pt-1">{t("landing.actsTitle")}</h2>
         <ul className="border-t border-rule">
           {JURISDICTIONS.map((j) => (
@@ -154,7 +154,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </section>
 
       <footer className="border-t border-rule mt-auto">
-        <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 h-14 flex items-center gap-4 text-[12.5px] text-ink-3">
+        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-14 flex items-center gap-4 text-[12.5px] text-ink-3">
           <span className="truncate">{t("app.notice")}</span>
           <Link href="/login" className="ml-auto shrink-0 inline-flex items-center gap-1 text-ink-2 hover:text-ink">
             {t("landing.footerSignIn")} <ArrowRight size={12} aria-hidden />
