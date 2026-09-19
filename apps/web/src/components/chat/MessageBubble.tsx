@@ -30,7 +30,7 @@ export function MessageBubble({ message, onFeedback, onRetry }: Props) {
   if (isUser) {
     return (
       <article className="rise flex flex-col items-end" aria-label={t("you")}>
-        <div className="max-w-[92%] sm:max-w-[75%] rounded-2xl rounded-br-md bg-violet-soft text-ink px-4 py-2.5 text-[15px] whitespace-pre-wrap">
+        <div className="max-w-[92%] sm:max-w-[75%] rounded-2xl rounded-br-md bg-brand-soft text-ink px-4 py-2.5 text-[15px] whitespace-pre-wrap">
           {message.text}
         </div>
         <span className="mt-1 font-mono text-[10.5px] text-ink-3">{time}</span>
@@ -82,7 +82,7 @@ export function MessageBubble({ message, onFeedback, onRetry }: Props) {
               "mt-3 flex gap-2 rounded-lg px-3 py-2 text-[13px] max-w-[68ch]",
               message.meta?.escalate
                 ? "bg-seal-soft text-ink border border-seal/30"
-                : "bg-violet-soft text-ink border border-violet/30",
+                : "bg-brand-soft text-ink border border-brand/30",
             )}
           >
             <AlertTriangle size={15} className="shrink-0 mt-0.5 text-seal" aria-hidden />

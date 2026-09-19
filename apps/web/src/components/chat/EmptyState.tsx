@@ -48,7 +48,7 @@ export function EmptyState({ onPick, composer }: Props) {
           {composer}
           {/* Attached strip: which Act the answer will come from. */}
           <div className="mx-2 -mt-2 pt-4 pb-1.5 px-3 rounded-b-xl border border-t-0 border-rule bg-muted/60 flex items-center gap-2 text-[12.5px] text-ink-2 min-h-11">
-            <Scale size={13} className="text-violet shrink-0" aria-hidden />
+            <Scale size={13} className="text-brand shrink-0" aria-hidden />
             <span className="truncate">
               {t("chat.answeringFrom")}{" "}
               <span className="text-ink font-medium sm:hidden">{j?.short}</span>
@@ -58,7 +58,7 @@ export function EmptyState({ onPick, composer }: Props) {
             </span>
             <Link
               href="/checklists"
-              className="ml-auto shrink-0 inline-flex items-center gap-1 h-7 px-2 rounded-md border border-rule bg-sheet text-[12px] font-medium text-ink hover:border-violet/50 transition-colors"
+              className="ml-auto shrink-0 inline-flex items-center gap-1 h-7 px-2 rounded-md border border-rule bg-sheet text-[12px] font-medium text-ink hover:border-brand/50 transition-colors"
             >
               {t("nav.checklists")}
               <ArrowUpRight size={12} aria-hidden />
@@ -74,9 +74,9 @@ export function EmptyState({ onPick, composer }: Props) {
                 <button
                   type="button"
                   onClick={() => onPick(ex.question)}
-                  className="group w-full h-full flex flex-col items-start text-left rounded-xl border border-rule bg-sheet p-4 hover:border-violet/50 hover:shadow-[0_10px_30px_-18px_color-mix(in_srgb,var(--violet)_55%,transparent)] transition-[border-color,box-shadow]"
+                  className="group w-full h-full flex flex-col items-start text-left rounded-xl border border-rule bg-sheet p-4 hover:border-brand/50 hover:shadow-[0_10px_30px_-18px_color-mix(in_srgb,var(--brand)_55%,transparent)] transition-[border-color,box-shadow]"
                 >
-                  <span className="h-8 w-8 rounded-lg bg-muted text-ink-2 group-hover:bg-violet-soft group-hover:text-violet flex items-center justify-center mb-3 transition-colors">
+                  <span className="h-8 w-8 rounded-lg bg-muted text-ink-2 group-hover:bg-brand-soft group-hover:text-brand flex items-center justify-center mb-3 transition-colors">
                     <Icon size={16} strokeWidth={1.75} aria-hidden />
                   </span>
                   <span className="block text-[13.5px] font-medium text-ink mb-1">

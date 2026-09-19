@@ -14,7 +14,7 @@ export function IndexingIndicator({ label }: { label: string }) {
       cellSize={4}
       gap={2}
       fontSize={12}
-      color="var(--violet)"
+      color="var(--brand)"
       doneColor="var(--verified)"
       errorColor="var(--seal)"
       showTimer={false}

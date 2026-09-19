@@ -18,7 +18,7 @@ const FEATURES = ["cites", "languages", "jurisdictions", "procedures"] as const;
 const BOX = "grid gap-px bg-rule-strong border border-rule-strong rounded-md overflow-hidden";
 const CELL = "bg-white dark:bg-sheet p-5 sm:p-6 transition-colors hover:bg-muted/50";
 const SECTION = "relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 py-12 sm:py-16 min-h-dvh flex flex-col justify-center";
-const KICKER = "text-[12px] font-semibold uppercase tracking-[0.12em] text-violet mb-3";
+const KICKER = "text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-3 mb-3";
 const H2 = "text-[clamp(26px,3vw,36px)] font-semibold tracking-[-0.03em] leading-[1.1] text-ink";
 const BTN_PRIMARY =
   "group h-11 px-5 inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground text-[14.5px] font-medium hover:bg-primary/90 transition-colors";
@@ -88,7 +88,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             </p>
           </Reveal>
           <Reveal delay={240}>
-            <Link href="/login" className={`${BTN_PRIMARY} mt-7 h-12 px-7 text-[15px] shadow-[0_10px_24px_-12px_var(--violet)]`}>
+            <Link href="/login" className={`${BTN_PRIMARY} mt-7 h-12 px-7 text-[15px]`}>
               {t("landing.ctaDemo")}
               <ArrowRight size={16} className={ARROW} aria-hidden />
             </Link>
@@ -99,7 +99,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </section>
 
       {/* Benefits band */}
-      <div className="relative bg-violet text-primary-foreground">
+      <div className="relative bg-brand text-primary-foreground">
         <ul className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 min-h-14 py-3 grid gap-y-3 sm:grid-cols-3 items-center text-[13.5px] font-medium">
           {[
             { icon: BookOpenCheck, label: t("landing.features.cites.title") },
@@ -123,7 +123,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           <ol className="grid sm:grid-cols-3 gap-px bg-rule-strong" data-stagger>
             {steps.map((s, i) => (
               <li key={s.title} className={CELL}>
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-violet text-primary-foreground font-mono text-[12px] font-semibold">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-brand text-primary-foreground font-mono text-[12px] font-semibold">
                   {i + 1}
                 </span>
                 <h2 className="mt-7 text-[19px] font-semibold tracking-tight text-ink">{s.title}</h2>
@@ -134,7 +134,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           <dl className="grid grid-cols-2 lg:grid-cols-1 gap-px bg-rule-strong" data-stagger>
             {stats.map((s) => (
               <div key={s.label} className={`${CELL} py-4 sm:py-5`}>
-                <dd className="text-[34px] font-semibold tracking-[-0.03em] text-violet leading-none tabular-nums">
+                <dd className="text-[34px] font-semibold tracking-[-0.03em] text-brand leading-none tabular-nums">
                   <CountUp value={s.value} locale={locale} />
                 </dd>
                 <dt className="mt-1.5 text-[12.5px] font-medium text-ink-2">{s.label}</dt>
@@ -154,7 +154,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             {topics.map((tp) => (
               <li key={tp.name} className={`${CELL} group`}>
                 <h2 className="flex items-center gap-2 text-[16px] font-semibold tracking-tight text-ink">
-                  <span className="h-2 w-2 rounded-sm bg-violet transition-transform group-hover:scale-125" aria-hidden />
+                  <span className="h-2 w-2 rounded-sm bg-brand transition-transform group-hover:scale-125" aria-hidden />
                   {tp.name}
                 </h2>
                 <p className="mt-2 text-[14px] text-ink-2 leading-[1.55]">“{tp.example}”</p>
@@ -193,7 +193,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                     </span>
                     <h3 className="mt-3 text-[16.5px] font-semibold tracking-tight text-ink">{pick(c.title, locale)}</h3>
                     <p className="mt-1.5 text-[13.5px] text-ink-2 leading-[1.55] flex-1">{pick(c.summary, locale)}</p>
-                    <Link href="/login" className="group mt-4 inline-flex items-center gap-1 text-[13px] font-medium text-violet hover:text-ink transition-colors">
+                    <Link href="/login" className="group mt-4 inline-flex items-center gap-1 text-[13px] font-medium text-brand hover:text-ink transition-colors">
                       {t("landing.procedures.open")} <ArrowRight size={13} className={ARROW} aria-hidden />
                     </Link>
                   </li>
@@ -230,7 +230,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             <ul className="mt-5 border-t border-rule-strong" data-stagger>
               {JURISDICTIONS.map((j) => (
                 <li key={j.id} className="grid grid-cols-[7.5rem_1fr] sm:grid-cols-[8.5rem_1fr_auto] gap-x-4 items-baseline py-3 border-b border-rule text-[15px] hover:bg-muted/50 -mx-2 px-2 rounded-sm">
-                  <span className="font-mono text-[12.5px] text-violet">{j.short}</span>
+                  <span className="font-mono text-[12.5px] text-brand">{j.short}</span>
                   <span className="text-ink font-semibold">{j.name}</span>
                   <span className="hidden sm:block text-[13px] text-ink-3 truncate">{j.act}</span>
                 </li>
@@ -244,7 +244,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
               <ul className="space-y-2.5">
                 {does.map((d) => (
                   <li key={d} className="flex gap-2.5 text-[14px] text-ink-2 leading-snug">
-                    <span className="mt-0.5 h-5 w-5 shrink-0 rounded-sm bg-verified-soft text-verified inline-flex items-center justify-center">
+                    <span className="mt-0.5 h-5 w-5 shrink-0 rounded-sm bg-ink text-paper inline-flex items-center justify-center">
                       <Check size={13} strokeWidth={2.5} aria-hidden />
                     </span>
                     {d}
@@ -257,7 +257,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
               <ul className="space-y-2.5">
                 {doesNot.map((d) => (
                   <li key={d} className="flex gap-2.5 text-[14px] text-ink-2 leading-snug">
-                    <span className="mt-0.5 h-5 w-5 shrink-0 rounded-sm bg-seal-soft text-seal inline-flex items-center justify-center">
+                    <span className="mt-0.5 h-5 w-5 shrink-0 rounded-sm border border-rule-strong text-ink inline-flex items-center justify-center">
                       <X size={13} strokeWidth={2.5} aria-hidden />
                     </span>
                     {d}

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Tokens — lavender-grey neutrals on near-white, one violet accent.
+   Tokens — monochrome: black ink on white, greys for everything else.
    The shell sits on a soft grey (--shell); content lives on a white
    card (--sheet). App-level names (paper/sheet/ink/rule/...) map onto
    the theme's background/card/foreground/border/primary tokens below.
@@ -16,13 +16,13 @@
   --muted-foreground: #6f6f80;
   --secondary: #e2e2ee;
   --secondary-foreground: #18181b;
-  --accent: #efeafd;
-  --accent-foreground: #6d4ff0;
-  --primary: #6d4ff0;
+  --accent: #f1f1f4;
+  --accent-foreground: #09090b;
+  --primary: #09090b;
   --primary-foreground: #ffffff;
-  --border: #e6e6ef;
-  --input: #e6e6ef;
-  --ring: #6d4ff0;
+  --border: #e4e4e9;
+  --input: #e4e4e9;
+  --ring: #09090b;
   --destructive: #d92d20;
   --success: #12805c;
   --radius: 0.625rem;
@@ -36,13 +36,13 @@
   --ink-3: var(--muted-foreground);
   --rule: var(--border);
   --rule-strong: #c8c8dc;
-  --violet: var(--primary);
-  --violet-soft: var(--accent);
+  --brand: var(--primary);
+  --brand-soft: var(--accent);
 
   /* hero orb, light → deep */
-  --orb-1: #f1edff;
-  --orb-2: #c9b8ff;
-  --orb-3: #8f6cff;
+  --orb-1: #f2f2f5;
+  --orb-2: #c6c6cf;
+  --orb-3: #55555f;
   --seal: var(--destructive);
   --seal-soft: #fdecea;
   --verified: var(--success);
@@ -64,13 +64,13 @@
     --muted-foreground: #8a8a9a;
     --secondary: #202027;
     --secondary-foreground: #fafafa;
-    --accent: #241b48;
-    --accent-foreground: #b8a3ff;
-    --primary: #a78bfa;
-    --primary-foreground: #14102a;
+    --accent: #1f1f24;
+    --accent-foreground: #fafafa;
+    --primary: #fafafa;
+    --primary-foreground: #09090b;
     --border: #26262e;
     --input: #26262e;
-    --ring: #a78bfa;
+    --ring: #fafafa;
     --destructive: #f0605a;
     --success: #3ec48a;
 
@@ -79,9 +79,9 @@
     --seal-soft: #3a1c1c;
     --verified-soft: #10291e;
     --shell: #09090b;
-    --orb-1: #2a2150;
-    --orb-2: #6d4ff0;
-    --orb-3: #c9b8ff;
+    --orb-1: #1f1f24;
+    --orb-2: #55555f;
+    --orb-3: #c6c6cf;
   }
 }
 
@@ -94,13 +94,13 @@
   --muted-foreground: #8a8a9a;
   --secondary: #202027;
   --secondary-foreground: #fafafa;
-  --accent: #241b48;
-  --accent-foreground: #b8a3ff;
-  --primary: #a78bfa;
-  --primary-foreground: #14102a;
+  --accent: #1f1f24;
+  --accent-foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #09090b;
   --border: #26262e;
   --input: #26262e;
-  --ring: #a78bfa;
+  --ring: #fafafa;
   --destructive: #f0605a;
   --success: #3ec48a;
 
@@ -109,9 +109,9 @@
   --seal-soft: #3a1c1c;
   --verified-soft: #10291e;
   --shell: #09090b;
-  --orb-1: #2a2150;
-  --orb-2: #6d4ff0;
-  --orb-3: #c9b8ff;
+  --orb-1: #1f1f24;
+  --orb-2: #55555f;
+  --orb-3: #c6c6cf;
 }
 
 /* Indic locales: the display serif has no Devanagari/Tamil glyphs,
@@ -138,8 +138,8 @@ html[lang="ta"] {
   --color-seal-soft: var(--seal-soft);
   --color-verified: var(--verified);
   --color-verified-soft: var(--verified-soft);
-  --color-violet: var(--violet);
-  --color-violet-soft: var(--violet-soft);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
   --color-shell: var(--shell);
   --color-muted: var(--muted);
   --color-secondary: var(--secondary);
@@ -322,7 +322,7 @@ html[lang="ta"] h2 {
   top: 0;
   bottom: 0;
   width: 1px;
-  background: var(--violet);
+  background: var(--brand);
   opacity: 0.6;
 }
 
@@ -366,16 +366,16 @@ html[lang="ta"] h2 {
   font-weight: 600;
   line-height: 1;
   color: var(--ink);
-  background: var(--violet-soft);
-  border: 1px solid color-mix(in srgb, var(--violet) 45%, transparent);
+  background: var(--brand-soft);
+  border: 1px solid color-mix(in srgb, var(--brand) 45%, transparent);
   border-radius: 4px;
   cursor: pointer;
   transition: background 120ms ease;
 }
 .cite:hover,
 .cite[data-active="true"] {
-  background: var(--violet);
-  border-color: var(--violet);
+  background: var(--brand);
+  border-color: var(--brand);
   color: var(--primary-foreground);
 }
 

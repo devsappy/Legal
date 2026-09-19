@@ -123,7 +123,7 @@ export function Sidebar({ user, onCollapse, onNavigate, hotkey }: Props) {
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("shell.search")}
           aria-label={t("shell.search")}
-          className="h-8 w-full rounded-lg border border-rule bg-sheet pl-8 pr-10 text-[13px] text-ink placeholder:text-ink-3 outline-none focus:border-violet/60"
+          className="h-8 w-full rounded-lg border border-rule bg-sheet pl-8 pr-10 text-[13px] text-ink placeholder:text-ink-3 outline-none focus:border-brand/60"
         />
         {hotkey && (
           <kbd className="absolute right-2 top-1/2 -translate-y-1/2 font-mono text-[10px] text-ink-3 border border-rule rounded px-1 py-px bg-muted">
@@ -204,7 +204,7 @@ export function Sidebar({ user, onCollapse, onNavigate, hotkey }: Props) {
                             cellSize={3}
                             gap={2}
                             fontSize={10}
-                            color="var(--violet)"
+                            color="var(--brand)"
                             showTimer={false}
                           />
                         </span>
@@ -229,7 +229,7 @@ export function Sidebar({ user, onCollapse, onNavigate, hotkey }: Props) {
 
       {/* Signed-in user */}
       <div className="flex items-center gap-2.5 rounded-xl border border-rule bg-sheet p-2 pr-1.5">
-        <span className="h-9 w-9 shrink-0 rounded-full bg-violet-soft text-violet flex items-center justify-center text-[13px] font-semibold">
+        <span className="h-9 w-9 shrink-0 rounded-full bg-brand-soft text-brand flex items-center justify-center text-[13px] font-semibold">
           {user.name.slice(0, 1).toUpperCase()}
         </span>
         <span className="min-w-0 flex-1 leading-tight">

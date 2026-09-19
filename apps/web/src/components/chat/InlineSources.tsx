@@ -39,7 +39,7 @@ export function InlineSources({ citations, open, onToggle, active, onSelect }: P
         aria-expanded={open}
         className="w-full flex items-center gap-2 px-3 h-10 text-left text-[13px] text-ink-2 hover:bg-muted transition-colors"
       >
-        <BookOpen size={14} className="text-violet shrink-0" aria-hidden />
+        <BookOpen size={14} className="text-brand shrink-0" aria-hidden />
         <span className="font-medium text-ink">{t("openSources", { count: citations.length })}</span>
         <span className="hidden sm:inline text-ink-3">
           · {verified}/{citations.length} {t("verifiedShort")}
@@ -63,7 +63,7 @@ export function InlineSources({ citations, open, onToggle, active, onSelect }: P
                   aria-pressed={isActive}
                   className={clsx(
                     "w-full text-left px-3 py-2.5 transition-colors",
-                    isActive ? "bg-violet-soft/60" : "hover:bg-muted/70",
+                    isActive ? "bg-brand-soft/60" : "hover:bg-muted/70",
                   )}
                 >
                   <div className="flex items-start gap-2.5">
@@ -71,8 +71,8 @@ export function InlineSources({ citations, open, onToggle, active, onSelect }: P
                       className={clsx(
                         "mt-0.5 font-mono text-[11px] font-semibold w-5 h-5 shrink-0 inline-flex items-center justify-center rounded border",
                         isActive
-                          ? "bg-violet border-violet text-primary-foreground"
-                          : "border-violet/50 text-ink bg-violet-soft",
+                          ? "bg-brand border-brand text-primary-foreground"
+                          : "border-brand/50 text-ink bg-brand-soft",
                       )}
                     >
                       {c.id}
@@ -84,7 +84,7 @@ export function InlineSources({ citations, open, onToggle, active, onSelect }: P
                       </div>
                       <div className="text-[12.5px] text-ink-3 truncate">{c.act}</div>
                       {isActive && (
-                        <blockquote className="mt-1.5 text-[13px] text-ink-2 italic border-l-2 border-violet/40 pl-2.5">
+                        <blockquote className="mt-1.5 text-[13px] text-ink-2 italic border-l-2 border-brand/40 pl-2.5">
                           &ldquo;{c.excerpt}&rdquo;
                         </blockquote>
                       )}

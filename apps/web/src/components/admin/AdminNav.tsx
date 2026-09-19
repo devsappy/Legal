@@ -26,7 +26,7 @@ export function AdminNav() {
             className={clsx(
               "px-3 py-2 text-sm border-b-2 -mb-px transition-colors whitespace-nowrap",
               active
-                ? "border-violet text-ink font-medium"
+                ? "border-brand text-ink font-medium"
                 : "border-transparent text-ink-2 hover:text-ink",
             )}
           >

@@ -29,7 +29,7 @@ export default async function ChecklistsPage({ params }: { params: Promise<{ loc
             <li key={c.slug}>
               <Link
                 href={`/checklists/${c.slug}`}
-                className="group flex flex-col h-full rounded-lg border border-rule bg-sheet p-4 hover:border-violet transition-colors"
+                className="group flex flex-col h-full rounded-lg border border-rule bg-sheet p-4 hover:border-brand transition-colors"
               >
                 <span className="font-mono text-[11px] text-ink-3 tracking-wide mb-2">
                   {j?.short} · {t("stepCount", { count: c.steps.length })}

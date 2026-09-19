@@ -13,7 +13,7 @@ export function Select({ options, icon, className, ...rest }: Props) {
     <span className={clsx("relative inline-flex", className)}>
       {icon && (
         <span
-          className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-violet flex"
+          className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-brand flex"
           aria-hidden
         >
           {icon}

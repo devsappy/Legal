@@ -75,7 +75,7 @@ export function PipelineTrace({ message, onRetry }: Props) {
         glyph="dot"
         fontSize={13}
         color="var(--ink-2)"
-        glyphColor="var(--violet)"
+        glyphColor="var(--brand)"
         collapsible
         collapseOnSettle
         showTimer

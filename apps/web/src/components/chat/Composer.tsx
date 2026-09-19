@@ -28,7 +28,7 @@ export function Composer({ busy, speechLang, onSend, onStop, seed, autoFocus, cl
   const ref = useRef<HTMLTextAreaElement>(null);
 
   // The pill paints its waveform on a canvas, so it needs resolved colours.
-  const violet = useToken("--violet", "#6d4ff0");
+  const brand = useToken("--brand", "#6d4ff0");
   const inkSoft = useToken("--ink-2", "#4a4a58");
   const muted = useToken("--muted", "#f1f1f8");
 
@@ -80,10 +80,10 @@ export function Composer({ busy, speechLang, onSend, onStop, seed, autoFocus, cl
       }}
       className={clsx(
         "relative z-10 rounded-2xl border bg-sheet transition-[border-color,box-shadow]",
-        "shadow-[0_1px_2px_rgba(9,9,11,0.04),0_16px_48px_-24px_color-mix(in_srgb,var(--violet)_45%,transparent)]",
+        "shadow-[0_1px_2px_rgba(9,9,11,0.04),0_16px_48px_-24px_color-mix(in_srgb,var(--brand)_45%,transparent)]",
         speech.listening
-          ? "border-violet/60"
-          : "border-rule focus-within:border-violet/50 focus-within:shadow-[0_1px_2px_rgba(9,9,11,0.04),0_20px_56px_-24px_color-mix(in_srgb,var(--violet)_60%,transparent)]",
+          ? "border-brand/60"
+          : "border-rule focus-within:border-brand/50 focus-within:shadow-[0_1px_2px_rgba(9,9,11,0.04),0_20px_56px_-24px_color-mix(in_srgb,var(--brand)_60%,transparent)]",
         className,
       )}
     >
@@ -121,7 +121,7 @@ export function Composer({ busy, speechLang, onSend, onStop, seed, autoFocus, cl
             shape="pill"
             mode="auto"
             reactive="simulated"
-            accentColor={violet}
+            accentColor={brand}
             iconColor={inkSoft}
             background={muted}
             disabled={!speech.supported || busy}
@@ -149,7 +149,7 @@ export function Composer({ busy, speechLang, onSend, onStop, seed, autoFocus, cl
             cellSize={4}
             gap={2}
             fontSize={12}
-            color="var(--violet)"
+            color="var(--brand)"
             glow
             showTimer
           />
@@ -172,7 +172,7 @@ export function Composer({ busy, speechLang, onSend, onStop, seed, autoFocus, cl
               type="submit"
               disabled={!value.trim()}
               aria-label={t("send")}
-              className="h-9 w-9 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-[0_2px_8px_-2px_var(--violet)]"
+              className="h-9 w-9 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-[0_2px_8px_-2px_var(--brand)]"
             >
               <ArrowUp size={17} strokeWidth={2.5} />
             </button>

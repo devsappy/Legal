@@ -65,7 +65,7 @@ export function StatusPill({ kind, label }: { kind: "ok" | "warn" | "bad" | "mut
       className={clsx(
         "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11.5px] font-medium",
         kind === "ok" && "bg-verified-soft text-verified",
-        kind === "warn" && "bg-violet-soft text-ink",
+        kind === "warn" && "bg-brand-soft text-ink",
         kind === "bad" && "bg-seal-soft text-seal",
         kind === "muted" && "bg-muted text-ink-3",
       )}
@@ -75,7 +75,7 @@ export function StatusPill({ kind, label }: { kind: "ok" | "warn" | "bad" | "mut
         className={clsx(
           "w-1.5 h-1.5 rounded-full",
           kind === "ok" && "bg-verified",
-          kind === "warn" && "bg-violet",
+          kind === "warn" && "bg-brand",
           kind === "bad" && "bg-seal",
           kind === "muted" && "bg-ink-3",
         )}

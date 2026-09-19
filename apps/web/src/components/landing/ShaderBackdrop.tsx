@@ -5,7 +5,7 @@ import * as THREE from "three";
 
 /*
  * A slow, domain-warped noise field behind the landing page.
- * Paper → violet-soft only, so it reads as light on paper rather than a
+ * Paper → brand-soft only, so it reads as light on paper rather than a
  * colour gradient, and it fades out below the hero. Renders one frame when
  * the visitor prefers reduced motion, sleeps while the tab is hidden or
  * the hero is scrolled out of view.
@@ -108,7 +108,7 @@ export function ShaderBackdrop() {
       uRes: { value: new THREE.Vector2(1, 1) },
       uTime: { value: 0 },
       uPaper: { value: cssColor("--paper", "#fdfdff") },
-      uSoft: { value: cssColor("--violet-soft", "#efeafd") },
+      uSoft: { value: cssColor("--brand-soft", "#efeafd") },
       uTint: { value: cssColor("--orb-2", "#c9b8ff") },
       uAmount: { value: 0.7 },
     };
@@ -127,7 +127,7 @@ export function ShaderBackdrop() {
     };
     const retheme = () => {
       uniforms.uPaper.value = cssColor("--paper", "#fdfdff");
-      uniforms.uSoft.value = cssColor("--violet-soft", "#efeafd");
+      uniforms.uSoft.value = cssColor("--brand-soft", "#efeafd");
       uniforms.uTint.value = cssColor("--orb-2", "#c9b8ff");
     };
 

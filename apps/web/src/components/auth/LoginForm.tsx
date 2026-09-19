@@ -39,7 +39,7 @@ export function LoginForm({ demo }: Props) {
   };
 
   const field =
-    "h-11 w-full rounded-xl border bg-sheet pl-10 pr-3 text-[15px] text-ink placeholder:text-ink-3 outline-none transition-colors focus:border-violet/60";
+    "h-11 w-full rounded-xl border bg-sheet pl-10 pr-3 text-[15px] text-ink placeholder:text-ink-3 outline-none transition-colors focus:border-brand/60";
 
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
@@ -95,8 +95,8 @@ export function LoginForm({ demo }: Props) {
       </button>
 
       {/* Demo account: one click fills the form, a second click signs in. */}
-      <div className="rounded-xl border border-dashed border-violet/40 bg-violet-soft/50 p-3.5">
-        <div className="flex items-center gap-2 text-[12.5px] font-medium text-violet mb-2">
+      <div className="rounded-xl border border-dashed border-brand/40 bg-brand-soft/50 p-3.5">
+        <div className="flex items-center gap-2 text-[12.5px] font-medium text-brand mb-2">
           <Sparkles size={14} aria-hidden />
           {t("demoTitle")}
         </div>
@@ -113,7 +113,7 @@ export function LoginForm({ demo }: Props) {
             setPassword(demo.password);
             setFailed(false);
           }}
-          className="mt-3 h-8 px-3 rounded-full border border-rule bg-sheet text-[12.5px] font-medium text-ink hover:border-violet/50 transition-colors"
+          className="mt-3 h-8 px-3 rounded-full border border-rule bg-sheet text-[12.5px] font-medium text-ink hover:border-brand/50 transition-colors"
         >
           {t("useDemo")}
         </button>
