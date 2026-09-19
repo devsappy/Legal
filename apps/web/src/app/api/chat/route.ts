@@ -18,6 +18,11 @@ export const dynamic = "force-dynamic";
 
 const LANG_NAME: Record<string, string> = { en: "English", hi: "Hindi", mr: "Marathi", ta: "Tamil" };
 
+/* Words that mean a real dispute or deadline is in play; these force the
+   escalation notice regardless of what the triage model decided. */
+const ESCALATE_WORDS =
+  /dispute|complaint|deadline|penalty|arbitration|court|notice period|शिकायत|विवाद|समय-सीमा|जुर्माना|तक्रार|वाद|मुदत|दंड|புகார்|தகராறு|காலக்கெடு|அபராதம்/i;
+
 type Analysis = {
   language_detected: "en" | "hi" | "mr" | "ta" | "other";
   intent: Intent;
@@ -86,7 +91,7 @@ export async function POST(req: NextRequest) {
           intent: analysis.intent,
           confidence: analysis.intent === "out_of_scope" ? 0.2 : confidenceOf(hits),
           language_detected: answerLang,
-          escalate: analysis.escalate || analysis.intent === "escalate",
+          escalate: analysis.escalate || analysis.intent === "escalate" || ESCALATE_WORDS.test(question),
         });
         send("citations", citations);
 

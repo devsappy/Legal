@@ -10,4 +10,5 @@ if (-not $llama) {
   if (Test-Path $pkg) { $llama = $pkg } else { Write-Error "llama.cpp not found. Run: winget install llama.cpp"; exit 1 }
 } else { $llama = $llama.Source }
 
-& $llama serve -hf $model --host 127.0.0.1 --port 8080 -c $ctx -ngl 99 -fa on -ctk q8_0 -ctv q8_0 --reasoning off -a sahayak
+# -dev Vulkan0 keeps everything on the discrete GPU; without it llama.cpp also spreads layers onto an Intel iGPU and prefill crawls.
+& $llama serve -hf $model --host 127.0.0.1 --port 8080 -c $ctx -ngl 99 -dev Vulkan0 -fa on --no-mmproj -np 2 --reasoning off -a sahayak
