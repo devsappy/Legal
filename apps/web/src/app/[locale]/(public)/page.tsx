@@ -72,8 +72,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </header>
 
       {/* 1 · Hero: centred claim over a line-art streetscape, benefits band below */}
-      <section className="relative mx-auto w-full max-w-[1400px] px-5 sm:px-8 min-h-[calc(100dvh-68px-3.5rem)] flex flex-col overflow-hidden">
-        <div className="my-auto pt-10 sm:pt-14 pb-6 flex flex-col items-center text-center">
+      <section className="relative w-full min-h-[calc(100dvh-68px-3.5rem)] flex flex-col overflow-hidden">
+        <div className="my-auto mx-auto w-full max-w-[1400px] px-5 sm:px-8 pt-10 sm:pt-14 pb-6 flex flex-col items-center text-center">
           <Reveal>
             <p className={KICKER}>{t("landing.eyebrow")}</p>
           </Reveal>
@@ -94,8 +94,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             </Link>
           </Reveal>
         </div>
-        {/* Keeps a minimum width so phones see the centre of the street rather than a thin strip */}
-        <Skyline className="skyline w-[max(100%,880px)] max-w-none h-auto self-center text-rule-strong shrink-0 -mb-px" />
+        {/* Edge to edge on wide screens; phones keep a minimum width and see the centre of the street */}
+        <Skyline className="skyline w-[max(100%,1200px)] max-w-none h-auto self-center text-rule-strong shrink-0 -mb-px" />
       </section>
 
       {/* Benefits band */}

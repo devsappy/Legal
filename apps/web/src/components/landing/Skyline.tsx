@@ -52,7 +52,7 @@ export function Skyline({ className }: { className?: string }) {
   const d = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
   return (
     <svg
-      viewBox="0 0 1400 340"
+      viewBox="-300 0 2000 340"
       className={className}
       fill="none"
       stroke="currentColor"
@@ -88,7 +88,68 @@ export function Skyline({ className }: { className?: string }) {
       </g>
 
       {/* Ground */}
-      <line x1="0" y1="320" x2="1400" y2="320" {...P} style={d(0)} />
+      <line x1="-300" y1="320" x2="1700" y2="320" {...P} style={d(0)} />
+
+      {/* Left wing: village houses, a well and a wind pump */}
+      <g style={d(150)}>
+        <rect x="-280" y="268" width="70" height="52" {...P} />
+        <path d="M-286 268 l41 -30 l41 30" {...P} />
+        <rect x="-258" y="290" width="14" height="30" {...P} />
+        <rect x="-232" y="280" width="14" height="12" {...P} />
+        <rect x="-196" y="258" width="84" height="62" {...P} />
+        <path d="M-202 258 l48 -34 l48 34" {...P} />
+        <rect x="-166" y="292" width="16" height="28" {...P} />
+        <rect x="-140" y="272" width="16" height="14" {...P} />
+        <rect x="-188" y="272" width="14" height="14" {...P} />
+        <line x1="-170" y1="238" x2="-170" y2="224" {...P} />
+        <line x1="-176" y1="224" x2="-164" y2="224" {...P} />
+      </g>
+      <Tree x={-100} y={320} s={0.9} />
+      <g style={d(250)}>
+        {/* well */}
+        <path d="M-70 320 v-26 a16 6 0 0 1 32 0 v26" {...P} />
+        <path d="M-70 294 a16 6 0 0 0 32 0" {...P} />
+        <line x1="-66" y1="294" x2="-66" y2="262" {...P} />
+        <line x1="-42" y1="294" x2="-42" y2="262" {...P} />
+        <path d="M-72 262 l18 -12 l18 12" {...P} />
+        {/* wind pump */}
+        <path d="M-14 320 l8 -100 l8 100" {...P} />
+        <line x1="-12" y1="290" x2="0" y2="290" {...P} />
+        <circle cx="-6" cy="216" r="16" {...P} />
+        <line x1="-6" y1="200" x2="-6" y2="232" {...P} />
+        <line x1="-22" y1="216" x2="10" y2="216" {...P} />
+        <line x1="-17" y1="205" x2="5" y2="227" {...P} />
+        <line x1="5" y1="205" x2="-17" y2="227" {...P} />
+      </g>
+
+      {/* Right wing: society hall, water tank, fence and trees */}
+      <g style={d(850)}>
+        <rect x="1400" y="246" width="120" height="74" {...P} />
+        <path d="M1394 246 l66 -40 l66 40" {...P} />
+        <line x1="1460" y1="206" x2="1460" y2="184" {...P} />
+        <path d="M1460 184 l14 5 l-14 5" {...P} />
+        <rect x="1450" y="286" width="20" height="34" {...P} />
+        <rect x="1412" y="262" width="18" height="16" {...P} />
+        <rect x="1490" y="262" width="18" height="16" {...P} />
+        <line x1="1400" y1="252" x2="1520" y2="252" {...P} />
+      </g>
+      <g style={d(950)}>
+        {/* water tank on stilts */}
+        <line x1="1552" y1="320" x2="1556" y2="232" {...P} />
+        <line x1="1596" y1="320" x2="1592" y2="232" {...P} />
+        <line x1="1556" y1="276" x2="1592" y2="276" {...P} />
+        <line x1="1556" y1="252" x2="1592" y2="252" {...P} />
+        <rect x="1546" y="200" width="56" height="32" {...P} />
+        <path d="M1546 200 a28 8 0 0 1 56 0" {...P} />
+        {/* fence */}
+        {Array.from({ length: 7 }, (_, i) => (
+          <line key={i} x1={1616 + i * 12} y1="320" x2={1616 + i * 12} y2="300" {...P} />
+        ))}
+        <line x1="1612" y1="306" x2="1692" y2="306" {...P} />
+        <line x1="1612" y1="314" x2="1692" y2="314" {...P} />
+      </g>
+      <Tree x={1536} y={320} s={0.8} />
+      <Tree x={1690} y={320} s={1.05} />
 
       {/* Sugar cooperative silos */}
       <g style={d(100)}>
