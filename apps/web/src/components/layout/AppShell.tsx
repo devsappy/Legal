@@ -9,14 +9,16 @@ import { useChatContext } from "@/components/chat/ChatProvider";
 import { JURISDICTIONS } from "@/lib/config";
 import { useJurisdiction } from "./JurisdictionProvider";
 import { JurisdictionSelect } from "./JurisdictionSelect";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Sidebar } from "./Sidebar";
+import type { SessionUser } from "@/lib/auth";
 import { Button } from "@/components/ui/Button";
 
 /**
  * Sidebar on the left, everything else on an inset white card.
  * Desktop can hide the sidebar; below `lg` it becomes a drawer.
  */
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ user, children }: { user: SessionUser; children: React.ReactNode }) {
   const t = useTranslations();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
@@ -52,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             !collapsed && "lg:flex lg:flex-col",
           )}
         >
-          <Sidebar hotkey onCollapse={() => setCollapsed(true)} />
+          <Sidebar user={user} hotkey onCollapse={() => setCollapsed(true)} />
         </aside>
 
         {/* Mobile drawer */}
@@ -65,7 +67,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className="absolute inset-0 bg-ink/30 backdrop-blur-[2px]"
             />
             <aside className="rise absolute inset-y-0 left-0 w-[min(88vw,300px)] bg-shell flex flex-col shadow-2xl">
-              <Sidebar onCollapse={() => setDrawer(false)} onNavigate={() => setDrawer(false)} />
+              <Sidebar user={user} onCollapse={() => setDrawer(false)} onNavigate={() => setDrawer(false)} />
             </aside>
           </div>
         )}
@@ -109,7 +111,7 @@ function TopBar({
   const pathname = usePathname();
   const chat = useChatContext();
   const { jurisdiction } = useJurisdiction();
-  const onAsk = pathname === "/";
+  const onAsk = pathname === "/ask";
   const hasChat = chat.messages.length > 0;
 
   const exportChat = () => {
@@ -158,6 +160,7 @@ function TopBar({
       <JurisdictionSelect />
 
       <div className="ml-auto flex items-center gap-2">
+        <LanguageSwitcher />
         {onAsk && (
           <Button size="sm" variant="outline" onClick={exportChat} disabled={!hasChat} className="h-8 rounded-full px-3">
             <Download size={13} /> <span className="hidden sm:inline">{t("shell.export")}</span>

@@ -4,9 +4,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { fontVariables } from "@/lib/fonts";
-import { AppShell } from "@/components/layout/AppShell";
 import { JurisdictionProvider } from "@/components/layout/JurisdictionProvider";
-import { ChatProvider } from "@/components/chat/ChatProvider";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -39,13 +37,9 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={fontVariables} suppressHydrationWarning>
-      <body className="h-dvh flex flex-col overflow-hidden bg-shell">
+      <body className="min-h-dvh flex flex-col bg-shell">
         <NextIntlClientProvider>
-          <JurisdictionProvider>
-            <ChatProvider>
-              <AppShell>{children}</AppShell>
-            </ChatProvider>
-          </JurisdictionProvider>
+          <JurisdictionProvider>{children}</JurisdictionProvider>
         </NextIntlClientProvider>
       </body>
     </html>

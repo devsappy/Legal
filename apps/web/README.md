@@ -9,6 +9,23 @@ npm install
 npm run dev        # http://localhost:3000  (redirects to /en)
 ```
 
+## Pages and sign-in
+
+| Route | What it is |
+|-------|------------|
+| `/{locale}` | Landing page |
+| `/{locale}/login` | Sign-in |
+| `/{locale}/ask` | The assistant (signed in) |
+| `/{locale}/checklists`, `/{locale}/admin` | Procedures and admin (signed in) |
+
+Sign-in is a demo: one fixed account, checked in `src/lib/auth.ts`, that sets an
+httpOnly session cookie. Replace `verify()` and `getSessionUser()` there when real
+accounts arrive.
+
+| Email | Password |
+|-------|----------|
+| `test@gmail.com` | `1234` |
+
 With no `NEXT_PUBLIC_API_URL` set, the chat talks to the built-in mock stream at
 `/api/mock/chat`, so the UI runs without the backend or Ollama. Point it at the
 FastAPI service with:

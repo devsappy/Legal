@@ -1,0 +1,18 @@
+import { Scale } from "lucide-react";
+import clsx from "clsx";
+
+/** The violet scale tile used in the sidebar, landing header and sign-in card. */
+export function BrandMark({ size = 28, className }: { size?: number; className?: string }) {
+  return (
+    <span
+      className={clsx(
+        "shrink-0 rounded-lg bg-gradient-to-br from-[var(--orb-3)] to-[var(--orb-2)] text-white flex items-center justify-center shadow-[0_2px_8px_-2px_var(--orb-3)]",
+        className,
+      )}
+      style={{ width: size, height: size }}
+      aria-hidden
+    >
+      <Scale size={Math.round(size * 0.54)} strokeWidth={2.25} />
+    </span>
+  );
+}

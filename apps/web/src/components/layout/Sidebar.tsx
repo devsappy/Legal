@@ -4,10 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   ListChecks,
+  LogOut,
   MessageSquareText,
   PanelLeftClose,
   Plus,
-  Scale,
   Search,
   Settings2,
   X,
@@ -16,11 +16,12 @@ import clsx from "clsx";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useChatContext } from "@/components/chat/ChatProvider";
 import { bucketOf, useHistory, type HistoryBucket } from "@/lib/history";
-import { LanguageSwitcher } from "./LanguageSwitcher";
 import { LatticeLoader } from "@/components/reactbits";
+import { BrandMark } from "@/components/ui/BrandMark";
+import type { SessionUser } from "@/lib/auth";
 
 const NAV = [
-  { href: "/", key: "chat", icon: MessageSquareText },
+  { href: "/ask", key: "chat", icon: MessageSquareText },
   { href: "/checklists", key: "checklists", icon: ListChecks, match: "/checklists" },
   { href: "/admin/documents", key: "admin", icon: Settings2, match: "/admin" },
 ] as const;
@@ -28,6 +29,7 @@ const NAV = [
 const BUCKETS: HistoryBucket[] = ["today", "yesterday", "week", "older"];
 
 type Props = {
+  user: SessionUser;
   onCollapse: () => void;
   /** Called after a nav or history pick, so a drawer can close. */
   onNavigate?: () => void;
@@ -35,7 +37,7 @@ type Props = {
   hotkey?: boolean;
 };
 
-export function Sidebar({ onCollapse, onNavigate, hotkey }: Props) {
+export function Sidebar({ user, onCollapse, onNavigate, hotkey }: Props) {
   const t = useTranslations();
   const pathname = usePathname();
   const router = useRouter();
@@ -60,8 +62,15 @@ export function Sidebar({ onCollapse, onNavigate, hotkey }: Props) {
     "match" in item ? pathname.startsWith(item.match) : pathname === item.href;
 
   const goToAsk = () => {
-    if (pathname !== "/") router.push("/");
+    if (pathname !== "/ask") router.push("/ask");
     onNavigate?.();
+  };
+
+  const signOut = async () => {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => null);
+    chat.reset();
+    router.replace("/login");
+    router.refresh();
   };
 
   const grouped = useMemo(() => {
@@ -79,9 +88,7 @@ export function Sidebar({ onCollapse, onNavigate, hotkey }: Props) {
     <div className="flex flex-col h-full min-h-0 px-3 pt-3 pb-3 gap-3">
       {/* Brand */}
       <div className="flex items-center gap-2.5 px-1 h-8">
-        <span className="h-7 w-7 shrink-0 rounded-lg bg-gradient-to-br from-[var(--orb-3)] to-[var(--orb-2)] text-white flex items-center justify-center shadow-[0_2px_8px_-2px_var(--orb-3)]">
-          <Scale size={15} strokeWidth={2.25} aria-hidden />
-        </span>
+        <BrandMark />
         <span className="font-semibold tracking-tight text-[15px] text-ink truncate">{t("app.name")}</span>
         <button
           type="button"
@@ -165,7 +172,7 @@ export function Sidebar({ onCollapse, onNavigate, hotkey }: Props) {
               <h2 className="px-2 mb-1 text-[11px] text-ink-3">{t(`shell.${b}`)}</h2>
               <ul className="space-y-px">
                 {grouped.get(b)!.map((c) => {
-                  const active = c.id === chat.sessionId && pathname === "/";
+                  const active = c.id === chat.sessionId && pathname === "/ask";
                   const working = active && chat.busy;
                   return (
                     <li key={c.id} className="group relative">
@@ -220,7 +227,25 @@ export function Sidebar({ onCollapse, onNavigate, hotkey }: Props) {
         )}
       </div>
 
-      <LanguageSwitcher variant="card" />
+      {/* Signed-in user */}
+      <div className="flex items-center gap-2.5 rounded-xl border border-rule bg-sheet p-2 pr-1.5">
+        <span className="h-9 w-9 shrink-0 rounded-full bg-violet-soft text-violet flex items-center justify-center text-[13px] font-semibold">
+          {user.name.slice(0, 1).toUpperCase()}
+        </span>
+        <span className="min-w-0 flex-1 leading-tight">
+          <span className="block text-[13px] font-medium text-ink truncate">{user.name}</span>
+          <span className="block text-[11px] text-ink-3 truncate">{user.email}</span>
+        </span>
+        <button
+          type="button"
+          onClick={signOut}
+          aria-label={t("shell.signOut")}
+          title={t("shell.signOut")}
+          className="h-8 w-8 shrink-0 inline-flex items-center justify-center rounded-md text-ink-3 hover:text-ink hover:bg-muted"
+        >
+          <LogOut size={15} />
+        </button>
+      </div>
     </div>
   );
 }

@@ -25,7 +25,48 @@
     "week": "Previous 7 days",
     "older": "Older",
     "noHistory": "Conversations you start will be listed here.",
-    "noMatches": "No conversations match."
+    "noMatches": "No conversations match.",
+    "signOut": "Sign out"
+  },
+  "landing": {
+    "eyebrow": "For cooperative societies across India",
+    "title": "Cooperative law, answered with the section it comes from.",
+    "subtitle": "Ask about membership, elections, audits and bylaws in your own language. Every answer cites the Act, so you can check it yourself.",
+    "ctaDemo": "Try the demo",
+    "ctaSignIn": "Sign in",
+    "sampleLabel": "Sample answer",
+    "features": {
+      "cites": {
+        "title": "Cites the section",
+        "body": "Each answer points to the section it relies on and flags any it could not verify against the indexed text."
+      },
+      "languages": {
+        "title": "Four languages",
+        "body": "English, Hindi, Marathi and Tamil. Type the question or speak it."
+      },
+      "jurisdictions": {
+        "title": "Six jurisdictions",
+        "body": "The Multi-State Act and the state Acts of Maharashtra, Gujarat, Karnataka, Tamil Nadu and West Bengal."
+      },
+      "procedures": {
+        "title": "Step-by-step procedures",
+        "body": "Registration, elections, general meetings and disputes, with the forms, fees and deadlines each one needs."
+      }
+    },
+    "actsTitle": "Acts the assistant answers from",
+    "footerSignIn": "Sign in to the demo"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Use the demo account to explore the assistant.",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "signingIn": "Signing in…",
+    "demoTitle": "Demo account",
+    "useDemo": "Fill in demo details",
+    "error": "That email and password don't match.",
+    "back": "Back to home"
   },
   "chat": {
     "placeholder": "Ask about membership, elections, audits, bylaws…",

@@ -339,6 +339,24 @@ html[lang="ta"] h2 {
   }
 }
 
+.orb--sm {
+  width: 56px;
+  height: 56px;
+}
+.orb--sm::before {
+  inset: -14px;
+  filter: blur(8px);
+}
+
+/* Soft violet wash behind the landing and sign-in pages */
+.landing-glow {
+  background-image: radial-gradient(
+    60% 40% at 50% -5%,
+    color-mix(in srgb, var(--orb-2) 28%, transparent) 0,
+    transparent 100%
+  );
+}
+
 .greeting {
   background: linear-gradient(90deg, var(--orb-3), var(--orb-2));
   -webkit-background-clip: text;
