@@ -7,7 +7,8 @@ import * as THREE from "three";
  * A slow, domain-warped noise field behind the landing page.
  * Paper → violet-soft only, so it reads as light on paper rather than a
  * colour gradient, and it fades out below the hero. Renders one frame when
- * the visitor prefers reduced motion, sleeps while the tab is hidden.
+ * the visitor prefers reduced motion, sleeps while the tab is hidden or
+ * the hero is scrolled out of view.
  */
 
 const VERT = /* glsl */ `
@@ -132,6 +133,7 @@ export function ShaderBackdrop() {
 
     let frame = 0;
     let running = false;
+    let onScreen = true;
     const start = performance.now();
     const draw = () => {
       uniforms.uTime.value = (performance.now() - start) / 1000;
@@ -142,7 +144,7 @@ export function ShaderBackdrop() {
       frame = requestAnimationFrame(loop);
     };
     const play = () => {
-      if (running || reduceMotion.matches || document.hidden) return;
+      if (running || reduceMotion.matches || document.hidden || !onScreen) return;
       running = true;
       frame = requestAnimationFrame(loop);
     };
@@ -170,6 +172,13 @@ export function ShaderBackdrop() {
       if (!running) draw();
     });
     ro.observe(canvas);
+    // Nothing to animate once the hero has scrolled away
+    const io = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      if (onScreen) play();
+      else pause();
+    });
+    io.observe(canvas);
     document.addEventListener("visibilitychange", visibility);
     reduceMotion.addEventListener("change", motion);
     darkMode.addEventListener("change", theme);
@@ -177,6 +186,7 @@ export function ShaderBackdrop() {
     return () => {
       pause();
       ro.disconnect();
+      io.disconnect();
       document.removeEventListener("visibilitychange", visibility);
       reduceMotion.removeEventListener("change", motion);
       darkMode.removeEventListener("change", theme);
