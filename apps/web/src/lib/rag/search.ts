@@ -55,10 +55,3 @@ export function search(sections: Section[], query: string, k = 5): Hit[] {
   }
   return hits.sort((a, b) => b.score - a.score).slice(0, k);
 }
-
-/** 0..1 — how convincingly the best hit beats "nothing matched". */
-export function confidenceOf(hits: Hit[]): number {
-  if (!hits.length) return 0.1;
-  const top = hits[0].score;
-  return Math.max(0.15, Math.min(0.95, top / (top + 4)));
-}

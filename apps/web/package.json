@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "llm": "powershell -ExecutionPolicy Bypass -File scripts/llm.ps1"
+    "llm": "powershell -ExecutionPolicy Bypass -File scripts/llm.ps1",
+    "ingest": "node scripts/ingest.mjs",
+    "embed": "powershell -ExecutionPolicy Bypass -File scripts/embed.ps1",
+    "eval": "node eval/run.mjs"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.3",
@@ -29,6 +32,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
+    "pdf-parse": "^2.4.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

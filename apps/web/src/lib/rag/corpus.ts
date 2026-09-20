@@ -38,6 +38,7 @@ async function listFiles(): Promise<{ file: string; jurisdiction: string; mtime:
     return out;
   }
   for (const dir of dirs) {
+    if (dir.startsWith("_")) continue; // _sources holds the original PDFs
     const full = path.join(CORPUS_DIR, dir);
     const st = await fs.stat(full).catch(() => null);
     if (!st?.isDirectory()) continue;

@@ -1,0 +1,1550 @@
+[
+  {
+    "id": "agm-central-en",
+    "topic": "agm",
+    "jurisdiction": "central",
+    "lang": "en",
+    "question": "When must the annual general meeting be held and what business does it transact?",
+    "expect": [
+      "§39"
+    ]
+  },
+  {
+    "id": "agm-central-hi",
+    "topic": "agm",
+    "jurisdiction": "central",
+    "lang": "hi",
+    "question": "वार्षिक आम सभा कब बुलानी होती है और उसमें कौन-सा कार्य होता है?",
+    "expect": [
+      "§39"
+    ]
+  },
+  {
+    "id": "agm-central-mr",
+    "topic": "agm",
+    "jurisdiction": "central",
+    "lang": "mr",
+    "question": "वार्षिक सर्वसाधारण सभा कधी घ्यावी लागते आणि तिच्यात कोणते कामकाज होते?",
+    "expect": [
+      "§39"
+    ]
+  },
+  {
+    "id": "agm-central-ta",
+    "topic": "agm",
+    "jurisdiction": "central",
+    "lang": "ta",
+    "question": "ஆண்டுப் பொதுக்கூட்டம் எப்போது நடத்த வேண்டும், அதில் என்ன விஷயங்கள் நடக்கும்?",
+    "expect": [
+      "§39"
+    ]
+  },
+  {
+    "id": "agm-maharashtra-en",
+    "topic": "agm",
+    "jurisdiction": "maharashtra",
+    "lang": "en",
+    "question": "When must the annual general meeting be held and what business does it transact?",
+    "expect": [
+      "§75"
+    ]
+  },
+  {
+    "id": "agm-maharashtra-hi",
+    "topic": "agm",
+    "jurisdiction": "maharashtra",
+    "lang": "hi",
+    "question": "वार्षिक आम सभा कब बुलानी होती है और उसमें कौन-सा कार्य होता है?",
+    "expect": [
+      "§75"
+    ]
+  },
+  {
+    "id": "agm-maharashtra-mr",
+    "topic": "agm",
+    "jurisdiction": "maharashtra",
+    "lang": "mr",
+    "question": "वार्षिक सर्वसाधारण सभा कधी घ्यावी लागते आणि तिच्यात कोणते कामकाज होते?",
+    "expect": [
+      "§75"
+    ]
+  },
+  {
+    "id": "agm-maharashtra-ta",
+    "topic": "agm",
+    "jurisdiction": "maharashtra",
+    "lang": "ta",
+    "question": "ஆண்டுப் பொதுக்கூட்டம் எப்போது நடத்த வேண்டும், அதில் என்ன விஷயங்கள் நடக்கும்?",
+    "expect": [
+      "§75"
+    ]
+  },
+  {
+    "id": "agm-gujarat-en",
+    "topic": "agm",
+    "jurisdiction": "gujarat",
+    "lang": "en",
+    "question": "When must the annual general meeting be held and what business does it transact?",
+    "expect": [
+      "§77"
+    ]
+  },
+  {
+    "id": "agm-gujarat-hi",
+    "topic": "agm",
+    "jurisdiction": "gujarat",
+    "lang": "hi",
+    "question": "वार्षिक आम सभा कब बुलानी होती है और उसमें कौन-सा कार्य होता है?",
+    "expect": [
+      "§77"
+    ]
+  },
+  {
+    "id": "agm-gujarat-mr",
+    "topic": "agm",
+    "jurisdiction": "gujarat",
+    "lang": "mr",
+    "question": "वार्षिक सर्वसाधारण सभा कधी घ्यावी लागते आणि तिच्यात कोणते कामकाज होते?",
+    "expect": [
+      "§77"
+    ]
+  },
+  {
+    "id": "agm-gujarat-ta",
+    "topic": "agm",
+    "jurisdiction": "gujarat",
+    "lang": "ta",
+    "question": "ஆண்டுப் பொதுக்கூட்டம் எப்போது நடத்த வேண்டும், அதில் என்ன விஷயங்கள் நடக்கும்?",
+    "expect": [
+      "§77"
+    ]
+  },
+  {
+    "id": "agm-karnataka-en",
+    "topic": "agm",
+    "jurisdiction": "karnataka",
+    "lang": "en",
+    "question": "When must the annual general meeting be held and what business does it transact?",
+    "expect": [
+      "§27"
+    ]
+  },
+  {
+    "id": "agm-karnataka-hi",
+    "topic": "agm",
+    "jurisdiction": "karnataka",
+    "lang": "hi",
+    "question": "वार्षिक आम सभा कब बुलानी होती है और उसमें कौन-सा कार्य होता है?",
+    "expect": [
+      "§27"
+    ]
+  },
+  {
+    "id": "agm-karnataka-mr",
+    "topic": "agm",
+    "jurisdiction": "karnataka",
+    "lang": "mr",
+    "question": "वार्षिक सर्वसाधारण सभा कधी घ्यावी लागते आणि तिच्यात कोणते कामकाज होते?",
+    "expect": [
+      "§27"
+    ]
+  },
+  {
+    "id": "agm-karnataka-ta",
+    "topic": "agm",
+    "jurisdiction": "karnataka",
+    "lang": "ta",
+    "question": "ஆண்டுப் பொதுக்கூட்டம் எப்போது நடத்த வேண்டும், அதில் என்ன விஷயங்கள் நடக்கும்?",
+    "expect": [
+      "§27"
+    ]
+  },
+  {
+    "id": "agm-tamil-nadu-en",
+    "topic": "agm",
+    "jurisdiction": "tamil-nadu",
+    "lang": "en",
+    "question": "When must the annual general meeting be held and what business does it transact?",
+    "expect": [
+      "§32"
+    ]
+  },
+  {
+    "id": "agm-tamil-nadu-hi",
+    "topic": "agm",
+    "jurisdiction": "tamil-nadu",
+    "lang": "hi",
+    "question": "वार्षिक आम सभा कब बुलानी होती है और उसमें कौन-सा कार्य होता है?",
+    "expect": [
+      "§32"
+    ]
+  },
+  {
+    "id": "agm-tamil-nadu-mr",
+    "topic": "agm",
+    "jurisdiction": "tamil-nadu",
+    "lang": "mr",
+    "question": "वार्षिक सर्वसाधारण सभा कधी घ्यावी लागते आणि तिच्यात कोणते कामकाज होते?",
+    "expect": [
+      "§32"
+    ]
+  },
+  {
+    "id": "agm-tamil-nadu-ta",
+    "topic": "agm",
+    "jurisdiction": "tamil-nadu",
+    "lang": "ta",
+    "question": "ஆண்டுப் பொதுக்கூட்டம் எப்போது நடத்த வேண்டும், அதில் என்ன விஷயங்கள் நடக்கும்?",
+    "expect": [
+      "§32"
+    ]
+  },
+  {
+    "id": "sgm-central-en",
+    "topic": "sgm",
+    "jurisdiction": "central",
+    "lang": "en",
+    "question": "Who can call a special general meeting and within what time?",
+    "expect": [
+      "§40"
+    ]
+  },
+  {
+    "id": "sgm-central-hi",
+    "topic": "sgm",
+    "jurisdiction": "central",
+    "lang": "hi",
+    "question": "विशेष आम सभा कौन बुला सकता है और कितने समय में?",
+    "expect": [
+      "§40"
+    ]
+  },
+  {
+    "id": "sgm-central-mr",
+    "topic": "sgm",
+    "jurisdiction": "central",
+    "lang": "mr",
+    "question": "विशेष सर्वसाधारण सभा कोण बोलावू शकते आणि किती वेळात?",
+    "expect": [
+      "§40"
+    ]
+  },
+  {
+    "id": "sgm-central-ta",
+    "topic": "sgm",
+    "jurisdiction": "central",
+    "lang": "ta",
+    "question": "சிறப்புப் பொதுக்கூட்டத்தை யார், எவ்வளவு காலத்திற்குள் கூட்டலாம்?",
+    "expect": [
+      "§40"
+    ]
+  },
+  {
+    "id": "sgm-maharashtra-en",
+    "topic": "sgm",
+    "jurisdiction": "maharashtra",
+    "lang": "en",
+    "question": "Who can call a special general meeting and within what time?",
+    "expect": [
+      "§76"
+    ]
+  },
+  {
+    "id": "sgm-maharashtra-hi",
+    "topic": "sgm",
+    "jurisdiction": "maharashtra",
+    "lang": "hi",
+    "question": "विशेष आम सभा कौन बुला सकता है और कितने समय में?",
+    "expect": [
+      "§76"
+    ]
+  },
+  {
+    "id": "sgm-maharashtra-mr",
+    "topic": "sgm",
+    "jurisdiction": "maharashtra",
+    "lang": "mr",
+    "question": "विशेष सर्वसाधारण सभा कोण बोलावू शकते आणि किती वेळात?",
+    "expect": [
+      "§76"
+    ]
+  },
+  {
+    "id": "sgm-maharashtra-ta",
+    "topic": "sgm",
+    "jurisdiction": "maharashtra",
+    "lang": "ta",
+    "question": "சிறப்புப் பொதுக்கூட்டத்தை யார், எவ்வளவு காலத்திற்குள் கூட்டலாம்?",
+    "expect": [
+      "§76"
+    ]
+  },
+  {
+    "id": "sgm-gujarat-en",
+    "topic": "sgm",
+    "jurisdiction": "gujarat",
+    "lang": "en",
+    "question": "Who can call a special general meeting and within what time?",
+    "expect": [
+      "§78"
+    ]
+  },
+  {
+    "id": "sgm-gujarat-hi",
+    "topic": "sgm",
+    "jurisdiction": "gujarat",
+    "lang": "hi",
+    "question": "विशेष आम सभा कौन बुला सकता है और कितने समय में?",
+    "expect": [
+      "§78"
+    ]
+  },
+  {
+    "id": "sgm-gujarat-mr",
+    "topic": "sgm",
+    "jurisdiction": "gujarat",
+    "lang": "mr",
+    "question": "विशेष सर्वसाधारण सभा कोण बोलावू शकते आणि किती वेळात?",
+    "expect": [
+      "§78"
+    ]
+  },
+  {
+    "id": "sgm-gujarat-ta",
+    "topic": "sgm",
+    "jurisdiction": "gujarat",
+    "lang": "ta",
+    "question": "சிறப்புப் பொதுக்கூட்டத்தை யார், எவ்வளவு காலத்திற்குள் கூட்டலாம்?",
+    "expect": [
+      "§78"
+    ]
+  },
+  {
+    "id": "sgm-karnataka-en",
+    "topic": "sgm",
+    "jurisdiction": "karnataka",
+    "lang": "en",
+    "question": "Who can call a special general meeting and within what time?",
+    "expect": [
+      "§28"
+    ]
+  },
+  {
+    "id": "sgm-karnataka-hi",
+    "topic": "sgm",
+    "jurisdiction": "karnataka",
+    "lang": "hi",
+    "question": "विशेष आम सभा कौन बुला सकता है और कितने समय में?",
+    "expect": [
+      "§28"
+    ]
+  },
+  {
+    "id": "sgm-karnataka-mr",
+    "topic": "sgm",
+    "jurisdiction": "karnataka",
+    "lang": "mr",
+    "question": "विशेष सर्वसाधारण सभा कोण बोलावू शकते आणि किती वेळात?",
+    "expect": [
+      "§28"
+    ]
+  },
+  {
+    "id": "sgm-karnataka-ta",
+    "topic": "sgm",
+    "jurisdiction": "karnataka",
+    "lang": "ta",
+    "question": "சிறப்புப் பொதுக்கூட்டத்தை யார், எவ்வளவு காலத்திற்குள் கூட்டலாம்?",
+    "expect": [
+      "§28"
+    ]
+  },
+  {
+    "id": "registration-central-en",
+    "topic": "registration",
+    "jurisdiction": "central",
+    "lang": "en",
+    "question": "How do we apply to register a new cooperative society?",
+    "expect": [
+      "§6",
+      "§7"
+    ]
+  },
+  {
+    "id": "registration-central-hi",
+    "topic": "registration",
+    "jurisdiction": "central",
+    "lang": "hi",
+    "question": "नई सहकारी समिति के पंजीकरण के लिए आवेदन कैसे करें?",
+    "expect": [
+      "§6",
+      "§7"
+    ]
+  },
+  {
+    "id": "registration-central-mr",
+    "topic": "registration",
+    "jurisdiction": "central",
+    "lang": "mr",
+    "question": "नवीन सहकारी संस्थेच्या नोंदणीसाठी अर्ज कसा करावा?",
+    "expect": [
+      "§6",
+      "§7"
+    ]
+  },
+  {
+    "id": "registration-central-ta",
+    "topic": "registration",
+    "jurisdiction": "central",
+    "lang": "ta",
+    "question": "புதிய கூட்டுறவுச் சங்கத்தைப் பதிவு செய்ய எப்படி விண்ணப்பிப்பது?",
+    "expect": [
+      "§6",
+      "§7"
+    ]
+  },
+  {
+    "id": "registration-maharashtra-en",
+    "topic": "registration",
+    "jurisdiction": "maharashtra",
+    "lang": "en",
+    "question": "How do we apply to register a new cooperative society?",
+    "expect": [
+      "§8",
+      "§9"
+    ]
+  },
+  {
+    "id": "registration-maharashtra-hi",
+    "topic": "registration",
+    "jurisdiction": "maharashtra",
+    "lang": "hi",
+    "question": "नई सहकारी समिति के पंजीकरण के लिए आवेदन कैसे करें?",
+    "expect": [
+      "§8",
+      "§9"
+    ]
+  },
+  {
+    "id": "registration-maharashtra-mr",
+    "topic": "registration",
+    "jurisdiction": "maharashtra",
+    "lang": "mr",
+    "question": "नवीन सहकारी संस्थेच्या नोंदणीसाठी अर्ज कसा करावा?",
+    "expect": [
+      "§8",
+      "§9"
+    ]
+  },
+  {
+    "id": "registration-maharashtra-ta",
+    "topic": "registration",
+    "jurisdiction": "maharashtra",
+    "lang": "ta",
+    "question": "புதிய கூட்டுறவுச் சங்கத்தைப் பதிவு செய்ய எப்படி விண்ணப்பிப்பது?",
+    "expect": [
+      "§8",
+      "§9"
+    ]
+  },
+  {
+    "id": "registration-karnataka-en",
+    "topic": "registration",
+    "jurisdiction": "karnataka",
+    "lang": "en",
+    "question": "How do we apply to register a new cooperative society?",
+    "expect": [
+      "§6",
+      "§7"
+    ]
+  },
+  {
+    "id": "registration-karnataka-hi",
+    "topic": "registration",
+    "jurisdiction": "karnataka",
+    "lang": "hi",
+    "question": "नई सहकारी समिति के पंजीकरण के लिए आवेदन कैसे करें?",
+    "expect": [
+      "§6",
+      "§7"
+    ]
+  },
+  {
+    "id": "registration-karnataka-mr",
+    "topic": "registration",
+    "jurisdiction": "karnataka",
+    "lang": "mr",
+    "question": "नवीन सहकारी संस्थेच्या नोंदणीसाठी अर्ज कसा करावा?",
+    "expect": [
+      "§6",
+      "§7"
+    ]
+  },
+  {
+    "id": "registration-karnataka-ta",
+    "topic": "registration",
+    "jurisdiction": "karnataka",
+    "lang": "ta",
+    "question": "புதிய கூட்டுறவுச் சங்கத்தைப் பதிவு செய்ய எப்படி விண்ணப்பிப்பது?",
+    "expect": [
+      "§6",
+      "§7"
+    ]
+  },
+  {
+    "id": "registration-tamil-nadu-en",
+    "topic": "registration",
+    "jurisdiction": "tamil-nadu",
+    "lang": "en",
+    "question": "How do we apply to register a new cooperative society?",
+    "expect": [
+      "§8",
+      "§9"
+    ]
+  },
+  {
+    "id": "registration-tamil-nadu-hi",
+    "topic": "registration",
+    "jurisdiction": "tamil-nadu",
+    "lang": "hi",
+    "question": "नई सहकारी समिति के पंजीकरण के लिए आवेदन कैसे करें?",
+    "expect": [
+      "§8",
+      "§9"
+    ]
+  },
+  {
+    "id": "registration-tamil-nadu-mr",
+    "topic": "registration",
+    "jurisdiction": "tamil-nadu",
+    "lang": "mr",
+    "question": "नवीन सहकारी संस्थेच्या नोंदणीसाठी अर्ज कसा करावा?",
+    "expect": [
+      "§8",
+      "§9"
+    ]
+  },
+  {
+    "id": "registration-tamil-nadu-ta",
+    "topic": "registration",
+    "jurisdiction": "tamil-nadu",
+    "lang": "ta",
+    "question": "புதிய கூட்டுறவுச் சங்கத்தைப் பதிவு செய்ய எப்படி விண்ணப்பிப்பது?",
+    "expect": [
+      "§8",
+      "§9"
+    ]
+  },
+  {
+    "id": "membership-central-en",
+    "topic": "membership",
+    "jurisdiction": "central",
+    "lang": "en",
+    "question": "Who is eligible to become a member of a cooperative society?",
+    "expect": [
+      "§25"
+    ]
+  },
+  {
+    "id": "membership-central-hi",
+    "topic": "membership",
+    "jurisdiction": "central",
+    "lang": "hi",
+    "question": "सहकारी समिति का सदस्य कौन बन सकता है?",
+    "expect": [
+      "§25"
+    ]
+  },
+  {
+    "id": "membership-central-mr",
+    "topic": "membership",
+    "jurisdiction": "central",
+    "lang": "mr",
+    "question": "सहकारी संस्थेचा सभासद कोण होऊ शकतो?",
+    "expect": [
+      "§25"
+    ]
+  },
+  {
+    "id": "membership-central-ta",
+    "topic": "membership",
+    "jurisdiction": "central",
+    "lang": "ta",
+    "question": "கூட்டுறவுச் சங்கத்தில் யார் உறுப்பினராகலாம்?",
+    "expect": [
+      "§25"
+    ]
+  },
+  {
+    "id": "membership-maharashtra-en",
+    "topic": "membership",
+    "jurisdiction": "maharashtra",
+    "lang": "en",
+    "question": "Who is eligible to become a member of a cooperative society?",
+    "expect": [
+      "§22"
+    ]
+  },
+  {
+    "id": "membership-maharashtra-hi",
+    "topic": "membership",
+    "jurisdiction": "maharashtra",
+    "lang": "hi",
+    "question": "सहकारी समिति का सदस्य कौन बन सकता है?",
+    "expect": [
+      "§22"
+    ]
+  },
+  {
+    "id": "membership-maharashtra-mr",
+    "topic": "membership",
+    "jurisdiction": "maharashtra",
+    "lang": "mr",
+    "question": "सहकारी संस्थेचा सभासद कोण होऊ शकतो?",
+    "expect": [
+      "§22"
+    ]
+  },
+  {
+    "id": "membership-maharashtra-ta",
+    "topic": "membership",
+    "jurisdiction": "maharashtra",
+    "lang": "ta",
+    "question": "கூட்டுறவுச் சங்கத்தில் யார் உறுப்பினராகலாம்?",
+    "expect": [
+      "§22"
+    ]
+  },
+  {
+    "id": "membership-karnataka-en",
+    "topic": "membership",
+    "jurisdiction": "karnataka",
+    "lang": "en",
+    "question": "Who is eligible to become a member of a cooperative society?",
+    "expect": [
+      "§16"
+    ]
+  },
+  {
+    "id": "membership-karnataka-hi",
+    "topic": "membership",
+    "jurisdiction": "karnataka",
+    "lang": "hi",
+    "question": "सहकारी समिति का सदस्य कौन बन सकता है?",
+    "expect": [
+      "§16"
+    ]
+  },
+  {
+    "id": "membership-karnataka-mr",
+    "topic": "membership",
+    "jurisdiction": "karnataka",
+    "lang": "mr",
+    "question": "सहकारी संस्थेचा सभासद कोण होऊ शकतो?",
+    "expect": [
+      "§16"
+    ]
+  },
+  {
+    "id": "membership-karnataka-ta",
+    "topic": "membership",
+    "jurisdiction": "karnataka",
+    "lang": "ta",
+    "question": "கூட்டுறவுச் சங்கத்தில் யார் உறுப்பினராகலாம்?",
+    "expect": [
+      "§16"
+    ]
+  },
+  {
+    "id": "membership-tamil-nadu-en",
+    "topic": "membership",
+    "jurisdiction": "tamil-nadu",
+    "lang": "en",
+    "question": "Who is eligible to become a member of a cooperative society?",
+    "expect": [
+      "§21"
+    ]
+  },
+  {
+    "id": "membership-tamil-nadu-hi",
+    "topic": "membership",
+    "jurisdiction": "tamil-nadu",
+    "lang": "hi",
+    "question": "सहकारी समिति का सदस्य कौन बन सकता है?",
+    "expect": [
+      "§21"
+    ]
+  },
+  {
+    "id": "membership-tamil-nadu-mr",
+    "topic": "membership",
+    "jurisdiction": "tamil-nadu",
+    "lang": "mr",
+    "question": "सहकारी संस्थेचा सभासद कोण होऊ शकतो?",
+    "expect": [
+      "§21"
+    ]
+  },
+  {
+    "id": "membership-tamil-nadu-ta",
+    "topic": "membership",
+    "jurisdiction": "tamil-nadu",
+    "lang": "ta",
+    "question": "கூட்டுறவுச் சங்கத்தில் யார் உறுப்பினராகலாம்?",
+    "expect": [
+      "§21"
+    ]
+  },
+  {
+    "id": "expulsion-central-en",
+    "topic": "expulsion",
+    "jurisdiction": "central",
+    "lang": "en",
+    "question": "On what grounds can a member be expelled from the society?",
+    "expect": [
+      "§30"
+    ]
+  },
+  {
+    "id": "expulsion-central-hi",
+    "topic": "expulsion",
+    "jurisdiction": "central",
+    "lang": "hi",
+    "question": "किन आधारों पर किसी सदस्य को समिति से निष्कासित किया जा सकता है?",
+    "expect": [
+      "§30"
+    ]
+  },
+  {
+    "id": "expulsion-central-mr",
+    "topic": "expulsion",
+    "jurisdiction": "central",
+    "lang": "mr",
+    "question": "कोणत्या कारणांवरून सभासदाला संस्थेतून काढून टाकता येते?",
+    "expect": [
+      "§30"
+    ]
+  },
+  {
+    "id": "expulsion-central-ta",
+    "topic": "expulsion",
+    "jurisdiction": "central",
+    "lang": "ta",
+    "question": "என்ன காரணங்களுக்காக ஒரு உறுப்பினரைச் சங்கத்திலிருந்து நீக்கலாம்?",
+    "expect": [
+      "§30"
+    ]
+  },
+  {
+    "id": "expulsion-maharashtra-en",
+    "topic": "expulsion",
+    "jurisdiction": "maharashtra",
+    "lang": "en",
+    "question": "On what grounds can a member be expelled from the society?",
+    "expect": [
+      "§35"
+    ]
+  },
+  {
+    "id": "expulsion-maharashtra-hi",
+    "topic": "expulsion",
+    "jurisdiction": "maharashtra",
+    "lang": "hi",
+    "question": "किन आधारों पर किसी सदस्य को समिति से निष्कासित किया जा सकता है?",
+    "expect": [
+      "§35"
+    ]
+  },
+  {
+    "id": "expulsion-maharashtra-mr",
+    "topic": "expulsion",
+    "jurisdiction": "maharashtra",
+    "lang": "mr",
+    "question": "कोणत्या कारणांवरून सभासदाला संस्थेतून काढून टाकता येते?",
+    "expect": [
+      "§35"
+    ]
+  },
+  {
+    "id": "expulsion-maharashtra-ta",
+    "topic": "expulsion",
+    "jurisdiction": "maharashtra",
+    "lang": "ta",
+    "question": "என்ன காரணங்களுக்காக ஒரு உறுப்பினரைச் சங்கத்திலிருந்து நீக்கலாம்?",
+    "expect": [
+      "§35"
+    ]
+  },
+  {
+    "id": "expulsion-gujarat-en",
+    "topic": "expulsion",
+    "jurisdiction": "gujarat",
+    "lang": "en",
+    "question": "On what grounds can a member be expelled from the society?",
+    "expect": [
+      "§36"
+    ]
+  },
+  {
+    "id": "expulsion-gujarat-hi",
+    "topic": "expulsion",
+    "jurisdiction": "gujarat",
+    "lang": "hi",
+    "question": "किन आधारों पर किसी सदस्य को समिति से निष्कासित किया जा सकता है?",
+    "expect": [
+      "§36"
+    ]
+  },
+  {
+    "id": "expulsion-gujarat-mr",
+    "topic": "expulsion",
+    "jurisdiction": "gujarat",
+    "lang": "mr",
+    "question": "कोणत्या कारणांवरून सभासदाला संस्थेतून काढून टाकता येते?",
+    "expect": [
+      "§36"
+    ]
+  },
+  {
+    "id": "expulsion-gujarat-ta",
+    "topic": "expulsion",
+    "jurisdiction": "gujarat",
+    "lang": "ta",
+    "question": "என்ன காரணங்களுக்காக ஒரு உறுப்பினரைச் சங்கத்திலிருந்து நீக்கலாம்?",
+    "expect": [
+      "§36"
+    ]
+  },
+  {
+    "id": "expulsion-tamil-nadu-en",
+    "topic": "expulsion",
+    "jurisdiction": "tamil-nadu",
+    "lang": "en",
+    "question": "On what grounds can a member be expelled from the society?",
+    "expect": [
+      "§25"
+    ]
+  },
+  {
+    "id": "expulsion-tamil-nadu-hi",
+    "topic": "expulsion",
+    "jurisdiction": "tamil-nadu",
+    "lang": "hi",
+    "question": "किन आधारों पर किसी सदस्य को समिति से निष्कासित किया जा सकता है?",
+    "expect": [
+      "§25"
+    ]
+  },
+  {
+    "id": "expulsion-tamil-nadu-mr",
+    "topic": "expulsion",
+    "jurisdiction": "tamil-nadu",
+    "lang": "mr",
+    "question": "कोणत्या कारणांवरून सभासदाला संस्थेतून काढून टाकता येते?",
+    "expect": [
+      "§25"
+    ]
+  },
+  {
+    "id": "expulsion-tamil-nadu-ta",
+    "topic": "expulsion",
+    "jurisdiction": "tamil-nadu",
+    "lang": "ta",
+    "question": "என்ன காரணங்களுக்காக ஒரு உறுப்பினரைச் சங்கத்திலிருந்து நீக்கலாம்?",
+    "expect": [
+      "§25"
+    ]
+  },
+  {
+    "id": "bylaws-central-en",
+    "topic": "bylaws",
+    "jurisdiction": "central",
+    "lang": "en",
+    "question": "How are the bye-laws of a society amended?",
+    "expect": [
+      "§11",
+      "§12"
+    ]
+  },
+  {
+    "id": "bylaws-central-hi",
+    "topic": "bylaws",
+    "jurisdiction": "central",
+    "lang": "hi",
+    "question": "समिति के उपनियमों में संशोधन कैसे किया जाता है?",
+    "expect": [
+      "§11",
+      "§12"
+    ]
+  },
+  {
+    "id": "bylaws-central-mr",
+    "topic": "bylaws",
+    "jurisdiction": "central",
+    "lang": "mr",
+    "question": "संस्थेच्या उपविधींमध्ये सुधारणा कशी केली जाते?",
+    "expect": [
+      "§11",
+      "§12"
+    ]
+  },
+  {
+    "id": "bylaws-central-ta",
+    "topic": "bylaws",
+    "jurisdiction": "central",
+    "lang": "ta",
+    "question": "சங்கத்தின் துணைவிதிகள் எப்படித் திருத்தப்படுகின்றன?",
+    "expect": [
+      "§11",
+      "§12"
+    ]
+  },
+  {
+    "id": "bylaws-maharashtra-en",
+    "topic": "bylaws",
+    "jurisdiction": "maharashtra",
+    "lang": "en",
+    "question": "How are the bye-laws of a society amended?",
+    "expect": [
+      "§13"
+    ]
+  },
+  {
+    "id": "bylaws-maharashtra-hi",
+    "topic": "bylaws",
+    "jurisdiction": "maharashtra",
+    "lang": "hi",
+    "question": "समिति के उपनियमों में संशोधन कैसे किया जाता है?",
+    "expect": [
+      "§13"
+    ]
+  },
+  {
+    "id": "bylaws-maharashtra-mr",
+    "topic": "bylaws",
+    "jurisdiction": "maharashtra",
+    "lang": "mr",
+    "question": "संस्थेच्या उपविधींमध्ये सुधारणा कशी केली जाते?",
+    "expect": [
+      "§13"
+    ]
+  },
+  {
+    "id": "bylaws-maharashtra-ta",
+    "topic": "bylaws",
+    "jurisdiction": "maharashtra",
+    "lang": "ta",
+    "question": "சங்கத்தின் துணைவிதிகள் எப்படித் திருத்தப்படுகின்றன?",
+    "expect": [
+      "§13"
+    ]
+  },
+  {
+    "id": "bylaws-karnataka-en",
+    "topic": "bylaws",
+    "jurisdiction": "karnataka",
+    "lang": "en",
+    "question": "How are the bye-laws of a society amended?",
+    "expect": [
+      "§12"
+    ]
+  },
+  {
+    "id": "bylaws-karnataka-hi",
+    "topic": "bylaws",
+    "jurisdiction": "karnataka",
+    "lang": "hi",
+    "question": "समिति के उपनियमों में संशोधन कैसे किया जाता है?",
+    "expect": [
+      "§12"
+    ]
+  },
+  {
+    "id": "bylaws-karnataka-mr",
+    "topic": "bylaws",
+    "jurisdiction": "karnataka",
+    "lang": "mr",
+    "question": "संस्थेच्या उपविधींमध्ये सुधारणा कशी केली जाते?",
+    "expect": [
+      "§12"
+    ]
+  },
+  {
+    "id": "bylaws-karnataka-ta",
+    "topic": "bylaws",
+    "jurisdiction": "karnataka",
+    "lang": "ta",
+    "question": "சங்கத்தின் துணைவிதிகள் எப்படித் திருத்தப்படுகின்றன?",
+    "expect": [
+      "§12"
+    ]
+  },
+  {
+    "id": "audit-central-en",
+    "topic": "audit",
+    "jurisdiction": "central",
+    "lang": "en",
+    "question": "Who audits the accounts of the society and how often?",
+    "expect": [
+      "§70",
+      "§73"
+    ]
+  },
+  {
+    "id": "audit-central-hi",
+    "topic": "audit",
+    "jurisdiction": "central",
+    "lang": "hi",
+    "question": "समिति के खातों का ऑडिट कौन करता है और कितनी बार?",
+    "expect": [
+      "§70",
+      "§73"
+    ]
+  },
+  {
+    "id": "audit-central-mr",
+    "topic": "audit",
+    "jurisdiction": "central",
+    "lang": "mr",
+    "question": "संस्थेच्या हिशेबांचे लेखापरीक्षण कोण करते आणि किती वेळा?",
+    "expect": [
+      "§70",
+      "§73"
+    ]
+  },
+  {
+    "id": "audit-central-ta",
+    "topic": "audit",
+    "jurisdiction": "central",
+    "lang": "ta",
+    "question": "சங்கத்தின் கணக்குகளை யார், எவ்வளவு அடிக்கடி தணிக்கை செய்கிறார்?",
+    "expect": [
+      "§70",
+      "§73"
+    ]
+  },
+  {
+    "id": "audit-maharashtra-en",
+    "topic": "audit",
+    "jurisdiction": "maharashtra",
+    "lang": "en",
+    "question": "Who audits the accounts of the society and how often?",
+    "expect": [
+      "§81"
+    ]
+  },
+  {
+    "id": "audit-maharashtra-hi",
+    "topic": "audit",
+    "jurisdiction": "maharashtra",
+    "lang": "hi",
+    "question": "समिति के खातों का ऑडिट कौन करता है और कितनी बार?",
+    "expect": [
+      "§81"
+    ]
+  },
+  {
+    "id": "audit-maharashtra-mr",
+    "topic": "audit",
+    "jurisdiction": "maharashtra",
+    "lang": "mr",
+    "question": "संस्थेच्या हिशेबांचे लेखापरीक्षण कोण करते आणि किती वेळा?",
+    "expect": [
+      "§81"
+    ]
+  },
+  {
+    "id": "audit-maharashtra-ta",
+    "topic": "audit",
+    "jurisdiction": "maharashtra",
+    "lang": "ta",
+    "question": "சங்கத்தின் கணக்குகளை யார், எவ்வளவு அடிக்கடி தணிக்கை செய்கிறார்?",
+    "expect": [
+      "§81"
+    ]
+  },
+  {
+    "id": "audit-karnataka-en",
+    "topic": "audit",
+    "jurisdiction": "karnataka",
+    "lang": "en",
+    "question": "Who audits the accounts of the society and how often?",
+    "expect": [
+      "§63"
+    ]
+  },
+  {
+    "id": "audit-karnataka-hi",
+    "topic": "audit",
+    "jurisdiction": "karnataka",
+    "lang": "hi",
+    "question": "समिति के खातों का ऑडिट कौन करता है और कितनी बार?",
+    "expect": [
+      "§63"
+    ]
+  },
+  {
+    "id": "audit-karnataka-mr",
+    "topic": "audit",
+    "jurisdiction": "karnataka",
+    "lang": "mr",
+    "question": "संस्थेच्या हिशेबांचे लेखापरीक्षण कोण करते आणि किती वेळा?",
+    "expect": [
+      "§63"
+    ]
+  },
+  {
+    "id": "audit-karnataka-ta",
+    "topic": "audit",
+    "jurisdiction": "karnataka",
+    "lang": "ta",
+    "question": "சங்கத்தின் கணக்குகளை யார், எவ்வளவு அடிக்கடி தணிக்கை செய்கிறார்?",
+    "expect": [
+      "§63"
+    ]
+  },
+  {
+    "id": "audit-tamil-nadu-en",
+    "topic": "audit",
+    "jurisdiction": "tamil-nadu",
+    "lang": "en",
+    "question": "Who audits the accounts of the society and how often?",
+    "expect": [
+      "§80"
+    ]
+  },
+  {
+    "id": "audit-tamil-nadu-hi",
+    "topic": "audit",
+    "jurisdiction": "tamil-nadu",
+    "lang": "hi",
+    "question": "समिति के खातों का ऑडिट कौन करता है और कितनी बार?",
+    "expect": [
+      "§80"
+    ]
+  },
+  {
+    "id": "audit-tamil-nadu-mr",
+    "topic": "audit",
+    "jurisdiction": "tamil-nadu",
+    "lang": "mr",
+    "question": "संस्थेच्या हिशेबांचे लेखापरीक्षण कोण करते आणि किती वेळा?",
+    "expect": [
+      "§80"
+    ]
+  },
+  {
+    "id": "audit-tamil-nadu-ta",
+    "topic": "audit",
+    "jurisdiction": "tamil-nadu",
+    "lang": "ta",
+    "question": "சங்கத்தின் கணக்குகளை யார், எவ்வளவு அடிக்கடி தணிக்கை செய்கிறார்?",
+    "expect": [
+      "§80"
+    ]
+  },
+  {
+    "id": "disputes-central-en",
+    "topic": "disputes",
+    "jurisdiction": "central",
+    "lang": "en",
+    "question": "Where do I take a dispute between a member and the managing committee?",
+    "expect": [
+      "§84"
+    ]
+  },
+  {
+    "id": "disputes-central-hi",
+    "topic": "disputes",
+    "jurisdiction": "central",
+    "lang": "hi",
+    "question": "सदस्य और प्रबंध समिति के बीच विवाद कहाँ ले जाऊँ?",
+    "expect": [
+      "§84"
+    ]
+  },
+  {
+    "id": "disputes-central-mr",
+    "topic": "disputes",
+    "jurisdiction": "central",
+    "lang": "mr",
+    "question": "सभासद आणि व्यवस्थापक समितीमधील वाद कुठे न्यावा?",
+    "expect": [
+      "§84"
+    ]
+  },
+  {
+    "id": "disputes-central-ta",
+    "topic": "disputes",
+    "jurisdiction": "central",
+    "lang": "ta",
+    "question": "ஒரு உறுப்பினருக்கும் நிர்வாகக் குழுவுக்கும் இடையிலான தகராறை எங்கே கொண்டு செல்வது?",
+    "expect": [
+      "§84"
+    ]
+  },
+  {
+    "id": "disputes-maharashtra-en",
+    "topic": "disputes",
+    "jurisdiction": "maharashtra",
+    "lang": "en",
+    "question": "Where do I take a dispute between a member and the managing committee?",
+    "expect": [
+      "§91"
+    ]
+  },
+  {
+    "id": "disputes-maharashtra-hi",
+    "topic": "disputes",
+    "jurisdiction": "maharashtra",
+    "lang": "hi",
+    "question": "सदस्य और प्रबंध समिति के बीच विवाद कहाँ ले जाऊँ?",
+    "expect": [
+      "§91"
+    ]
+  },
+  {
+    "id": "disputes-maharashtra-mr",
+    "topic": "disputes",
+    "jurisdiction": "maharashtra",
+    "lang": "mr",
+    "question": "सभासद आणि व्यवस्थापक समितीमधील वाद कुठे न्यावा?",
+    "expect": [
+      "§91"
+    ]
+  },
+  {
+    "id": "disputes-maharashtra-ta",
+    "topic": "disputes",
+    "jurisdiction": "maharashtra",
+    "lang": "ta",
+    "question": "ஒரு உறுப்பினருக்கும் நிர்வாகக் குழுவுக்கும் இடையிலான தகராறை எங்கே கொண்டு செல்வது?",
+    "expect": [
+      "§91"
+    ]
+  },
+  {
+    "id": "disputes-gujarat-en",
+    "topic": "disputes",
+    "jurisdiction": "gujarat",
+    "lang": "en",
+    "question": "Where do I take a dispute between a member and the managing committee?",
+    "expect": [
+      "§96",
+      "§98"
+    ]
+  },
+  {
+    "id": "disputes-gujarat-hi",
+    "topic": "disputes",
+    "jurisdiction": "gujarat",
+    "lang": "hi",
+    "question": "सदस्य और प्रबंध समिति के बीच विवाद कहाँ ले जाऊँ?",
+    "expect": [
+      "§96",
+      "§98"
+    ]
+  },
+  {
+    "id": "disputes-gujarat-mr",
+    "topic": "disputes",
+    "jurisdiction": "gujarat",
+    "lang": "mr",
+    "question": "सभासद आणि व्यवस्थापक समितीमधील वाद कुठे न्यावा?",
+    "expect": [
+      "§96",
+      "§98"
+    ]
+  },
+  {
+    "id": "disputes-gujarat-ta",
+    "topic": "disputes",
+    "jurisdiction": "gujarat",
+    "lang": "ta",
+    "question": "ஒரு உறுப்பினருக்கும் நிர்வாகக் குழுவுக்கும் இடையிலான தகராறை எங்கே கொண்டு செல்வது?",
+    "expect": [
+      "§96",
+      "§98"
+    ]
+  },
+  {
+    "id": "disputes-karnataka-en",
+    "topic": "disputes",
+    "jurisdiction": "karnataka",
+    "lang": "en",
+    "question": "Where do I take a dispute between a member and the managing committee?",
+    "expect": [
+      "§70"
+    ]
+  },
+  {
+    "id": "disputes-karnataka-hi",
+    "topic": "disputes",
+    "jurisdiction": "karnataka",
+    "lang": "hi",
+    "question": "सदस्य और प्रबंध समिति के बीच विवाद कहाँ ले जाऊँ?",
+    "expect": [
+      "§70"
+    ]
+  },
+  {
+    "id": "disputes-karnataka-mr",
+    "topic": "disputes",
+    "jurisdiction": "karnataka",
+    "lang": "mr",
+    "question": "सभासद आणि व्यवस्थापक समितीमधील वाद कुठे न्यावा?",
+    "expect": [
+      "§70"
+    ]
+  },
+  {
+    "id": "disputes-karnataka-ta",
+    "topic": "disputes",
+    "jurisdiction": "karnataka",
+    "lang": "ta",
+    "question": "ஒரு உறுப்பினருக்கும் நிர்வாகக் குழுவுக்கும் இடையிலான தகராறை எங்கே கொண்டு செல்வது?",
+    "expect": [
+      "§70"
+    ]
+  },
+  {
+    "id": "disputes-tamil-nadu-en",
+    "topic": "disputes",
+    "jurisdiction": "tamil-nadu",
+    "lang": "en",
+    "question": "Where do I take a dispute between a member and the managing committee?",
+    "expect": [
+      "§90"
+    ]
+  },
+  {
+    "id": "disputes-tamil-nadu-hi",
+    "topic": "disputes",
+    "jurisdiction": "tamil-nadu",
+    "lang": "hi",
+    "question": "सदस्य और प्रबंध समिति के बीच विवाद कहाँ ले जाऊँ?",
+    "expect": [
+      "§90"
+    ]
+  },
+  {
+    "id": "disputes-tamil-nadu-mr",
+    "topic": "disputes",
+    "jurisdiction": "tamil-nadu",
+    "lang": "mr",
+    "question": "सभासद आणि व्यवस्थापक समितीमधील वाद कुठे न्यावा?",
+    "expect": [
+      "§90"
+    ]
+  },
+  {
+    "id": "disputes-tamil-nadu-ta",
+    "topic": "disputes",
+    "jurisdiction": "tamil-nadu",
+    "lang": "ta",
+    "question": "ஒரு உறுப்பினருக்கும் நிர்வாகக் குழுவுக்கும் இடையிலான தகராறை எங்கே கொண்டு செல்வது?",
+    "expect": [
+      "§90"
+    ]
+  },
+  {
+    "id": "winding-central-en",
+    "topic": "winding",
+    "jurisdiction": "central",
+    "lang": "en",
+    "question": "When can the Registrar order a society to be wound up?",
+    "expect": [
+      "§86"
+    ]
+  },
+  {
+    "id": "winding-central-hi",
+    "topic": "winding",
+    "jurisdiction": "central",
+    "lang": "hi",
+    "question": "रजिस्ट्रार किसी समिति के परिसमापन का आदेश कब दे सकता है?",
+    "expect": [
+      "§86"
+    ]
+  },
+  {
+    "id": "winding-central-mr",
+    "topic": "winding",
+    "jurisdiction": "central",
+    "lang": "mr",
+    "question": "निबंधक संस्थेच्या अवसायनाचा आदेश कधी देऊ शकतो?",
+    "expect": [
+      "§86"
+    ]
+  },
+  {
+    "id": "winding-central-ta",
+    "topic": "winding",
+    "jurisdiction": "central",
+    "lang": "ta",
+    "question": "பதிவாளர் ஒரு சங்கத்தைக் கலைக்க எப்போது உத்தரவிடலாம்?",
+    "expect": [
+      "§86"
+    ]
+  },
+  {
+    "id": "winding-maharashtra-en",
+    "topic": "winding",
+    "jurisdiction": "maharashtra",
+    "lang": "en",
+    "question": "When can the Registrar order a society to be wound up?",
+    "expect": [
+      "§102"
+    ]
+  },
+  {
+    "id": "winding-maharashtra-hi",
+    "topic": "winding",
+    "jurisdiction": "maharashtra",
+    "lang": "hi",
+    "question": "रजिस्ट्रार किसी समिति के परिसमापन का आदेश कब दे सकता है?",
+    "expect": [
+      "§102"
+    ]
+  },
+  {
+    "id": "winding-maharashtra-mr",
+    "topic": "winding",
+    "jurisdiction": "maharashtra",
+    "lang": "mr",
+    "question": "निबंधक संस्थेच्या अवसायनाचा आदेश कधी देऊ शकतो?",
+    "expect": [
+      "§102"
+    ]
+  },
+  {
+    "id": "winding-maharashtra-ta",
+    "topic": "winding",
+    "jurisdiction": "maharashtra",
+    "lang": "ta",
+    "question": "பதிவாளர் ஒரு சங்கத்தைக் கலைக்க எப்போது உத்தரவிடலாம்?",
+    "expect": [
+      "§102"
+    ]
+  },
+  {
+    "id": "winding-gujarat-en",
+    "topic": "winding",
+    "jurisdiction": "gujarat",
+    "lang": "en",
+    "question": "When can the Registrar order a society to be wound up?",
+    "expect": [
+      "§107"
+    ]
+  },
+  {
+    "id": "winding-gujarat-hi",
+    "topic": "winding",
+    "jurisdiction": "gujarat",
+    "lang": "hi",
+    "question": "रजिस्ट्रार किसी समिति के परिसमापन का आदेश कब दे सकता है?",
+    "expect": [
+      "§107"
+    ]
+  },
+  {
+    "id": "winding-gujarat-mr",
+    "topic": "winding",
+    "jurisdiction": "gujarat",
+    "lang": "mr",
+    "question": "निबंधक संस्थेच्या अवसायनाचा आदेश कधी देऊ शकतो?",
+    "expect": [
+      "§107"
+    ]
+  },
+  {
+    "id": "winding-gujarat-ta",
+    "topic": "winding",
+    "jurisdiction": "gujarat",
+    "lang": "ta",
+    "question": "பதிவாளர் ஒரு சங்கத்தைக் கலைக்க எப்போது உத்தரவிடலாம்?",
+    "expect": [
+      "§107"
+    ]
+  },
+  {
+    "id": "winding-karnataka-en",
+    "topic": "winding",
+    "jurisdiction": "karnataka",
+    "lang": "en",
+    "question": "When can the Registrar order a society to be wound up?",
+    "expect": [
+      "§72"
+    ]
+  },
+  {
+    "id": "winding-karnataka-hi",
+    "topic": "winding",
+    "jurisdiction": "karnataka",
+    "lang": "hi",
+    "question": "रजिस्ट्रार किसी समिति के परिसमापन का आदेश कब दे सकता है?",
+    "expect": [
+      "§72"
+    ]
+  },
+  {
+    "id": "winding-karnataka-mr",
+    "topic": "winding",
+    "jurisdiction": "karnataka",
+    "lang": "mr",
+    "question": "निबंधक संस्थेच्या अवसायनाचा आदेश कधी देऊ शकतो?",
+    "expect": [
+      "§72"
+    ]
+  },
+  {
+    "id": "winding-karnataka-ta",
+    "topic": "winding",
+    "jurisdiction": "karnataka",
+    "lang": "ta",
+    "question": "பதிவாளர் ஒரு சங்கத்தைக் கலைக்க எப்போது உத்தரவிடலாம்?",
+    "expect": [
+      "§72"
+    ]
+  },
+  {
+    "id": "winding-tamil-nadu-en",
+    "topic": "winding",
+    "jurisdiction": "tamil-nadu",
+    "lang": "en",
+    "question": "When can the Registrar order a society to be wound up?",
+    "expect": [
+      "§137"
+    ]
+  },
+  {
+    "id": "winding-tamil-nadu-hi",
+    "topic": "winding",
+    "jurisdiction": "tamil-nadu",
+    "lang": "hi",
+    "question": "रजिस्ट्रार किसी समिति के परिसमापन का आदेश कब दे सकता है?",
+    "expect": [
+      "§137"
+    ]
+  },
+  {
+    "id": "winding-tamil-nadu-mr",
+    "topic": "winding",
+    "jurisdiction": "tamil-nadu",
+    "lang": "mr",
+    "question": "निबंधक संस्थेच्या अवसायनाचा आदेश कधी देऊ शकतो?",
+    "expect": [
+      "§137"
+    ]
+  },
+  {
+    "id": "winding-tamil-nadu-ta",
+    "topic": "winding",
+    "jurisdiction": "tamil-nadu",
+    "lang": "ta",
+    "question": "பதிவாளர் ஒரு சங்கத்தைக் கலைக்க எப்போது உத்தரவிடலாம்?",
+    "expect": [
+      "§137"
+    ]
+  }
+]

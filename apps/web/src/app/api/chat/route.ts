@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { JURISDICTIONS, LANGUAGES } from "@/lib/config";
 import { chatJSON, streamChat, type Message } from "@/lib/llm";
 import { sectionsFor } from "@/lib/rag/corpus";
-import { confidenceOf, search } from "@/lib/rag/search";
+import { confidenceOf, retrieve } from "@/lib/rag/retrieve";
 import type { ChatRequest, Citation, Intent } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -28,6 +28,25 @@ type Analysis = {
   intent: Intent;
   escalate: boolean;
   search_terms: string;
+};
+
+/** After the answer: which cited sources actually support the sentences that cite them. */
+type Support = { checks: { id: number; supported: boolean }[] };
+const SUPPORT_SCHEMA = {
+  type: "object",
+  properties: {
+    checks: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { id: { type: "integer" }, supported: { type: "boolean" } },
+        required: ["id", "supported"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["checks"],
+  additionalProperties: false,
 };
 
 const ANALYSIS_SCHEMA = {
@@ -76,7 +95,7 @@ export async function POST(req: NextRequest) {
 
         // 2 · find the sections
         const sections = await sectionsFor(jurisdiction.id);
-        const hits = search(sections, `${analysis.search_terms} ${question}`, 5);
+        const hits = await retrieve(sections, `${analysis.search_terms} ${question}`, question, jurisdiction.id, 5);
         const citations: Citation[] = hits.map((h, i) => ({
           id: i + 1,
           act: h.section.act,
@@ -113,10 +132,56 @@ export async function POST(req: NextRequest) {
             content: `Jurisdiction: ${jurisdiction.act}\n\nQuestion: ${question}\n\nSources:\n${sourceBlock}`,
           },
         ];
+        let answer = "";
         for await (const text of streamChat(messages, req.signal)) {
           if (req.signal.aborted) break;
+          answer += text;
           send("token", { text });
         }
+
+        // 4 · verify: keep only the sources the answer cites, check each supports its sentences
+        const used = new Set([...answer.matchAll(/\[(\d{1,2})\]/g)].map((m) => Number(m[1])));
+        const invented = [...used].filter((n) => n < 1 || n > citations.length).length;
+        let cited = citations.filter((c) => used.has(c.id));
+        if (cited.length && !req.signal.aborted) {
+          try {
+            const verdict = await chatJSON<Support>(
+              [
+                {
+                  role: "system",
+                  content:
+                    "You check citations. For each source number, decide whether the source text supports the sentences of the answer that cite that number. " +
+                    "Return supported=false when the answer claims something the source does not say.",
+                },
+                {
+                  role: "user",
+                  content: [
+                    "Answer:",
+                    answer,
+                    "",
+                    "Sources:",
+                    cited.map((c) => `[${c.id}] ${hits[c.id - 1].section.text.slice(0, 2500)}`).join("\n\n"),
+                  ].join("\n"),
+                },
+              ],
+              SUPPORT_SCHEMA,
+              AbortSignal.any([req.signal, AbortSignal.timeout(20_000)]),
+            );
+            const ok = new Map(verdict.checks.map((c) => [c.id, c.supported]));
+            cited = cited.map((c) => ({ ...c, verified: ok.get(c.id) ?? true }));
+          } catch {
+            /* the existence check already passed; leave verified as is */
+          }
+        }
+        send("citations", cited);
+        const base = analysis.intent === "out_of_scope" ? 0.2 : confidenceOf(hits);
+        const unsupported = cited.filter((c) => !c.verified).length;
+        send("meta", {
+          intent: analysis.intent,
+          confidence: Math.max(0.1, base - 0.2 * invented - 0.15 * unsupported),
+          language_detected: answerLang,
+          escalate: analysis.escalate || analysis.intent === "escalate" || ESCALATE_WORDS.test(question),
+        });
         send("done", { message_id: `local-${Date.now().toString(36)}` });
       } catch (err) {
         if (!req.signal.aborted) send("error", { message: (err as Error).message });

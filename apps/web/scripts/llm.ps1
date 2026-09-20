@@ -2,7 +2,8 @@
 # Install once:  winget install llama.cpp
 # Model: an instruct GGUF that fits the GPU. Override with $env:LLM_HF_MODEL.
 $model = if ($env:LLM_HF_MODEL) { $env:LLM_HF_MODEL } else { "unsloth/Qwen3.5-4B-GGUF:Q4_K_M" }
-$ctx = if ($env:LLM_CTX) { $env:LLM_CTX } else { 8192 }
+# Two slots share the context, so this is 8k per request; Qwen3.5 KV is small enough for it on 6 GB.
+$ctx = if ($env:LLM_CTX) { $env:LLM_CTX } else { 16384 }
 
 $llama = Get-Command llama -ErrorAction SilentlyContinue
 if (-not $llama) {
