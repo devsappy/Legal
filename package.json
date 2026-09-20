@@ -1,8 +1,13 @@
 {
   "name": "sahakar-sahayak",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
+    "dev": "concurrently -n llm,embed,backend,frontend -c magenta,cyan,green,blue \"npm run llm\" \"npm run embed\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:apps": "concurrently -n backend,frontend -c green,blue \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "npm run dev --workspace apps/backend",
     "dev:frontend": "npm run dev --workspace apps/frontend",
     "llm": "npm run llm --workspace apps/backend",
@@ -11,5 +16,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "build": "npm run build --workspace apps/frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
   }
 }

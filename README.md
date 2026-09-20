@@ -19,11 +19,15 @@ Both apps are npm workspaces; run `npm install` once at the root.
 
 ```bash
 npm install
-npm run llm            # terminal 1: chat model server (llama.cpp, downloads Qwen3.5-4B on first run)
-npm run embed          # terminal 2: embedding server (bge-m3, CPU) — optional but recommended
-npm run dev:backend    # terminal 3: API on http://127.0.0.1:4000
-npm run dev:frontend   # terminal 4: UI on http://localhost:3000
+npm run dev            # everything in one terminal: chat model, embedding server, API, UI
 ```
+
+`npm run dev` starts four processes (`concurrently`): the chat model server on :8080
+(llama.cpp, downloads Qwen3.5-4B on first run), the embedding server on :8081 (bge-m3),
+the API on http://127.0.0.1:4000 and the UI on http://localhost:3000. If the model
+servers are already running, `npm run dev:apps` starts just the API and the UI; each
+piece is also available on its own (`npm run llm`, `npm run embed`, `npm run dev:backend`,
+`npm run dev:frontend`).
 
 `npm run llm` / `npm run embed` need llama.cpp (`winget install llama.cpp` on Windows; see
 `apps/backend/scripts/*.ps1` for the flags). Sign in with the demo admin
