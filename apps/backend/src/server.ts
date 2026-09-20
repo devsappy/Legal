@@ -1,3 +1,4 @@
+import "./env";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
@@ -7,6 +8,7 @@ import { chat } from "./routes/chat";
 import { conversations } from "./routes/conversations";
 import { admin } from "./routes/admin";
 import { pub } from "./routes/public";
+import { ensureSchema } from "./lib/db";
 
 /**
  * Sahakar Sahayak API. The frontend proxies /api/* here, so cookies stay
@@ -33,6 +35,12 @@ app.onError((err, c) => {
 
 const port = Number(process.env.PORT ?? 4000);
 const hostname = process.env.HOST ?? "127.0.0.1";
+try {
+  await ensureSchema();
+} catch (err) {
+  console.error(`database unavailable: ${(err as Error).message}`);
+  process.exit(1);
+}
 serve({ fetch: app.fetch, port, hostname }, () => {
   console.log(`sahayak api listening on http://${hostname}:${port}`);
 });

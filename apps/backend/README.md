@@ -1,7 +1,7 @@
 # @sahayak/backend
 
-The API: Hono on Node, SQLite via better-sqlite3, the RAG pipeline over `corpus/`, and the
-launchers for the local llama.cpp servers. Routes live in `src/routes/`, the pipeline in
+The API: Hono on Node, Postgres (Supabase) via postgres.js, the RAG pipeline over `corpus/`,
+and the launchers for the local llama.cpp servers. Routes live in `src/routes/`, the pipeline in
 `src/routes/chat.ts` and `src/lib/rag/`. See the root README for the route table.
 
 ```bash
@@ -12,5 +12,5 @@ npm run ingest -- corpus/_sources/some-act.pdf <jurisdiction> "<Act title>" --ou
 npm run eval -- --base http://localhost:4000 [--filter -hi]
 ```
 
-State lives in `data/` (SQLite database, embedding index); both are rebuilt on first
-start if missing. Configuration is in `.env.example`.
+Set `DATABASE_URL` (see `.env.example`) before starting: the tables are created and the demo
+admin seeded on first start. The embedding index lives in `data/` and is rebuilt if missing.

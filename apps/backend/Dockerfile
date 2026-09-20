@@ -2,7 +2,6 @@
 #   docker build -f apps/backend/Dockerfile -t sahayak-backend .
 FROM node:22-bookworm-slim AS deps
 WORKDIR /repo
-RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
 COPY apps/backend/package.json apps/backend/
 COPY apps/frontend/package.json apps/frontend/
@@ -19,6 +18,7 @@ COPY apps/backend ./apps/backend
 WORKDIR /repo/apps/backend
 RUN mkdir -p data && chown -R node:node /repo
 USER node
+# data/ holds the embedding index; the database is Postgres (DATABASE_URL)
 VOLUME ["/repo/apps/backend/data", "/repo/apps/backend/corpus"]
 EXPOSE 4000
 CMD ["npx", "tsx", "src/server.ts"]

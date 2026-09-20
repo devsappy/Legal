@@ -38,22 +38,40 @@ services:
       retries: 40
     restart: unless-stopped
 
+  # Local Postgres for self-hosting. Using Supabase instead? Remove this service and set DATABASE_URL in .env.
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sahayak}
+      POSTGRES_DB: sahayak
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
   backend:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
     environment:
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:${POSTGRES_PASSWORD:-sahayak}@db:5432/sahayak}
+      DB_SSL: ${DB_SSL:-0}
       LLM_URL: http://llm:8080
       LLM_API_KEY: ${LLM_API_KEY:-change-me}
       EMBED_URL: http://embed:8081
       EMBED_API_KEY: ${EMBED_API_KEY:-change-me}
-      DB_PATH: /repo/apps/backend/data/sahayak.db
       CHAT_RATE_LIMIT: "30"
       COOKIE_SECURE: "0"   # plain http between the browser and the frontend; set to 1 behind HTTPS
     volumes:
       - backend-data:/repo/apps/backend/data
       - ./apps/backend/corpus:/repo/apps/backend/corpus
     depends_on:
+      db:
+        condition: service_healthy
       llm:
         condition: service_healthy
       embed:
@@ -82,4 +100,5 @@ services:
 
 volumes:
   hf-cache:
+  db-data:
   backend-data:

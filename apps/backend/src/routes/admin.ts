@@ -5,7 +5,7 @@ import { promisify } from "node:util";
 import { Hono } from "hono";
 import { JURISDICTIONS, type DocumentRow, type GlossaryRow, type ReviewRow } from "@sahayak/shared";
 import { requireUser } from "../lib/admin";
-import { db } from "../lib/db";
+import { db, isUniqueViolation } from "../lib/db";
 import { loadCorpus } from "../lib/rag/corpus";
 import { getIndex, hasIndex, resetIndex } from "../lib/rag/embeddings";
 
@@ -33,7 +33,7 @@ async function indexedAt(): Promise<string | undefined> {
 
 // Every route here is admin-only.
 admin.use("*", async (c, next) => {
-  const gate = requireUser(c, "admin");
+  const gate = await requireUser(c, "admin");
   if ("response" in gate) return gate.response;
   await next();
 });
@@ -122,8 +122,8 @@ admin.post("/reindex", async (c) => {
 /* ---- glossary ---- */
 type GlossaryBody = Partial<GlossaryRow>;
 
-admin.get("/glossary", (c) => {
-  const rows = db().prepare("SELECT id, term, hi, mr, ta, source FROM glossary ORDER BY term").all() as GlossaryRow[];
+admin.get("/glossary", async (c) => {
+  const rows = await db()<GlossaryRow[]>`SELECT id, term, hi, mr, ta, source FROM glossary ORDER BY term`;
   return c.json({ ok: true, rows });
 });
 
@@ -131,10 +131,12 @@ admin.post("/glossary", async (c) => {
   const b = (await c.req.json().catch(() => ({}))) as GlossaryBody;
   if (!b.term?.trim()) return c.json({ ok: false }, 400);
   try {
-    const info = db().prepare("INSERT INTO glossary (term, hi, mr, ta, source) VALUES (?, ?, ?, ?, ?)").run(b.term.trim(), b.hi ?? "", b.mr ?? "", b.ta ?? "", b.source ?? "");
-    return c.json({ ok: true, id: Number(info.lastInsertRowid) });
-  } catch {
-    return c.json({ ok: false, error: "exists" }, 409);
+    const [row] = await db()<{ id: number }[]>`
+      INSERT INTO glossary (term, hi, mr, ta, source) VALUES (${b.term.trim()}, ${b.hi ?? ""}, ${b.mr ?? ""}, ${b.ta ?? ""}, ${b.source ?? ""}) RETURNING id`;
+    return c.json({ ok: true, id: row.id });
+  } catch (err) {
+    if (isUniqueViolation(err)) return c.json({ ok: false, error: "exists" }, 409);
+    throw err;
   }
 });
 
@@ -142,27 +144,28 @@ admin.put("/glossary", async (c) => {
   const b = (await c.req.json().catch(() => ({}))) as GlossaryBody;
   if (!b.id || !b.term?.trim()) return c.json({ ok: false }, 400);
   try {
-    const info = db().prepare("UPDATE glossary SET term = ?, hi = ?, mr = ?, ta = ?, source = ? WHERE id = ?").run(b.term.trim(), b.hi ?? "", b.mr ?? "", b.ta ?? "", b.source ?? "", b.id);
-    if (info.changes === 0) return c.json({ ok: false, error: "not_found" }, 404);
+    const result = await db()`
+      UPDATE glossary SET term = ${b.term.trim()}, hi = ${b.hi ?? ""}, mr = ${b.mr ?? ""}, ta = ${b.ta ?? ""}, source = ${b.source ?? ""} WHERE id = ${b.id}`;
+    if (result.count === 0) return c.json({ ok: false, error: "not_found" }, 404);
     return c.json({ ok: true });
-  } catch {
+  } catch (err) {
     // The UNIQUE index on term: renaming onto another entry's term.
-    return c.json({ ok: false, error: "exists" }, 409);
+    if (isUniqueViolation(err)) return c.json({ ok: false, error: "exists" }, 409);
+    throw err;
   }
 });
 
-admin.delete("/glossary", (c) => {
+admin.delete("/glossary", async (c) => {
   const id = Number(c.req.query("id"));
   if (!id) return c.json({ ok: false }, 400);
-  db().prepare("DELETE FROM glossary WHERE id = ?").run(id);
+  await db()`DELETE FROM glossary WHERE id = ${id}`;
   return c.json({ ok: true });
 });
 
 /* ---- review queue ---- */
-admin.get("/reviews", (c) => {
-  const rows = db()
-    .prepare("SELECT * FROM reviews ORDER BY CASE status WHEN 'open' THEN 0 ELSE 1 END, created_at DESC LIMIT 200")
-    .all() as ReviewRow[];
+admin.get("/reviews", async (c) => {
+  const rows = await db()<ReviewRow[]>`
+    SELECT * FROM reviews ORDER BY CASE status WHEN 'open' THEN 0 ELSE 1 END, created_at DESC LIMIT 200`;
   return c.json({ ok: true, rows });
 });
 
@@ -178,11 +181,6 @@ admin.patch("/reviews", async (c) => {
   );
   if (ids.length === 0 || ids.length > 500 || (b.status !== "open" && b.status !== "resolved")) return c.json({ ok: false }, 400);
   const status = b.status;
-  const stmt = db().prepare("UPDATE reviews SET status = ? WHERE id = ?");
-  const updated = db().transaction((list: number[]) => {
-    let n = 0;
-    for (const id of list) n += stmt.run(status, id).changes;
-    return n;
-  })(ids);
-  return c.json({ ok: true, updated });
+  const result = await db()`UPDATE reviews SET status = ${status} WHERE id = ANY(${ids}::int[])`;
+  return c.json({ ok: true, updated: result.count });
 });

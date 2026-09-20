@@ -1,5 +1,5 @@
 import type { SessionUser } from "@sahayak/shared";
-import { checkPassword, db, hashPassword, newToken, type UserRow } from "./db";
+import { checkPassword, db, hashPassword, isUniqueViolation, newToken, type UserRow } from "./db";
 
 /**
  * Cookie sessions backed by the users/sessions tables. The demo account
@@ -18,51 +18,48 @@ const toUser = (u: UserRow): SessionUser => ({
   name: u.name,
   email: u.email,
   role: u.role,
-  // SQLite's datetime('now') is UTC without a zone marker; say so.
-  ...(u.created_at ? { createdAt: u.created_at.replace(" ", "T") + (u.created_at.endsWith("Z") ? "" : "Z") } : {}),
+  ...(u.created_at ? { createdAt: u.created_at } : {}),
 });
 
-export function verify(email: string, password: string): SessionUser | null {
-  const row = db()
-    .prepare("SELECT id, email, name, role, password_hash, created_at FROM users WHERE email = ?")
-    .get(email.trim().toLowerCase()) as (UserRow & { password_hash: string }) | undefined;
+export async function verify(email: string, password: string): Promise<SessionUser | null> {
+  const [row] = await db()<(UserRow & { password_hash: string })[]>`
+    SELECT id, email, name, role, password_hash, created_at FROM users WHERE email = ${email.trim().toLowerCase()}`;
   if (!row || !checkPassword(password, row.password_hash)) return null;
   return toUser(row);
 }
 
 export type RegisterResult = { ok: true; user: SessionUser } | { ok: false; error: "exists" | "invalid" };
 
-export function register(email: string, name: string, password: string): RegisterResult {
+export async function register(email: string, name: string, password: string): Promise<RegisterResult> {
   const e = email.trim().toLowerCase();
   const n = name.trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) || n.length < 2 || password.length < 6) return { ok: false, error: "invalid" };
   try {
-    const info = db().prepare("INSERT INTO users (email, name, password_hash) VALUES (?, ?, ?)").run(e, n, hashPassword(password));
-    return { ok: true, user: { id: Number(info.lastInsertRowid), name: n, email: e, role: "member" } };
-  } catch {
-    return { ok: false, error: "exists" };
+    const [row] = await db()<{ id: number }[]>`
+      INSERT INTO users (email, name, password_hash) VALUES (${e}, ${n}, ${hashPassword(password)}) RETURNING id`;
+    return { ok: true, user: { id: row.id, name: n, email: e, role: "member" } };
+  } catch (err) {
+    if (isUniqueViolation(err)) return { ok: false, error: "exists" };
+    throw err;
   }
 }
 
-export function createSession(userId: number) {
+export async function createSession(userId: number) {
   const token = newToken();
   const expires = new Date(Date.now() + SESSION_DAYS * 86_400_000);
-  db().prepare("INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)").run(token, userId, expires.toISOString());
+  await db()`INSERT INTO sessions (token, user_id, expires_at) VALUES (${token}, ${userId}, ${expires.toISOString()})`;
   return { token, expires };
 }
 
-export function destroySession(token: string | undefined) {
-  if (token) db().prepare("DELETE FROM sessions WHERE token = ?").run(token);
+export async function destroySession(token: string | undefined) {
+  if (token) await db()`DELETE FROM sessions WHERE token = ${token}`;
 }
 
-export function userForToken(token: string | undefined): SessionUser | null {
+export async function userForToken(token: string | undefined): Promise<SessionUser | null> {
   if (!token) return null;
-  const row = db()
-    .prepare(
-      `SELECT u.id, u.email, u.name, u.role, u.created_at FROM sessions s JOIN users u ON u.id = s.user_id
-       WHERE s.token = ? AND s.expires_at > datetime('now')`,
-    )
-    .get(token) as UserRow | undefined;
+  const [row] = await db()<UserRow[]>`
+    SELECT u.id, u.email, u.name, u.role, u.created_at FROM sessions s JOIN users u ON u.id = s.user_id
+    WHERE s.token = ${token} AND s.expires_at > now()`;
   return row ? toUser(row) : null;
 }
 

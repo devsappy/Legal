@@ -46,7 +46,7 @@ async function probeHealth(): Promise<{ payload: HealthPayload; status: 200 | 50
   const [llm, embed, corpus] = await Promise.all([probe(LLM_URL), probe(EMBED_URL), loadCorpus().then((s) => s.length).catch(() => 0)]);
   let database = "ok";
   try {
-    db().prepare("SELECT 1").get();
+    await db()`SELECT 1`;
   } catch (err) {
     database = (err as Error).message;
   }

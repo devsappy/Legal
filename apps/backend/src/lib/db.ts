@@ -1,17 +1,16 @@
-import Database from "better-sqlite3";
+import postgres, { type Sql } from "postgres";
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { mkdirSync } from "node:fs";
-import path from "node:path";
 import type { GlossaryRow, ReviewRow, UserRole } from "@sahayak/shared";
 
 /**
- * One SQLite file under data/ holds users, sessions, conversations,
- * feedback, the review queue and the glossary. Opened once per process;
- * the schema is created on first use and the demo admin is seeded so the
- * sign-in page keeps working out of the box.
+ * Postgres (Supabase) holds users, sessions, conversations, feedback, the
+ * review queue and the glossary. DATABASE_URL is the project's connection
+ * string; the schema is created on startup (ensureSchema) and the demo
+ * admin is seeded so the sign-in page keeps working out of the box.
+ *
+ * Queries use postgres.js tagged templates: db()`SELECT … WHERE id = ${id}`.
+ * `prepare: false` keeps it working through Supabase's transaction pooler.
  */
-const DB_PATH = process.env.DB_PATH ?? path.join(process.cwd(), "data", "sahayak.db");
-
 export type Role = UserRole;
 export type UserRow = { id: number; email: string; name: string; role: Role; created_at: string };
 export type ConversationRow = { id: string; user_id: number; title: string; messages: string; updated_at: string };
@@ -29,88 +28,110 @@ const GLOSSARY_SEED: Omit<GlossaryRow, "id">[] = [
 ];
 
 declare global {
-  var __sahayakDb: Database.Database | undefined;
+  var __sahayakSql: Sql | undefined;
 }
 
-function open(): Database.Database {
-  mkdirSync(path.dirname(DB_PATH), { recursive: true });
-  const db = new Database(DB_PATH);
-  db.pragma("journal_mode = WAL");
-  db.pragma("foreign_keys = ON");
-  db.exec(`
+function connect(): Sql {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error("DATABASE_URL is not set. Copy .env.example to .env and paste the Supabase connection string.");
+  }
+  return postgres(url, {
+    // Supabase's pooler (port 6543) does not support prepared statements.
+    prepare: false,
+    max: Number(process.env.DB_POOL ?? 5),
+    idle_timeout: 20,
+    connect_timeout: 15,
+    ssl: process.env.DB_SSL === "0" ? undefined : "require",
+    // CREATE … IF NOT EXISTS raises a NOTICE on every start; keep the log clean.
+    onnotice: () => undefined,
+    // Keep timestamps as ISO strings so JSON responses are stable across drivers.
+    types: {
+      timestamptz: { to: 1184, from: [1184, 1114], serialize: (v: string) => v, parse: (v: string) => new Date(v).toISOString() },
+    },
+  });
+}
+
+/** The shared connection pool; opened lazily so tests that only hash passwords never connect. */
+export function db(): Sql {
+  if (!globalThis.__sahayakSql) globalThis.__sahayakSql = connect();
+  return globalThis.__sahayakSql;
+}
+
+/** Creates the tables if they are missing and seeds the demo admin and glossary. Called once at startup. */
+export async function ensureSchema() {
+  const sql = db();
+  await sql`
     CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       email TEXT NOT NULL UNIQUE,
       name TEXT NOT NULL,
       password_hash TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'member',
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`;
+  await sql`
     CREATE TABLE IF NOT EXISTS sessions (
       token TEXT PRIMARY KEY,
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      expires_at TEXT NOT NULL
-    );
+      expires_at TIMESTAMPTZ NOT NULL
+    )`;
+  await sql`
     CREATE TABLE IF NOT EXISTS conversations (
       id TEXT PRIMARY KEY,
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       title TEXT NOT NULL,
       messages TEXT NOT NULL,
-      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-    CREATE INDEX IF NOT EXISTS conversations_user ON conversations(user_id, updated_at DESC);
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`;
+  await sql`CREATE INDEX IF NOT EXISTS conversations_user ON conversations(user_id, updated_at DESC)`;
+  await sql`
     CREATE TABLE IF NOT EXISTS feedback (
-      id INTEGER PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       message_id TEXT NOT NULL,
       user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
       value TEXT NOT NULL,
       note TEXT,
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`;
+  await sql`
     CREATE TABLE IF NOT EXISTS reviews (
-      id INTEGER PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       question TEXT NOT NULL,
       answer TEXT NOT NULL,
       language TEXT NOT NULL,
       jurisdiction TEXT NOT NULL,
-      confidence REAL NOT NULL,
+      confidence DOUBLE PRECISION NOT NULL,
       reason TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'open',
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`;
+  await sql`
     CREATE TABLE IF NOT EXISTS glossary (
-      id INTEGER PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       term TEXT NOT NULL UNIQUE,
       hi TEXT NOT NULL DEFAULT '',
       mr TEXT NOT NULL DEFAULT '',
       ta TEXT NOT NULL DEFAULT '',
       source TEXT NOT NULL DEFAULT ''
-    );
-  `);
-  seed(db);
-  return db;
+    )`;
+  await seed(sql);
 }
 
-function seed(db: Database.Database) {
-  const users = db.prepare("SELECT COUNT(*) AS n FROM users").get() as { n: number };
-  if (users.n === 0) {
-    db.prepare("INSERT INTO users (email, name, password_hash, role) VALUES (?, ?, ?, 'admin')").run(
-      "test@gmail.com",
-      "Test User",
-      hashPassword("1234"),
-    );
+async function seed(sql: Sql) {
+  const [users] = await sql<{ n: string }[]>`SELECT COUNT(*) AS n FROM users`;
+  if (Number(users.n) === 0) {
+    await sql`INSERT INTO users (email, name, password_hash, role) VALUES ('test@gmail.com', 'Test User', ${hashPassword("1234")}, 'admin')`;
   }
-  const terms = db.prepare("SELECT COUNT(*) AS n FROM glossary").get() as { n: number };
-  if (terms.n === 0) {
-    const ins = db.prepare("INSERT INTO glossary (term, hi, mr, ta, source) VALUES (?, ?, ?, ?, ?)");
-    for (const g of GLOSSARY_SEED) ins.run(g.term, g.hi, g.mr, g.ta, g.source);
+  const [terms] = await sql<{ n: string }[]>`SELECT COUNT(*) AS n FROM glossary`;
+  if (Number(terms.n) === 0) {
+    await sql`INSERT INTO glossary ${sql(GLOSSARY_SEED, "term", "hi", "mr", "ta", "source")}`;
   }
 }
 
-export function db(): Database.Database {
-  // Survives Next's dev-mode module reloads without piling up connections.
-  if (!globalThis.__sahayakDb) globalThis.__sahayakDb = open();
-  return globalThis.__sahayakDb;
+/** True for a UNIQUE-constraint violation (duplicate email or glossary term). */
+export function isUniqueViolation(err: unknown) {
+  return typeof err === "object" && err !== null && (err as { code?: string }).code === "23505";
 }
 
 /* ---- passwords ---- */

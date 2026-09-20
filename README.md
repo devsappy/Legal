@@ -8,7 +8,7 @@ cites the sections it relies on.
 
 ```
 apps/frontend    Next.js 16 UI (port 3000). Talks to the backend over HTTP only.
-apps/backend     Hono API on Node (port 4000): auth, chat pipeline, RAG, SQLite, admin.
+apps/backend     Hono API on Node (port 4000): auth, chat pipeline, RAG, Postgres, admin.
                  Also owns the corpus, ingestion scripts, model launchers and the eval set.
 packages/shared  Types and config both sides use (locales, jurisdictions, SSE contract).
 ```
@@ -19,6 +19,7 @@ Both apps are npm workspaces; run `npm install` once at the root.
 
 ```bash
 npm install
+cp apps/backend/.env.example apps/backend/.env   # paste your Supabase DATABASE_URL
 npm run dev            # everything in one terminal: chat model, embedding server, API, UI
 ```
 
@@ -87,9 +88,13 @@ Documents page.
 
 ## Data
 
-SQLite at `apps/backend/data/sahayak.db` (`lib/db.ts`): users, sessions, conversations,
-feedback, review queue, glossary. Passwords are scrypt-hashed; sessions are httpOnly
-cookies. The demo admin and the starter glossary are seeded on first start.
+Postgres on Supabase (`lib/db.ts`, postgres.js): users, sessions, conversations, feedback,
+review queue, glossary. The backend creates the tables on first start and seeds the demo
+admin and the starter glossary. Passwords are scrypt-hashed; sessions are httpOnly cookies.
+
+Setup: create a free project at supabase.com, open Project Settings › Database › Connection
+string (URI), pick the Session pooler, and put it in `apps/backend/.env` as `DATABASE_URL`.
+Any other Postgres works too (`DB_SSL=0` for a local server without TLS).
 
 ## Evaluation
 
@@ -127,8 +132,10 @@ across both workspaces (vitest: corpus parsing, BM25, password hashing, SSE pars
 
 ## Deploy
 
-`docker compose up --build` starts the frontend, the backend, the chat model (CUDA image)
-and the embedding model with API keys from `.env` (`LLM_API_KEY`, `EMBED_API_KEY`).
+`docker compose up --build` starts the frontend, the backend, a local Postgres, the chat
+model (CUDA image) and the embedding model with API keys from `.env` (`LLM_API_KEY`,
+`EMBED_API_KEY`). To use Supabase instead of the bundled Postgres, set `DATABASE_URL` in
+`.env` and drop the `db` service.
 Both app images build from the repository root (`apps/*/Dockerfile`). The backend's
 `data/` and `corpus/` are volumes. The frontend bakes `BACKEND_URL` into its `/api`
 rewrite at build time (compose passes it as a build arg). Put HTTPS termination (Caddy,
@@ -137,7 +144,7 @@ a hard timeout, but no global limiter.
 
 ## Configuration
 
-`apps/backend/.env.example`: port, model URLs and keys, context size, rate limit, timeout,
-DB path, CORS. `apps/frontend/.env.example`: `BACKEND_URL`, mock mode, or
+`apps/backend/.env.example`: `DATABASE_URL`, port, model URLs and keys, context size, rate
+limit, timeout, CORS. `apps/frontend/.env.example`: `BACKEND_URL`, mock mode, or
 `NEXT_PUBLIC_API_URL` to let the browser call the backend directly (then set
 `CORS_ORIGIN` on the backend).

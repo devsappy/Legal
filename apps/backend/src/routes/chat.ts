@@ -63,7 +63,7 @@ const SUPPORT_SCHEMA = {
 const USED_SCHEMA = { type: "object", properties: { used: { type: "array", items: { type: "integer" } } }, required: ["used"], additionalProperties: false };
 
 chat.post("/", async (c) => {
-  if (!currentUser(c)) return c.text("sign in first", 401);
+  if (!(await currentUser(c))) return c.text("sign in first", 401);
   const gate = allow(clientKey(c.req.raw), RATE_LIMIT);
   if (!gate.ok) return c.text("too many requests", 429, { "Retry-After": String(gate.retryAfter) });
   const signal = AbortSignal.any([c.req.raw.signal, AbortSignal.timeout(TIMEOUT_MS)]);
@@ -193,9 +193,9 @@ chat.post("/", async (c) => {
 
         if (analysis.intent !== "out_of_scope" && (finalConfidence < 0.55 || cited.length === 0)) {
           try {
-            db()
-              .prepare("INSERT INTO reviews (question, answer, language, jurisdiction, confidence, reason) VALUES (?, ?, ?, ?, ?, ?)")
-              .run(question, answer, answerLang, jurisdiction.id, finalConfidence, cited.length === 0 ? "no_citation" : "low_confidence");
+            await db()`
+              INSERT INTO reviews (question, answer, language, jurisdiction, confidence, reason)
+              VALUES (${question}, ${answer}, ${answerLang}, ${jurisdiction.id}, ${finalConfidence}, ${cited.length === 0 ? "no_citation" : "low_confidence"})`;
           } catch {
             /* the review queue is best effort */
           }
@@ -218,7 +218,7 @@ chat.post("/", async (c) => {
 
 /** Thumbs up/down. A thumbs-down also opens a review item. */
 chat.post("/:id/feedback", async (c) => {
-  const gate = requireUser(c);
+  const gate = await requireUser(c);
   if ("response" in gate) return gate.response;
   const id = c.req.param("id");
   const body = (await c.req.json().catch(() => ({}))) as {
@@ -230,16 +230,12 @@ chat.post("/:id/feedback", async (c) => {
     jurisdiction?: string;
   };
   if (body.value !== "up" && body.value !== "down") return c.json({ ok: false }, 400);
-  const d = db();
-  d.prepare("INSERT INTO feedback (message_id, user_id, value, note) VALUES (?, ?, ?, ?)").run(id, gate.user.id, body.value, body.note ?? null);
+  const sql = db();
+  await sql`INSERT INTO feedback (message_id, user_id, value, note) VALUES (${id}, ${gate.user.id}, ${body.value}, ${body.note ?? null})`;
   if (body.value === "down" && body.question) {
-    d.prepare("INSERT INTO reviews (question, answer, language, jurisdiction, confidence, reason) VALUES (?, ?, ?, ?, ?, 'thumbs_down')").run(
-      body.question,
-      body.answer ?? "",
-      body.language ?? "en",
-      body.jurisdiction ?? "central",
-      0,
-    );
+    await sql`
+      INSERT INTO reviews (question, answer, language, jurisdiction, confidence, reason)
+      VALUES (${body.question}, ${body.answer ?? ""}, ${body.language ?? "en"}, ${body.jurisdiction ?? "central"}, 0, 'thumbs_down')`;
   }
   return c.json({ ok: true });
 });
