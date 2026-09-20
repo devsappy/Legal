@@ -59,7 +59,7 @@ function splitHeading(h: string) {
   return { section: m[1].trim(), title: m[2].trim() };
 }
 
-function parse(markdown: string, jurisdiction: string, file: string): Section[] {
+export function parseMarkdown(markdown: string, jurisdiction: string, file: string): Section[] {
   const lines = markdown.split(/\r?\n/);
   const fallbackAct = JURISDICTIONS.find((j) => j.id === jurisdiction)?.act ?? path.basename(file);
   let act = fallbackAct;
@@ -104,7 +104,7 @@ export async function loadCorpus(): Promise<Section[]> {
   const sections: Section[] = [];
   for (const f of files) {
     const md = await fs.readFile(f.file, "utf8");
-    sections.push(...parse(md, f.jurisdiction, f.file));
+    sections.push(...parseMarkdown(md, f.jurisdiction, f.file));
   }
   cache = { stamp, sections };
   return sections;

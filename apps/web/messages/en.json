@@ -26,7 +26,9 @@
     "older": "Older",
     "noHistory": "Conversations you start will be listed here.",
     "noMatches": "No conversations match.",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "darkMode": "Dark theme",
+    "lightMode": "Light theme"
   },
   "landing": {
     "eyebrow": "For cooperative societies across India",
@@ -245,7 +247,9 @@
       "sections": "{count} sections",
       "retry": "Retry"
     },
-    "verifiedShort": "verified"
+    "verifiedShort": "verified",
+    "speak": "Read aloud",
+    "stopSpeaking": "Stop reading"
   },
   "checklists": {
     "title": "Procedures",
@@ -316,5 +320,50 @@
     "delete": "Delete",
     "resolve": "Resolve",
     "reopen": "Reopen"
+  },
+  "legal": {
+    "updated": "Last updated 20 September 2026",
+    "privacy": {
+      "title": "Privacy",
+      "sections": [
+        {
+          "heading": "What we store",
+          "body": "Your account (name, email, a salted password hash), your conversations, and any feedback you give on answers. Conversations are also kept in your browser so they open instantly."
+        },
+        {
+          "heading": "Where it goes",
+          "body": "Questions are answered by a language model running on the operator's own server; nothing is sent to third-party AI services. Questions the assistant was unsure about, and answers you mark as unhelpful, are placed in a review queue that administrators can read to improve the corpus."
+        },
+        {
+          "heading": "Voice",
+          "body": "Voice input uses your browser's speech recognition, which may send audio to your browser vendor for transcription. Read-aloud uses your device's speech synthesis and sends nothing."
+        },
+        {
+          "heading": "Your choices",
+          "body": "Delete a conversation from the sidebar to remove it from your account. Ask the operator to delete your account entirely."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of use",
+      "sections": [
+        {
+          "heading": "Information, not advice",
+          "body": "Sahakar Sahayak explains what cooperative-society law says and cites the sections it relies on. It is not a lawyer and does not give legal advice. For a dispute, a deadline or a penalty, confirm with the Registrar's office or a qualified lawyer before acting."
+        },
+        {
+          "heading": "Accuracy",
+          "body": "The Acts in the corpus are converted from official PDFs and may contain conversion errors or be out of date after amendments. Every answer shows its sources so you can check the text yourself; unverified citations are flagged."
+        },
+        {
+          "heading": "Acceptable use",
+          "body": "Use the service for lawful purposes related to cooperative societies. Do not attempt to overload the service or access other users' data."
+        },
+        {
+          "heading": "Availability",
+          "body": "The service is provided as is, without warranty, and may change or be withdrawn at any time."
+        }
+      ]
+    }
   }
 }

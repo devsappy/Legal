@@ -303,6 +303,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       <footer className="relative border-t border-rule-strong mt-auto bg-white dark:bg-paper">
         <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-14 flex items-center gap-4 text-[12.5px] text-ink-3">
           <span className="truncate">{t("app.notice")}</span>
+          <Link href="/privacy" className="shrink-0 hover:text-ink">{t("legal.privacy.title")}</Link>
+          <Link href="/terms" className="shrink-0 hover:text-ink">{t("legal.terms.title")}</Link>
           <Link href="/login" className="group ml-auto shrink-0 inline-flex items-center gap-1 text-ink-2 hover:text-ink">
             {t("landing.footerSignIn")} <ArrowRight size={12} className={ARROW} aria-hidden />
           </Link>

@@ -9,6 +9,7 @@ import { AnswerText } from "./AnswerText";
 import { PipelineTrace } from "./PipelineTrace";
 import { InlineSources } from "./InlineSources";
 import { Button } from "@/components/ui/Button";
+import { SpeakButton } from "./SpeakButton";
 
 type Props = {
   message: ChatMessage;
@@ -106,6 +107,7 @@ export function MessageBubble({ message, onFeedback, onRetry }: Props) {
           <footer className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 max-w-[68ch]">
             <span className="stamp">{t("stamp")}</span>
             <div className="flex items-center gap-1 ml-auto">
+              <SpeakButton text={message.text} lang={message.meta?.languageDetected ?? "en"} />
               {message.feedback ? (
                 <span className="text-[12px] text-ink-3">{t("thanks")}</span>
               ) : (

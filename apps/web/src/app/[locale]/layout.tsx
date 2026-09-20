@@ -37,6 +37,14 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={fontVariables} suppressHydrationWarning>
+      <head>
+        {/* Restore the chosen theme before paint; light is the default. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem("coop.theme")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-dvh flex flex-col bg-shell">
         <NextIntlClientProvider>
           <JurisdictionProvider>{children}</JurisdictionProvider>

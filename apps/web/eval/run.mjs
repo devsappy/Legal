@@ -21,7 +21,8 @@ const FILTER = opt("filter", "");
 const LIMIT = Number(opt("limit", "0"));
 
 const all = JSON.parse(readFileSync(new URL("./questions.json", import.meta.url), "utf8"));
-let questions = FILTER ? all.filter((q) => q.id.includes(FILTER)) : all;
+// "--filter -mr" selects a language (id suffix); anything else is a substring match.
+let questions = FILTER ? all.filter((q) => (/^-[a-z]{2}$/.test(FILTER) ? q.id.endsWith(FILTER) : q.id.includes(FILTER))) : all;
 if (LIMIT) questions = questions.slice(0, LIMIT);
 
 const SCRIPT = {
@@ -58,6 +59,7 @@ async function ask(q) {
     body: JSON.stringify({ session_id: "eval", message: q.question, language: q.lang, jurisdiction: q.jurisdiction }),
   });
   const text = await res.text();
+  if (!res.ok) return { answer: "", retrieved: [], cited: [], meta: {}, error: `HTTP ${res.status} ${text.slice(0, 80)}` };
   const events = [];
   for (const frame of text.split("\n\n")) {
     let event = "message";

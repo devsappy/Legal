@@ -116,7 +116,9 @@ export async function POST(req: NextRequest) {
 
         // 2 · find the sections
         const sections = await sectionsFor(jurisdiction.id);
-        const hits = await retrieve(sections, `${analysis.search_terms} ${question}`, question, jurisdiction.id, 5);
+        // Both signals see the English search terms: bge-m3 is far stronger English→English
+        // than Marathi→English, and the terms carry the legal vocabulary the question lacks.
+        const hits = await retrieve(sections, `${analysis.search_terms} ${question}`, `${analysis.search_terms}. ${question}`, jurisdiction.id, 5);
         const citations: Citation[] = hits.map((h, i) => ({
           id: i + 1,
           act: h.section.act,
@@ -163,6 +165,32 @@ export async function POST(req: NextRequest) {
 
         // 4 · verify: keep only the sources the answer cites, check each supports its sentences
         const used = new Set([...answer.matchAll(/\[(\d{1,2})\]/g)].map((m) => Number(m[1])));
+        // Small models sometimes answer from the sources but forget the [n] markers,
+        // most often in Marathi. Ask once which sources the answer drew on.
+        if (used.size === 0 && citations.length && answer.length > 80 && !signal.aborted) {
+          try {
+            const attributed = await chatJSON<{ used: number[] }>(
+              [
+                { role: "system", content: "Given an answer and numbered sources, list the numbers of the sources the answer's statements come from. Return an empty list if the answer does not rely on any of them." },
+                {
+                  role: "user",
+                  content: [
+                    "Answer:",
+                    answer,
+                    "",
+                    "Sources:",
+                    citations.map((c) => `[${c.id}] ${c.act} ${c.section} ${c.title}: ${clip(hits[c.id - 1].section.text, 900)}`).join("\n\n"),
+                  ].join("\n"),
+                },
+              ],
+              { type: "object", properties: { used: { type: "array", items: { type: "integer" } } }, required: ["used"], additionalProperties: false },
+              AbortSignal.any([signal, AbortSignal.timeout(20_000)]),
+            );
+            for (const n of attributed.used) if (n >= 1 && n <= citations.length) used.add(n);
+          } catch {
+            /* leave the answer uncited; it will be queued for review */
+          }
+        }
         const invented = [...used].filter((n) => n < 1 || n > citations.length).length;
         let cited = citations.filter((c) => used.has(c.id));
         if (cited.length && !signal.aborted) {

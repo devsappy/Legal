@@ -40,7 +40,7 @@ export async function* streamChat(
   }
 }
 
-function parseFrame(frame: string): StreamEvent | null {
+export function parseFrame(frame: string): StreamEvent | null {
   let event = "message";
   const dataLines: string[] = [];
   for (const line of frame.split("\n")) {

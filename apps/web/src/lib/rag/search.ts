@@ -13,7 +13,8 @@ const STOP = new Set(
 );
 
 export function tokenize(text: string): string[] {
-  return (text.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []).filter((t) => t.length > 1 && !STOP.has(t));
+  // \p{M} keeps vowel signs and viramas attached to their consonants in Indic scripts.
+  return (text.toLowerCase().match(/[\p{L}\p{M}\p{N}]+/gu) ?? []).filter((t) => t.length > 1 && !STOP.has(t));
 }
 
 type Doc = { section: Section; tf: Map<string, number>; len: number };

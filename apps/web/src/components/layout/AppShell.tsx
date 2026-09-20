@@ -10,6 +10,7 @@ import { JURISDICTIONS } from "@/lib/config";
 import { useJurisdiction } from "./JurisdictionProvider";
 import { JurisdictionSelect } from "./JurisdictionSelect";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { ThemeToggle } from "./ThemeToggle";
 import { Sidebar } from "./Sidebar";
 import type { SessionUser } from "@/lib/auth";
 import { Button } from "@/components/ui/Button";
@@ -160,6 +161,7 @@ function TopBar({
       <JurisdictionSelect />
 
       <div className="ml-auto flex items-center gap-2">
+        <ThemeToggle />
         <LanguageSwitcher />
         {onAsk && (
           <Button size="sm" variant="outline" onClick={exportChat} disabled={!hasChat} className="h-8 rounded-full px-3">
