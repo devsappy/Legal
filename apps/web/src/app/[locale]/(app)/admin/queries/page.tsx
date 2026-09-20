@@ -1,8 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { QUERIES, type QueryRow } from "@/lib/mock-data";
-import { LANGUAGES } from "@/lib/config";
+import { JURISDICTIONS, LANGUAGES } from "@/lib/config";
+import { db, type ReviewRow } from "@/lib/db";
 import { DataTable, StatusPill, type Column } from "@/components/admin/DataTable";
-import { Button } from "@/components/ui/Button";
+import { ReviewActions } from "@/components/admin/ReviewActions";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -14,26 +16,33 @@ export default async function QueriesPage({ params }: { params: Promise<{ locale
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("admin");
+  const rows = db()
+    .prepare("SELECT * FROM reviews ORDER BY CASE status WHEN 'open' THEN 0 ELSE 1 END, created_at DESC LIMIT 200")
+    .all() as ReviewRow[];
 
-  const reasonKind: Record<QueryRow["reason"], "warn" | "bad"> = {
-    low_confidence: "warn",
-    thumbs_down: "bad",
-    no_citation: "bad",
-  };
+  const reasonKind: Record<ReviewRow["reason"], "warn" | "bad"> = { low_confidence: "warn", thumbs_down: "bad", no_citation: "bad" };
 
-  const columns: Column<QueryRow>[] = [
-    { key: "question", header: t("columns.question"), render: (r) => <span className="text-ink">{r.question}</span>, className: "min-w-[18rem]" },
+  const columns: Column<ReviewRow>[] = [
+    {
+      key: "question",
+      header: t("columns.question"),
+      render: (r) => (
+        <details className="max-w-[40rem]">
+          <summary className="text-ink cursor-pointer">{r.question}</summary>
+          <p className="mt-2 text-[13px] text-ink-2 whitespace-pre-wrap">{r.answer || "—"}</p>
+        </details>
+      ),
+      className: "min-w-[18rem]",
+    },
     { key: "language", header: t("columns.language"), render: (r) => LANGUAGES.find((l) => l.code === r.language)?.native ?? r.language },
+    { key: "jurisdiction", header: t("columns.jurisdiction"), render: (r) => JURISDICTIONS.find((j) => j.id === r.jurisdiction)?.short ?? r.jurisdiction, mono: true },
     {
       key: "confidence",
       header: t("columns.confidence"),
       render: (r) => (
         <span className="inline-flex items-center gap-2">
           <span className="w-16 h-1.5 rounded-full bg-rule overflow-hidden" aria-hidden>
-            <span
-              className={r.confidence < 0.55 ? "block h-full bg-seal" : "block h-full bg-verified"}
-              style={{ width: `${Math.round(r.confidence * 100)}%` }}
-            />
+            <span className={r.confidence < 0.55 ? "block h-full bg-seal" : "block h-full bg-verified"} style={{ width: `${Math.round(r.confidence * 100)}%` }} />
           </span>
           <span className="font-mono text-[12.5px]">{Math.round(r.confidence * 100)}%</span>
         </span>
@@ -43,16 +52,16 @@ export default async function QueriesPage({ params }: { params: Promise<{ locale
     {
       key: "asked",
       header: t("columns.asked"),
-      render: (r) => new Date(r.asked).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }),
+      render: (r) => new Date(r.created_at + "Z").toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }),
       mono: true,
     },
-    { key: "actions", header: "", render: () => <Button size="sm">{t("review")}</Button>, className: "text-right" },
+    { key: "actions", header: "", render: (r) => <ReviewActions id={r.id} status={r.status} />, className: "text-right" },
   ];
 
   return (
     <>
       <p className="text-ink-2 text-[14px] max-w-[60ch] mb-4">{t("queriesIntro")}</p>
-      <DataTable columns={columns} rows={QUERIES} rowKey={(r) => r.id} empty={t("empty")} />
+      <DataTable columns={columns} rows={rows} rowKey={(r) => String(r.id)} empty={t("empty")} />
     </>
   );
 }

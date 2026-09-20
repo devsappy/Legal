@@ -10,4 +10,6 @@ if (-not $llama) {
   if (Test-Path $pkg) { $llama = $pkg } else { Write-Error "llama.cpp not found. Run: winget install llama.cpp"; exit 1 }
 } else { $llama = $llama.Source }
 
-& $llama serve -hf $model --embedding --pooling cls --host 127.0.0.1 --port 8081 -c 2048 -b 2048 -ub 2048 -ngl $ngl -dev Vulkan0 -a embed
+$extra = @()
+if ($env:EMBED_API_KEY) { $extra += @("--api-key", $env:EMBED_API_KEY) }
+& $llama serve -hf $model --embedding --pooling cls --host 127.0.0.1 --port 8081 -c 2048 -b 2048 -ub 2048 -ngl $ngl -dev Vulkan0 -a embed @extra

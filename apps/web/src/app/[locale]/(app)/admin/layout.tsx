@@ -1,4 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { redirect } from "@/i18n/navigation";
+import { getSessionUser } from "@/lib/auth";
 import { AdminNav } from "@/components/admin/AdminNav";
 
 export default async function AdminLayout({
@@ -10,6 +12,8 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const user = await getSessionUser();
+  if (user?.role !== "admin") redirect({ href: "/ask", locale });
   const t = await getTranslations("admin");
 
   return (

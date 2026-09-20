@@ -1,10 +1,13 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { RefreshCw, Upload } from "lucide-react";
-import { DOCUMENTS, type DocumentRow } from "@/lib/mock-data";
 import { JURISDICTIONS } from "@/lib/config";
+import { loadCorpus } from "@/lib/rag/corpus";
+import { hasIndex } from "@/lib/rag/embeddings";
 import { DataTable, StatusPill, type Column } from "@/components/admin/DataTable";
-import { Button } from "@/components/ui/Button";
-import { IndexingIndicator } from "@/components/admin/IndexingIndicator";
+import { DocumentsActions } from "@/components/admin/DocumentsActions";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -12,32 +15,45 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: t("documents") };
 }
 
+type DocRow = { file: string; title: string; jurisdiction: string; sections: number; updated: string; untitled: number };
+
 export default async function DocumentsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("admin");
 
-  const statusKind: Record<DocumentRow["status"], "ok" | "warn" | "bad" | "muted"> = {
-    indexed: "ok",
-    processing: "warn",
-    failed: "bad",
-    superseded: "muted",
-  };
+  // One row per corpus file, straight from what the assistant reads.
+  const sections = await loadCorpus();
+  const byFile = new Map<string, DocRow>();
+  for (const s of sections) {
+    const row = byFile.get(s.file) ?? { file: s.file, title: s.act, jurisdiction: s.jurisdiction, sections: 0, updated: "", untitled: 0 };
+    row.sections += 1;
+    if (!s.title) row.untitled += 1;
+    byFile.set(s.file, row);
+  }
+  const rows = await Promise.all(
+    [...byFile.values()].map(async (r) => {
+      const st = await fs.stat(path.join(process.cwd(), r.file)).catch(() => null);
+      return { ...r, updated: st ? st.mtime.toISOString().slice(0, 10) : "" };
+    }),
+  );
+  rows.sort((a, b) => a.jurisdiction.localeCompare(b.jurisdiction) || b.sections - a.sections);
+  const indexed = await hasIndex(sections);
 
-  const columns: Column<DocumentRow>[] = [
+  const columns: Column<DocRow>[] = [
     { key: "title", header: t("columns.title"), render: (r) => <span className="text-ink font-medium">{r.title}</span> },
     { key: "jurisdiction", header: t("columns.jurisdiction"), render: (r) => JURISDICTIONS.find((j) => j.id === r.jurisdiction)?.name ?? r.jurisdiction },
-    { key: "version", header: t("columns.version"), render: (r) => r.version, mono: true },
-    { key: "effective", header: t("columns.effective"), render: (r) => r.effective, mono: true },
-    { key: "chunks", header: t("columns.chunks"), render: (r) => r.chunks.toLocaleString(locale), mono: true, className: "text-right" },
+    { key: "file", header: t("columns.version"), render: (r) => r.file.replace(/\\/g, "/"), mono: true },
+    { key: "updated", header: t("columns.effective"), render: (r) => r.updated, mono: true },
+    { key: "sections", header: t("columns.chunks"), render: (r) => r.sections.toLocaleString(locale), mono: true, className: "text-right" },
     {
       key: "status",
       header: t("columns.status"),
       render: (r) =>
-        r.status === "processing" ? (
-          <IndexingIndicator label={t("processingLabel")} />
+        r.untitled ? (
+          <StatusPill kind="warn" label={t("untitled", { count: r.untitled })} />
         ) : (
-          <StatusPill kind={statusKind[r.status]} label={t(`status.${r.status}`)} />
+          <StatusPill kind={indexed ? "ok" : "muted"} label={indexed ? t("status.indexed") : t("status.processing")} />
         ),
     },
   ];
@@ -46,16 +62,12 @@ export default async function DocumentsPage({ params }: { params: Promise<{ loca
     <>
       <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
         <p className="text-ink-2 text-[14px] max-w-[60ch]">{t("documentsIntro")}</p>
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <RefreshCw size={14} /> {t("reindex")}
-          </Button>
-          <Button variant="primary">
-            <Upload size={14} /> {t("upload")}
-          </Button>
-        </div>
+        <DocumentsActions />
       </div>
-      <DataTable columns={columns} rows={DOCUMENTS} rowKey={(r) => r.id} empty={t("empty")} />
+      <DataTable columns={columns} rows={rows} rowKey={(r) => r.file} empty={t("empty")} />
+      <p className="mt-3 text-[12.5px] text-ink-3">
+        {t("corpusSummary", { sections: sections.length, files: rows.length })} {indexed ? t("indexReady") : t("indexMissing")}
+      </p>
     </>
   );
 }

@@ -37,10 +37,24 @@ function scriptShare(text, lang) {
   return own / letters;
 }
 
+// The chat route is behind sign-in; use the demo account (or EVAL_EMAIL / EVAL_PASSWORD).
+async function login() {
+  const res = await fetch(`${BASE}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: process.env.EVAL_EMAIL ?? "test@gmail.com", password: process.env.EVAL_PASSWORD ?? "1234" }),
+  });
+  if (!res.ok) throw new Error(`sign-in failed (${res.status})`);
+  const cookie = res.headers.get("set-cookie")?.split(";")[0];
+  if (!cookie) throw new Error("no session cookie returned");
+  return cookie;
+}
+const COOKIE = await login();
+
 async function ask(q) {
   const res = await fetch(`${BASE}/api/chat`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Cookie: COOKIE },
     body: JSON.stringify({ session_id: "eval", message: q.question, language: q.lang, jurisdiction: q.jurisdiction }),
   });
   const text = await res.text();

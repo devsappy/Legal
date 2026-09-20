@@ -2,19 +2,21 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft, CalendarClock, FileText, IndianRupee } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { CHECKLISTS, pick } from "@/lib/mock-data";
+import { pick } from "@/lib/mock-data";
+import { findProcedure, loadProcedures } from "@/lib/procedures";
 import { JURISDICTIONS } from "@/lib/config";
 import { routing } from "@/i18n/routing";
 
 type Params = Promise<{ locale: string; slug: string }>;
 
-export function generateStaticParams() {
-  return routing.locales.flatMap((locale) => CHECKLISTS.map((c) => ({ locale, slug: c.slug })));
+export async function generateStaticParams() {
+  const all = await loadProcedures();
+  return routing.locales.flatMap((locale) => all.map((c) => ({ locale, slug: c.slug })));
 }
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { locale, slug } = await params;
-  const c = CHECKLISTS.find((x) => x.slug === slug);
+  const c = await findProcedure(slug);
   return { title: c ? pick(c.title, locale) : undefined };
 }
 
@@ -22,7 +24,7 @@ export default async function ChecklistPage({ params }: { params: Params }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("checklists");
-  const c = CHECKLISTS.find((x) => x.slug === slug);
+  const c = await findProcedure(slug);
   if (!c) notFound();
   const j = JURISDICTIONS.find((x) => x.id === c.jurisdiction);
 

@@ -168,7 +168,21 @@
     "demoTitle": "Demo account",
     "useDemo": "Fill in demo details",
     "error": "That email and password don't match.",
-    "back": "Back to home"
+    "back": "Back to home",
+    "noAccount": "No account yet?"
+  },
+  "register": {
+    "title": "Create an account",
+    "subtitle": "Your conversations are saved to your account.",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least 6 characters.",
+    "submit": "Create account",
+    "creating": "Creating…",
+    "haveAccount": "Already have an account?",
+    "exists": "An account with this email already exists.",
+    "invalid": "Check the name, email and password."
   },
   "chat": {
     "placeholder": "Ask about membership, elections, audits, bylaws…",
@@ -284,6 +298,23 @@
     "addTerm": "Add term",
     "review": "Review",
     "empty": "Nothing to review.",
-    "processingLabel": "Indexing"
+    "processingLabel": "Indexing",
+    "actTitle": "Act title",
+    "file": "File (PDF, Markdown or text)",
+    "uploading": "Uploading…",
+    "uploaded": "Added {count} sections. Re-index to include them in search.",
+    "uploadFailed": "Upload failed.",
+    "uploadHint": "PDFs are converted with the ingest script; check the result under Documents.",
+    "reindexed": "Embedded {count} sections in {seconds}s.",
+    "reindexFailed": "Re-index failed.",
+    "untitled": "{count} untitled",
+    "corpusSummary": "{sections} sections across {files} files.",
+    "indexReady": "Vector index is current.",
+    "indexMissing": "Vector index is out of date — run Rebuild index.",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "resolve": "Resolve",
+    "reopen": "Reopen"
   }
 }

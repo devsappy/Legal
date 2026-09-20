@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { sendFeedback, streamChat } from "@/lib/api";
 import { SESSION_STORAGE_KEY } from "@/lib/config";
-import { getConversation, removeConversation, saveConversation } from "@/lib/history";
+import { deleteOnServer, getConversation, pushToServer, removeConversation, saveConversation, syncFromServer } from "@/lib/history";
 import type { ChatMessage } from "@/lib/types";
 
 function newId() {
@@ -62,18 +62,25 @@ export function useChat(language: string, jurisdiction: string) {
     }
   }
 
+  // The server keeps the signed-in user's conversations; merge them in once.
+  useEffect(() => {
+    void syncFromServer();
+  }, []);
+
   // Persist once the stream settles so the sidebar can list and reopen it.
   useEffect(() => {
     if (busy || !dirty.current || !sessionId) return;
     const firstUser = messages.find((m) => m.role === "user");
     if (!firstUser) return;
     dirty.current = false;
-    saveConversation({
+    const conversation = {
       id: sessionId,
       title: firstUser.text.replace(/\s+/g, " ").slice(0, 96),
       updatedAt: Date.now(),
       messages,
-    });
+    };
+    saveConversation(conversation);
+    pushToServer(conversation);
   }, [messages, busy, sessionId]);
 
   const patch = useCallback((id: string, fn: (m: ChatMessage) => ChatMessage) => {
@@ -202,6 +209,7 @@ export function useChat(language: string, jurisdiction: string) {
   const remove = useCallback(
     (id: string) => {
       removeConversation(id);
+      deleteOnServer(id);
       if (id === sessionId) reset();
     },
     [sessionId, reset],
@@ -211,9 +219,13 @@ export function useChat(language: string, jurisdiction: string) {
     (id: string, value: "up" | "down") => {
       dirty.current = true;
       patch(id, (m) => ({ ...m, feedback: value }));
-      void sendFeedback(id, value);
+      // Send the exchange along so a thumbs-down can open a review item.
+      const list = messagesRef.current;
+      const idx = list.findIndex((m) => m.id === id);
+      const question = [...list.slice(0, Math.max(0, idx))].reverse().find((m) => m.role === "user")?.text;
+      void sendFeedback(id, value, { question, answer: list[idx]?.text, language, jurisdiction });
     },
-    [patch],
+    [patch, language, jurisdiction],
   );
 
   return { messages, busy, sessionId, send, stop, retry, reset, open, remove, feedback };

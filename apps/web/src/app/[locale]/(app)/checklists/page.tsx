@@ -1,7 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { CHECKLISTS, pick } from "@/lib/mock-data";
+import { pick } from "@/lib/mock-data";
+import { loadProcedures } from "@/lib/procedures";
 import { JURISDICTIONS } from "@/lib/config";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -14,6 +15,7 @@ export default async function ChecklistsPage({ params }: { params: Promise<{ loc
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("checklists");
+  const CHECKLISTS = await loadProcedures();
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 sm:py-10">

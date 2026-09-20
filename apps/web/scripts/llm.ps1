@@ -12,4 +12,6 @@ if (-not $llama) {
 } else { $llama = $llama.Source }
 
 # -dev Vulkan0 keeps everything on the discrete GPU; without it llama.cpp also spreads layers onto an Intel iGPU and prefill crawls.
-& $llama serve -hf $model --host 127.0.0.1 --port 8080 -c $ctx -ngl 99 -dev Vulkan0 -fa on --no-mmproj -np 2 --reasoning off -a sahayak
+$extra = @()
+if ($env:LLM_API_KEY) { $extra += @("--api-key", $env:LLM_API_KEY) }
+& $llama serve -hf $model --host 127.0.0.1 --port 8080 -c $ctx -ngl 99 -dev Vulkan0 -fa on --no-mmproj -np 2 --reasoning off -a sahayak @extra

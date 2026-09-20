@@ -5,6 +5,7 @@
  */
 export const LLM_URL = (process.env.LLM_URL ?? "http://127.0.0.1:8080").replace(/\/$/, "");
 export const LLM_MODEL = process.env.LLM_MODEL ?? "sahayak";
+const LLM_API_KEY = process.env.LLM_API_KEY;
 
 export type Message = { role: "system" | "user" | "assistant"; content: string };
 
@@ -20,7 +21,7 @@ async function post(body: unknown, signal?: AbortSignal): Promise<Response> {
   try {
     res = await fetch(`${LLM_URL}/v1/chat/completions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(LLM_API_KEY ? { Authorization: `Bearer ${LLM_API_KEY}` } : {}) },
       body: JSON.stringify({ model: LLM_MODEL, ...(body as object) }),
       signal,
     });

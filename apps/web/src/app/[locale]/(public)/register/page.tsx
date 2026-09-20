@@ -1,22 +1,20 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft } from "lucide-react";
 import { Link, redirect } from "@/i18n/navigation";
-import { DEMO_ACCOUNT, getSessionUser } from "@/lib/auth";
-import { LoginForm } from "@/components/auth/LoginForm";
+import { getSessionUser } from "@/lib/auth";
+import { RegisterForm } from "@/components/auth/RegisterForm";
 import { BrandMark } from "@/components/ui/BrandMark";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "login" });
+  const t = await getTranslations({ locale, namespace: "register" });
   return { title: t("title") };
 }
 
-export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   if (await getSessionUser()) redirect({ href: "/ask", locale });
-
   const t = await getTranslations();
 
   return (
@@ -37,19 +35,14 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
         <div className="rise w-full max-w-[420px]">
           <div className="rounded-2xl border border-rule bg-sheet p-6 sm:p-8">
             <BrandMark size={40} className="mb-6" />
-            <h1 className="text-[28px] font-medium tracking-[-0.03em] text-ink mb-1.5">{t("login.title")}</h1>
-            <p className="text-[14.5px] text-ink-2 mb-7">{t("login.subtitle")}</p>
-            <LoginForm demo={{ email: DEMO_ACCOUNT.email, password: DEMO_ACCOUNT.password }} />
+            <h1 className="text-[28px] font-medium tracking-[-0.03em] text-ink mb-1.5">{t("register.title")}</h1>
+            <p className="text-[14.5px] text-ink-2 mb-7">{t("register.subtitle")}</p>
+            <RegisterForm />
           </div>
           <p className="mt-5 text-center text-[13px] text-ink-2">
-            {t("login.noAccount")}{" "}
-            <Link href="/register" className="text-ink underline underline-offset-2">
-              {t("register.title")}
-            </Link>
-          </p>
-          <p className="mt-2 text-center text-[13px]">
-            <Link href="/" className="inline-flex items-center gap-1.5 text-ink-2 hover:text-ink">
-              <ArrowLeft size={14} aria-hidden /> {t("login.back")}
+            {t("register.haveAccount")}{" "}
+            <Link href="/login" className="text-ink underline underline-offset-2">
+              {t("login.title")}
             </Link>
           </p>
         </div>

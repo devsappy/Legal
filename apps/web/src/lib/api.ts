@@ -55,12 +55,14 @@ function parseFrame(frame: string): StreamEvent | null {
   }
 }
 
-export async function sendFeedback(messageId: string, value: "up" | "down", note?: string) {
+export type FeedbackContext = { question?: string; answer?: string; language?: string; jurisdiction?: string; note?: string };
+
+export async function sendFeedback(messageId: string, value: "up" | "down", context: FeedbackContext = {}) {
   if (!CHAT_ENDPOINT.startsWith("/api/mock")) {
     await fetch(`${CHAT_ENDPOINT}/${messageId}/feedback`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ value, note }),
+      body: JSON.stringify({ value, ...context }),
     }).catch(() => undefined);
   }
 }

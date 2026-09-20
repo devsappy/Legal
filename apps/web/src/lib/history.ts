@@ -62,6 +62,41 @@ export function removeConversation(id: string) {
   write(read().filter((x) => x.id !== id));
 }
 
+export function clearHistory() {
+  write([]);
+}
+
+/* ---- server copy: the signed-in user's conversations, kept in sync best-effort ---- */
+
+/** Pull the server's list and merge it in, newer revision wins per id. */
+export async function syncFromServer() {
+  try {
+    const res = await fetch("/api/conversations");
+    if (!res.ok) return;
+    const data = (await res.json()) as { conversations?: Conversation[] };
+    const local = new Map(read().map((c) => [c.id, c]));
+    for (const c of data.conversations ?? []) {
+      const mine = local.get(c.id);
+      if (!mine || mine.updatedAt < c.updatedAt) local.set(c.id, c);
+    }
+    write([...local.values()].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, LIMIT));
+  } catch {
+    /* offline or signed out */
+  }
+}
+
+export function pushToServer(c: Conversation) {
+  fetch("/api/conversations", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: c.id, title: c.title, messages: c.messages }),
+  }).catch(() => undefined);
+}
+
+export function deleteOnServer(id: string) {
+  fetch(`/api/conversations?id=${encodeURIComponent(id)}`, { method: "DELETE" }).catch(() => undefined);
+}
+
 export function getConversation(id: string) {
   return read().find((x) => x.id === id);
 }

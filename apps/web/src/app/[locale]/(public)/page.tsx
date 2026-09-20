@@ -2,7 +2,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowRight, BookOpenCheck, Check, Languages, Scale, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { JURISDICTIONS, LANGUAGES } from "@/lib/config";
-import { CHECKLISTS, DOCUMENTS, GLOSSARY, pick } from "@/lib/mock-data";
+import { GLOSSARY, pick } from "@/lib/mock-data";
+import { loadProcedures } from "@/lib/procedures";
+import { loadCorpus } from "@/lib/rag/corpus";
 import { BrandMark } from "@/components/ui/BrandMark";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { Skyline } from "@/components/landing/Skyline";
@@ -37,7 +39,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
   const doesNot = t.raw("landing.trust.doesNot") as string[];
   const faq = t.raw("landing.faq.items") as { q: string; a: string }[];
 
-  const indexed = DOCUMENTS.filter((d) => d.status === "indexed").reduce((n, d) => n + d.chunks, 0);
+  const [CHECKLISTS, corpus] = await Promise.all([loadProcedures(), loadCorpus()]);
+  const indexed = corpus.length;
   const stats = [
     { value: LANGUAGES.length, label: t("landing.stats.languages") },
     { value: JURISDICTIONS.length, label: t("landing.stats.acts") },

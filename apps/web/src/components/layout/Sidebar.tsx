@@ -15,7 +15,7 @@ import {
 import clsx from "clsx";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useChatContext } from "@/components/chat/ChatProvider";
-import { bucketOf, useHistory, type HistoryBucket } from "@/lib/history";
+import { bucketOf, clearHistory, useHistory, type HistoryBucket } from "@/lib/history";
 import { LatticeLoader } from "@/components/reactbits";
 import { BrandMark } from "@/components/ui/BrandMark";
 import type { SessionUser } from "@/lib/auth";
@@ -69,6 +69,7 @@ export function Sidebar({ user, onCollapse, onNavigate, hotkey }: Props) {
   const signOut = async () => {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => null);
     chat.reset();
+    clearHistory();
     router.replace("/login");
     router.refresh();
   };
@@ -135,7 +136,7 @@ export function Sidebar({ user, onCollapse, onNavigate, hotkey }: Props) {
       {/* Primary nav */}
       <nav aria-label="Primary">
         <ul className="space-y-0.5">
-          {NAV.map((item) => {
+          {NAV.filter((item) => item.key !== "admin" || user.role === "admin").map((item) => {
             const active = isActive(item);
             const Icon = item.icon;
             return (
