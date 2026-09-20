@@ -1,0 +1,15 @@
+{
+  "name": "sahakar-sahayak",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:backend": "npm run dev --workspace apps/backend",
+    "dev:frontend": "npm run dev --workspace apps/frontend",
+    "llm": "npm run llm --workspace apps/backend",
+    "embed": "npm run embed --workspace apps/backend",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspace apps/frontend"
+  }
+}

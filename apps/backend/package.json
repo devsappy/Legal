@@ -1,0 +1,34 @@
+{
+  "name": "@sahayak/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src tests",
+    "test": "vitest run",
+    "llm": "powershell -ExecutionPolicy Bypass -File scripts/llm.ps1",
+    "embed": "powershell -ExecutionPolicy Bypass -File scripts/embed.ps1",
+    "ingest": "node scripts/ingest.mjs",
+    "eval": "node eval/run.mjs"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "@sahayak/shared": "*",
+    "better-sqlite3": "^12.2.0",
+    "hono": "^4.7.0",
+    "pdf-parse": "^2.4.5",
+    "tsx": "^4.20.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22",
+    "eslint": "^9",
+    "typescript": "^5",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^3"
+  }
+}

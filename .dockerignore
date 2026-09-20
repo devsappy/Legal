@@ -1,0 +1,11 @@
+**/node_modules
+**/.next
+**/data
+**/eval/results
+**/corpus/_sources
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.github
+components.md.txt

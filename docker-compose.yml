@@ -1,0 +1,85 @@
+# Whole stack: frontend + backend + chat model + embedding model.
+# GPU: the llama.cpp CUDA image needs the NVIDIA container toolkit; swap the
+# image tag for `server` (CPU) or `server-vulkan` if you have no CUDA.
+services:
+  llm:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    command: >
+      -hf unsloth/Qwen3.5-4B-GGUF:Q4_K_M --host 0.0.0.0 --port 8080
+      -c 16384 -ngl 99 -fa on --no-mmproj -np 2 --reasoning off -a sahayak
+      --api-key ${LLM_API_KEY:-change-me}
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 40
+    restart: unless-stopped
+
+  embed:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    command: >
+      -hf gpustack/bge-m3-GGUF:Q8_0 --embedding --pooling cls --host 0.0.0.0 --port 8081
+      -c 2048 -b 2048 -ub 2048 -a embed --api-key ${EMBED_API_KEY:-change-me}
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8081/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 40
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    environment:
+      LLM_URL: http://llm:8080
+      LLM_API_KEY: ${LLM_API_KEY:-change-me}
+      EMBED_URL: http://embed:8081
+      EMBED_API_KEY: ${EMBED_API_KEY:-change-me}
+      DB_PATH: /repo/apps/backend/data/sahayak.db
+      CHAT_RATE_LIMIT: "30"
+      COOKIE_SECURE: "0"   # plain http between the browser and the frontend; set to 1 behind HTTPS
+    volumes:
+      - backend-data:/repo/apps/backend/data
+      - ./apps/backend/corpus:/repo/apps/backend/corpus
+    depends_on:
+      llm:
+        condition: service_healthy
+      embed:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      args:
+        BACKEND_URL: http://backend:4000
+    environment:
+      BACKEND_URL: http://backend:4000
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  hf-cache:
+  backend-data:
