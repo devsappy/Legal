@@ -136,6 +136,12 @@ across both workspaces (vitest: corpus parsing, BM25, password hashing, SSE pars
 model (CUDA image) and the embedding model with API keys from `.env` (`LLM_API_KEY`,
 `EMBED_API_KEY`). To use Supabase instead of the bundled Postgres, set `DATABASE_URL` in
 `.env` and drop the `db` service.
+
+**Free hosting**: `render.yaml` deploys just the backend to Render's free tier, pointed at
+Supabase for data and Groq/Cloudflare (also free, OpenAI-compatible) for the model and
+embeddings — see the comments in `render.yaml` and `apps/backend/.env.example` for the
+exact values. The frontend deploys separately (e.g. Vercel) with `BACKEND_URL` set to the
+Render service's URL.
 Both app images build from the repository root (`apps/*/Dockerfile`). The backend's
 `data/` and `corpus/` are volumes. The frontend bakes `BACKEND_URL` into its `/api`
 rewrite at build time (compose passes it as a build arg). Put HTTPS termination (Caddy,

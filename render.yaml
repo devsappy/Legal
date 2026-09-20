@@ -1,0 +1,44 @@
+# Render Blueprint for the backend API. In the Render dashboard:
+#   New > Blueprint > connect this repo > it finds this file automatically.
+# Render sets PORT itself; the app already reads it (see apps/backend/src/server.ts).
+# Fields with sync: false are secrets/URLs you paste in the Render dashboard after the
+# first deploy (Environment tab) — see apps/backend/.env.example for what each one does.
+services:
+  - type: web
+    name: sahayak-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./apps/backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      # Supabase connection string (Session pooler, port 5432) — Project Settings > Database
+      - key: DATABASE_URL
+        sync: false
+      # Chat model. Groq's free tier is OpenAI-compatible; strict JSON-schema output
+      # (used for triage/verification) only works on these Groq models: openai/gpt-oss-120b,
+      # openai/gpt-oss-20b, qwen/qwen3-32b — not llama-3.3-70b-versatile.
+      - key: LLM_URL
+        value: https://api.groq.com/openai
+      - key: LLM_MODEL
+        value: openai/gpt-oss-120b
+      - key: LLM_API_KEY
+        sync: false
+      # Embeddings (optional — retrieval falls back to BM25 without them). Cloudflare
+      # Workers AI's free tier is also OpenAI-compatible:
+      #   EMBED_URL = https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/ai
+      - key: EMBED_URL
+        sync: false
+      - key: EMBED_MODEL
+        value: "@cf/baai/bge-m3"
+      - key: EMBED_API_KEY
+        sync: false
+      # The frontend's origin, so the browser can call this API directly if it isn't
+      # proxied through Next's rewrite (NEXT_PUBLIC_API_URL on the frontend).
+      - key: CORS_ORIGIN
+        sync: false
+      - key: COOKIE_SECURE
+        value: "1"
+      - key: CHAT_RATE_LIMIT
+        value: "30"
