@@ -27,3 +27,45 @@ export async function backendPublic<T>(path: string, revalidate = 60): Promise<T
     return null;
   }
 }
+
+/* ---- result variants: pages branch on status instead of getting a bare null ---- */
+
+/**
+ * Outcome of a backend call. `ok: false` carries the HTTP status (401 -> sign
+ * in, 404 -> not found, 5xx -> the model server may still be starting) or
+ * "network" when nothing answered, plus the parsed error body when there is one.
+ */
+export type BackendResult<T> =
+  | { ok: true; status: number; data: T }
+  | { ok: false; status: number | "network"; body?: unknown };
+
+async function toResult<T>(res: Response): Promise<BackendResult<T>> {
+  let body: unknown;
+  try {
+    body = await res.json();
+  } catch {
+    body = undefined;
+  }
+  return res.ok ? { ok: true, status: res.status, data: body as T } : { ok: false, status: res.status, body };
+}
+
+/** GET as the signed-in user; never throws. */
+export async function backendResult<T>(path: string): Promise<BackendResult<T>> {
+  const cookie = (await headers()).get("cookie") ?? "";
+  try {
+    const res = await fetch(`${BACKEND_URL}${path}`, { headers: { cookie }, cache: "no-store" });
+    return await toResult<T>(res);
+  } catch {
+    return { ok: false, status: "network" };
+  }
+}
+
+/** GET a public route without cookies, cached briefly; never throws. */
+export async function backendPublicResult<T>(path: string, revalidate = 60): Promise<BackendResult<T>> {
+  try {
+    const res = await fetch(`${BACKEND_URL}${path}`, { next: { revalidate } });
+    return await toResult<T>(res);
+  } catch {
+    return { ok: false, status: "network" };
+  }
+}

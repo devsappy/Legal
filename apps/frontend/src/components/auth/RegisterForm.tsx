@@ -1,96 +1,160 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowRight, KeyRound, Mail, User } from "lucide-react";
-import clsx from "clsx";
-import { useRouter } from "@/i18n/navigation";
+import { ArrowRight, Mail, User } from "lucide-react";
+import { Link, useRouter } from "@/i18n/navigation";
+import { Badge, Button, Field, Input } from "@/components/ui";
+import { setPlan } from "@/lib/onboarding";
+import { PASSWORD_MIN, email as emailRule, hasErrors, minLength, name as nameRule, validateAll } from "@/lib/validate";
+import { FormError, errorKindFor, type FormErrorKind } from "./FormError";
+import { PasswordField } from "./PasswordField";
 
-/** Text input with a leading glyph. Lives at module scope so typing never remounts it. */
-function Field({ icon: Icon, invalid, ...props }: { icon: typeof Mail; invalid: boolean } & React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <span className="relative block">
-      <Icon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" aria-hidden />
-      <input
-        {...props}
-        className={clsx(
-          "h-11 w-full rounded-xl border bg-sheet pl-10 pr-3 text-[15px] text-ink placeholder:text-ink-3 outline-none transition-colors focus:border-brand/60",
-          invalid ? "border-seal/60" : "border-rule",
-        )}
-      />
-    </span>
-  );
-}
+type Props = {
+  /** The pricing tile the visitor came from (?plan=), persisted on success. */
+  plan?: string | null;
+};
 
-export function RegisterForm() {
-  const t = useTranslations("register");
+type Key = "name" | "email" | "password";
+
+const RULES = { name: nameRule, email: emailRule, password: minLength(PASSWORD_MIN) } as const;
+
+export function RegisterForm({ plan = null }: Props) {
+  const t = useTranslations();
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [values, setValues] = useState<Record<Key, string>>({ name: "", email: "", password: "" });
+  const [touched, setTouched] = useState<Partial<Record<Key, boolean>>>({});
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<"exists" | "invalid" | null>(null);
+  const [error, setError] = useState<FormErrorKind | null>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const errors = validateAll(values, RULES);
+  const message = (key: Key) =>
+    touched[key] && errors[key] ? t(`auth.validation.${errors[key]}`, { min: PASSWORD_MIN }) : undefined;
+
+  const set = (key: Key) => (value: string) => {
+    setValues((v) => ({ ...v, [key]: value }));
+    if (error) setError(null);
+  };
+  const touch = (key: Key) => () => setTouched((x) => ({ ...x, [key]: true }));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (pending) return;
+    setTouched({ name: true, email: true, password: true });
+    if (hasErrors(errors)) {
+      (errors.name ? nameRef : errors.email ? emailRef : passwordRef).current?.focus();
+      return;
+    }
     setPending(true);
     setError(null);
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name: values.name.trim(), email: values.email.trim(), password: values.password }),
     }).catch(() => null);
-    const data = (await res?.json().catch(() => null)) as { ok?: boolean; error?: "exists" | "invalid" } | null;
-    if (data?.ok) {
-      router.replace("/ask");
+    if (res?.ok) {
+      if (plan) setPlan(plan);
+      router.replace("/home?welcome=1");
       router.refresh();
       return;
     }
-    setError(data?.error ?? "invalid");
+    setError(errorKindFor(res, "invalid"));
     setPending(false);
+    if (res?.status === 409) emailRef.current?.focus();
   };
 
-  const invalid = error !== null;
-
   return (
-    <form onSubmit={submit} className="space-y-4" noValidate>
-      <label className="block">
-        <span className="block mb-1.5 text-[13px] font-medium text-ink-2">{t("name")}</span>
-        <Field icon={User} invalid={invalid} name="name" autoComplete="name" required value={name} onChange={(e) => setName(e.target.value)} />
-      </label>
-      <label className="block">
-        <span className="block mb-1.5 text-[13px] font-medium text-ink-2">{t("email")}</span>
-        <Field icon={Mail} invalid={invalid} type="email" name="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-      </label>
-      <label className="block">
-        <span className="block mb-1.5 text-[13px] font-medium text-ink-2">{t("password")}</span>
-        <Field
-          icon={KeyRound}
-          invalid={invalid}
-          type="password"
-          name="password"
-          autoComplete="new-password"
-          required
-          minLength={6}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <span className="mt-1 block text-[12px] text-ink-3">{t("passwordHint")}</span>
-      </label>
-      {error && (
-        <p role="alert" className="rounded-lg border border-seal/30 bg-seal-soft px-3 py-2 text-[13px] text-ink">
-          {t(error)}
+    <form onSubmit={submit} className="flex flex-col gap-4">
+      {plan && (
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-rule bg-muted/50 px-3 py-2 text-xs text-ink-2">
+          {t.rich("register.planNote", {
+            plan,
+            b: (chunks) => (
+              <Badge kind="solid" mono>
+                {chunks}
+              </Badge>
+            ),
+          })}
         </p>
       )}
-      <button
-        type="submit"
-        disabled={pending}
-        className="h-11 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-ink text-paper text-[14.5px] font-medium hover:opacity-90 disabled:opacity-60 transition-opacity"
-      >
-        {pending ? t("creating") : t("submit")}
-        {!pending && <ArrowRight size={16} aria-hidden />}
-      </button>
+
+      <Field id="register-name" label={t("register.name")} error={message("name")}>
+        {(a11y) => (
+          <Input
+            {...a11y}
+            ref={nameRef}
+            type="text"
+            name="name"
+            autoComplete="name"
+            autoFocus
+            value={values.name}
+            onChange={(e) => set("name")(e.target.value)}
+            onBlur={touch("name")}
+            icon={<User size={15} strokeWidth={1.75} />}
+          />
+        )}
+      </Field>
+
+      <Field id="register-email" label={t("register.email")} error={message("email")}>
+        {(a11y) => (
+          <Input
+            {...a11y}
+            ref={emailRef}
+            type="email"
+            name="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="off"
+            spellCheck={false}
+            value={values.email}
+            onChange={(e) => set("email")(e.target.value)}
+            onBlur={touch("email")}
+            icon={<Mail size={15} strokeWidth={1.75} />}
+          />
+        )}
+      </Field>
+
+      <PasswordField
+        id="register-password"
+        ref={passwordRef}
+        label={t("register.password")}
+        value={values.password}
+        onChange={set("password")}
+        onBlur={touch("password")}
+        error={message("password")}
+        hint={message("password") ? undefined : t("register.passwordHint")}
+        autoComplete="new-password"
+        strength
+      />
+
+      <FormError kind={error} />
+
+      <Button type="submit" variant="primary" size="lg" loading={pending} className="group mt-1 w-full">
+        {t("register.submit")}
+        <ArrowRight
+          size={16}
+          className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none [html[data-motion=reduced]_&]:transition-none"
+          aria-hidden
+        />
+      </Button>
+
+      <p className="text-center text-xs leading-relaxed text-ink-3">
+        {t.rich("auth.consent", {
+          terms: (chunks) => (
+            <Link href="/terms" className="text-ink underline underline-offset-2 hover:text-ink-2">
+              {chunks}
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link href="/privacy" className="text-ink underline underline-offset-2 hover:text-ink-2">
+              {chunks}
+            </Link>
+          ),
+        })}
+      </p>
     </form>
   );
 }

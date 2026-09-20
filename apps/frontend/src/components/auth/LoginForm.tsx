@@ -1,123 +1,114 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowRight, KeyRound, Mail, Sparkles } from "lucide-react";
-import clsx from "clsx";
+import { ArrowRight, Mail } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
+import { Button, Field, Input } from "@/components/ui";
+import { email as emailRule, hasErrors, required, validateAll } from "@/lib/validate";
+import { FormError, errorKindFor, type FormErrorKind } from "./FormError";
+import { PasswordField } from "./PasswordField";
 
 type Props = {
-  /** Shown on the form so anyone can try the product without an account. */
-  demo: { email: string; password: string };
+  /** Validated return path (safeNext) or "/home"; the page decides. */
+  next: string;
+  /** False when ?demo=1 gave the focus to the demo button instead. */
+  autoFocus?: boolean;
 };
 
-export function LoginForm({ demo }: Props) {
-  const t = useTranslations("login");
+type Key = "email" | "password";
+
+/** The demo password is four characters, so sign-in only asks for presence. */
+const RULES = { email: emailRule, password: required } as const;
+
+export function LoginForm({ next, autoFocus = true }: Props) {
+  const t = useTranslations();
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [values, setValues] = useState<Record<Key, string>>({ email: "", password: "" });
+  const [touched, setTouched] = useState<Partial<Record<Key, boolean>>>({});
   const [pending, setPending] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [error, setError] = useState<FormErrorKind | null>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  // Derived on every render: no effect, no stale copy of the errors.
+  const errors = validateAll(values, RULES);
+  const message = (key: Key) => (touched[key] && errors[key] ? t(`auth.validation.${errors[key]}`) : undefined);
+
+  const set = (key: Key) => (value: string) => {
+    setValues((v) => ({ ...v, [key]: value }));
+    if (error) setError(null);
+  };
+  const touch = (key: Key) => () => setTouched((x) => ({ ...x, [key]: true }));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (pending) return;
+    setTouched({ email: true, password: true });
+    if (hasErrors(errors)) {
+      (errors.email ? emailRef : passwordRef).current?.focus();
+      return;
+    }
     setPending(true);
-    setFailed(false);
+    setError(null);
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email: values.email.trim(), password: values.password }),
     }).catch(() => null);
     if (res?.ok) {
-      router.replace("/ask");
+      router.replace(next);
       router.refresh();
       return;
     }
-    setFailed(true);
+    setError(errorKindFor(res, "credentials"));
     setPending(false);
+    passwordRef.current?.focus();
   };
 
-  const field =
-    "h-11 w-full rounded-xl border bg-sheet pl-10 pr-3 text-[15px] text-ink placeholder:text-ink-3 outline-none transition-colors focus:border-brand/60";
-
   return (
-    <form onSubmit={submit} className="space-y-4" noValidate>
-      <label className="block">
-        <span className="block mb-1.5 text-[13px] font-medium text-ink-2">{t("email")}</span>
-        <span className="relative block">
-          <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" aria-hidden />
-          <input
+    <form onSubmit={submit} className="flex flex-col gap-4">
+      <Field id="login-email" label={t("login.email")} error={message("email")}>
+        {(a11y) => (
+          <Input
+            {...a11y}
+            ref={emailRef}
             type="email"
             name="email"
+            inputMode="email"
             autoComplete="username"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={demo.email}
-            aria-invalid={failed || undefined}
-            className={clsx(field, failed ? "border-seal/60" : "border-rule")}
+            autoCapitalize="off"
+            spellCheck={false}
+            autoFocus={autoFocus}
+            value={values.email}
+            onChange={(e) => set("email")(e.target.value)}
+            onBlur={touch("email")}
+            icon={<Mail size={15} strokeWidth={1.75} />}
           />
-        </span>
-      </label>
+        )}
+      </Field>
 
-      <label className="block">
-        <span className="block mb-1.5 text-[13px] font-medium text-ink-2">{t("password")}</span>
-        <span className="relative block">
-          <KeyRound size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" aria-hidden />
-          <input
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••"
-            aria-invalid={failed || undefined}
-            className={clsx(field, failed ? "border-seal/60" : "border-rule")}
-          />
-        </span>
-      </label>
+      <PasswordField
+        id="login-password"
+        ref={passwordRef}
+        label={t("login.password")}
+        value={values.password}
+        onChange={set("password")}
+        onBlur={touch("password")}
+        error={message("password")}
+        autoComplete="current-password"
+      />
 
-      {failed && (
-        <p role="alert" className="rounded-lg border border-seal/30 bg-seal-soft px-3 py-2 text-[13px] text-ink">
-          {t("error")}
-        </p>
-      )}
+      <FormError kind={error} />
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="h-11 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-ink text-paper text-[14.5px] font-medium hover:opacity-90 disabled:opacity-60 transition-opacity"
-      >
-        {pending ? t("signingIn") : t("submit")}
-        {!pending && <ArrowRight size={16} aria-hidden />}
-      </button>
-
-      {/* Demo account: one click fills the form, a second click signs in. */}
-      <div className="rounded-xl border border-dashed border-brand/40 bg-brand-soft/50 p-3.5">
-        <div className="flex items-center gap-2 text-[12.5px] font-medium text-brand mb-2">
-          <Sparkles size={14} aria-hidden />
-          {t("demoTitle")}
-        </div>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[13px] font-mono text-ink-2">
-          <dt className="text-ink-3">{t("email")}</dt>
-          <dd className="text-ink">{demo.email}</dd>
-          <dt className="text-ink-3">{t("password")}</dt>
-          <dd className="text-ink">{demo.password}</dd>
-        </dl>
-        <button
-          type="button"
-          onClick={() => {
-            setEmail(demo.email);
-            setPassword(demo.password);
-            setFailed(false);
-          }}
-          className="mt-3 h-8 px-3 rounded-full border border-rule bg-sheet text-[12.5px] font-medium text-ink hover:border-brand/50 transition-colors"
-        >
-          {t("useDemo")}
-        </button>
-      </div>
+      <Button type="submit" variant="primary" size="lg" loading={pending} className="group mt-1 w-full">
+        {t("login.submit")}
+        <ArrowRight
+          size={16}
+          className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none [html[data-motion=reduced]_&]:transition-none"
+          aria-hidden
+        />
+      </Button>
     </form>
   );
 }

@@ -10,7 +10,11 @@
     "admin": "Admin",
     "language": "Language",
     "jurisdiction": "Jurisdiction",
-    "skip": "Skip to conversation"
+    "skip": "Skip to conversation",
+    "home": "Home",
+    "settings": "Settings",
+    "help": "Help",
+    "status": "Status"
   },
   "shell": {
     "search": "Search conversations",
@@ -28,7 +32,47 @@
     "noMatches": "No conversations match.",
     "signOut": "Sign out",
     "darkMode": "Dark theme",
-    "lightMode": "Light theme"
+    "lightMode": "Light theme",
+    "rail": "Collapse to icons",
+    "toggleSidebar": "Toggle sidebar",
+    "more": "More options",
+    "exportOne": "Export conversation",
+    "exported": "Conversation exported",
+    "nothingToExport": "Nothing to export yet",
+    "deleteTitle": "Delete",
+    "deleted": "Conversation deleted",
+    "undo": "Undo",
+    "open": "Open",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "pinned": "Pinned",
+    "rename": "Rename",
+    "renameHint": "Enter to save, Escape to cancel",
+    "renameLabel": "Conversation title",
+    "conversations": "Conversations",
+    "primaryNav": "Primary",
+    "noHistoryTitle": "No conversations yet",
+    "noHistoryBody": "Ask your first question and it will be saved here.",
+    "startFirst": "Start your first conversation",
+    "moreActions": "Conversation actions",
+    "help": "Help",
+    "whatsNew": "What's new",
+    "status": "Service status",
+    "home": "Home",
+    "settings": "Settings",
+    "conversation": "Conversation",
+    "currentAct": "Answering from {act}",
+    "working": "Answering…",
+    "sync": {
+      "idle": "Not saved yet",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "error": "Could not save",
+      "offline": "Offline",
+      "retry": "Retry",
+      "lastSaved": "Saved · {time}",
+      "status": "Sync status"
+    }
   },
   "landing": {
     "eyebrow": "For cooperative societies across India",
@@ -62,23 +106,40 @@
       "steps": [
         {
           "title": "Ask in your own words",
-          "body": "Type or speak the question in English, Hindi, Marathi or Tamil. No legal phrasing needed."
+          "body": "Type or speak the question in English, Hindi, Marathi or Tamil. No legal phrasing needed.",
+          "points": [
+            "Type it or tap the microphone",
+            "English, Hindi, Marathi or Tamil",
+            "No legal phrasing needed"
+          ]
         },
         {
           "title": "It reads the Act",
-          "body": "The assistant searches the Act and rules for your jurisdiction and checks each section it finds against the indexed text."
+          "body": "The assistant searches the Act and rules for your jurisdiction and checks each section it finds against the indexed text.",
+          "points": [
+            "Searches the Act you picked",
+            "Finds the sections that apply",
+            "Checks each one against the indexed text"
+          ]
         },
         {
           "title": "You get the sections",
-          "body": "The answer cites every section it relies on, marks anything it could not verify, and flags matters that need the Registrar or a lawyer."
+          "body": "The answer cites every section it relies on, marks anything it could not verify, and flags matters that need the Registrar or a lawyer.",
+          "points": [
+            "Every claim carries a section number",
+            "Unverified sections are flagged",
+            "Registrar or lawyer matters are called out"
+          ]
         }
-      ]
+      ],
+      "tabsLabel": "Steps"
     },
     "stats": {
       "languages": "Languages",
       "acts": "Acts covered",
       "procedures": "Step-by-step procedures",
-      "sections": "Sections indexed"
+      "sections": "Sections indexed",
+      "unavailable": "Live count unavailable right now"
     },
     "topics": {
       "title": "What you can ask",
@@ -113,7 +174,10 @@
       "title": "Procedures, step by step",
       "body": "Each guide lists the forms, fees, deadlines and the authority to approach.",
       "steps": "{count} steps",
-      "open": "Open in the demo"
+      "open": "Open in the demo",
+      "empty": "The procedure guides could not be loaded",
+      "emptyBody": "The server did not answer. Sign in and they will be there as soon as it is back.",
+      "emptyAction": "Sign in"
     },
     "glossary": {
       "title": "One vocabulary, four languages",
@@ -152,17 +216,226 @@
         {
           "q": "Is this a lawyer?",
           "a": "No. It explains cooperative law and cites its sources. For a dispute or a deadline, confirm with the Registrar's office or a lawyer before acting."
+        },
+        {
+          "q": "Which languages can I use?",
+          "a": "English, Hindi, Marathi and Tamil, typed or spoken. The interface, the answers and the glossary all follow the language you pick."
+        },
+        {
+          "q": "How current is the text of the Acts?",
+          "a": "The assistant answers from the indexed text of each Act and its rules. The status page shows how many sections are indexed; amendments are added when the operator re-indexes."
+        },
+        {
+          "q": "What does it cost?",
+          "a": "Nothing during the pilot. The society and federation plans are indicative and billing is not live; you will be told before anything changes."
+        },
+        {
+          "q": "Can my society's own bylaws be included?",
+          "a": "Yes. An administrator can index your registered bylaws so that answers cite them alongside the Act."
         }
-      ]
+      ],
+      "stillTitle": "Still have a question?",
+      "stillLink": "Ask it in the demo"
     },
     "cta": {
       "title": "See it answer a real question",
-      "body": "Sign in with the demo account and ask about your society."
+      "body": "Create a free account, or sign in with the demo account and ask about your society.",
+      "note": "Free during the pilot. No card, no commitment.",
+      "signIn": "Sign in"
+    },
+    "hero": {
+      "createAccount": "Create free account",
+      "tryDemo": "Try the demo",
+      "seeHow": "See how it works",
+      "note": "Free during the pilot · no card needed"
+    },
+    "preview": {
+      "windowTitle": "Product preview",
+      "path": "/ask",
+      "sample": "What is the quorum for our annual general meeting?",
+      "answeringFrom": "Answering from {act}",
+      "sources": "Sources",
+      "verified": "Verified against the Act",
+      "unverified": "Could not verify",
+      "stamp": "Not legal advice",
+      "jurisdiction": "Act",
+      "languages": "Languages",
+      "you": "You",
+      "assistant": "Assistant",
+      "send": "Send",
+      "mic": "Speak"
+    },
+    "actsStrip": {
+      "label": "Answers from six Acts"
+    },
+    "benefits": {
+      "notice": "Not legal advice — said on every answer"
+    },
+    "personas": {
+      "title": "Built for the people who run a society",
+      "body": "Pick your role to see the questions people like you ask. Each one opens in the assistant.",
+      "label": "Who are you?",
+      "askThis": "Ask this in the demo",
+      "items": [
+        {
+          "name": "Society secretary",
+          "questions": [
+            "How much notice must I give before the annual general meeting?",
+            "Which registers must the society maintain?",
+            "When is the annual return due to the Registrar?"
+          ]
+        },
+        {
+          "name": "Managing committee member",
+          "questions": [
+            "How many committee meetings must be held in a year?",
+            "Can a committee member be removed before the term ends?",
+            "What happens if the committee fails to hold elections?"
+          ]
+        },
+        {
+          "name": "Ordinary member",
+          "questions": [
+            "How do I get a copy of the society's bylaws?",
+            "Can the society refuse to transfer my share?",
+            "How do I file a complaint against the committee?"
+          ]
+        },
+        {
+          "name": "Auditor or accountant",
+          "questions": [
+            "Who appoints the statutory auditor and for how long?",
+            "What must the audit report cover?",
+            "How may the surplus be distributed?"
+          ]
+        },
+        {
+          "name": "Federation officer",
+          "questions": [
+            "Which societies can affiliate to a federation?",
+            "How does a member society vote in the federation?",
+            "Can a federation inspect a member society's books?"
+          ]
+        }
+      ]
+    },
+    "compare": {
+      "title": "How it compares",
+      "body": "Where a general chatbot guesses and the bare Act stays silent, the assistant shows its sources.",
+      "columns": [
+        "Sahakar Sahayak",
+        "A general chatbot",
+        "Reading the Act yourself"
+      ],
+      "yes": "Yes",
+      "no": "No",
+      "partly": "Partly",
+      "rows": [
+        {
+          "label": "Cites the exact section behind each answer",
+          "cells": [
+            "yes",
+            "partly",
+            "yes"
+          ]
+        },
+        {
+          "label": "Tells you when a section could not be verified",
+          "cells": [
+            "yes",
+            "no",
+            "no"
+          ]
+        },
+        {
+          "label": "Answers in Hindi, Marathi and Tamil",
+          "cells": [
+            "yes",
+            "partly",
+            "partly"
+          ]
+        },
+        {
+          "label": "Knows which of six Acts applies to you",
+          "cells": [
+            "yes",
+            "partly",
+            "no"
+          ]
+        },
+        {
+          "label": "Step-by-step procedures with forms, fees and deadlines",
+          "cells": [
+            "partly",
+            "no",
+            "no"
+          ]
+        },
+        {
+          "label": "Points you to the Registrar or a lawyer when it should",
+          "cells": [
+            "yes",
+            "no",
+            "no"
+          ]
+        }
+      ]
+    },
+    "pricing": {
+      "title": "Pricing for the pilot",
+      "body": "Free for members while the pilot runs. Society and federation plans are indicative until billing goes live.",
+      "recommended": "Pilot",
+      "note": "Prices are indicative during the pilot. Billing is not live and nobody is charged.",
+      "contactEmail": "pilot@sahakar-sahayak.example",
+      "demoTitle": "Not sure yet? Try the demo first",
+      "demoBody": "No account needed — the demo answers a real question in under a minute.",
+      "plans": {
+        "member": {
+          "name": "Member",
+          "price": "Free",
+          "period": "for individual members",
+          "features": [
+            "Ask in four languages",
+            "Every answer cites the section",
+            "Step-by-step procedures",
+            "Conversations saved on your device"
+          ],
+          "cta": "Create free account"
+        },
+        "society": {
+          "name": "Society",
+          "price": "₹{amount}",
+          "period": "per society, per year",
+          "features": [
+            "Everything in Member",
+            "Accounts for committee members and staff",
+            "Admin console: documents, glossary, review queue",
+            "Your registered bylaws indexed on request"
+          ],
+          "cta": "Start with the pilot"
+        },
+        "federation": {
+          "name": "Federation",
+          "price": "Talk to us",
+          "period": "for federations and apex bodies",
+          "features": [
+            "Everything in Society",
+            "All member societies under one roof",
+            "Your state's rules and circulars indexed",
+            "Deployment on your own infrastructure"
+          ],
+          "cta": "Talk to us"
+        }
+      }
+    },
+    "seo": {
+      "ogTitle": "Cooperative law, answered with the section",
+      "ogDescription": "Ask about membership, elections, audits and bylaws in English, Hindi, Marathi or Tamil. Every answer cites the Act."
     }
   },
   "login": {
     "title": "Sign in",
-    "subtitle": "Use the demo account to explore the assistant.",
+    "subtitle": "Sign in to continue, or try the demo account.",
     "email": "Email",
     "password": "Password",
     "submit": "Sign in",
@@ -171,11 +444,12 @@
     "useDemo": "Fill in demo details",
     "error": "That email and password don't match.",
     "back": "Back to home",
-    "noAccount": "No account yet?"
+    "noAccount": "No account yet?",
+    "continueTo": "After signing in you'll continue to <code>{path}</code>."
   },
   "register": {
     "title": "Create an account",
-    "subtitle": "Your conversations are saved to your account.",
+    "subtitle": "Free during the pilot. Your conversations are saved to your account.",
     "name": "Name",
     "email": "Email",
     "password": "Password",
@@ -184,7 +458,8 @@
     "creating": "Creating…",
     "haveAccount": "Already have an account?",
     "exists": "An account with this email already exists.",
-    "invalid": "Check the name, email and password."
+    "invalid": "Check the name, email and password.",
+    "planNote": "Selected plan: <b>{plan}</b>. Pricing is indicative during the pilot; billing is not live."
   },
   "chat": {
     "placeholder": "Ask about membership, elections, audits, bylaws…",
@@ -249,7 +524,65 @@
     },
     "verifiedShort": "verified",
     "speak": "Read aloud",
-    "stopSpeaking": "Stop reading"
+    "stopSpeaking": "Stop reading",
+    "hintMod": "{mod} + Enter to send · Enter for a new line",
+    "copy": "Copy answer",
+    "copyWithSources": "Copy with sources",
+    "copied": "Copied to clipboard",
+    "copyFailed": "Could not copy — select the text instead",
+    "regenerate": "Regenerate",
+    "editResend": "Edit & resend",
+    "editing": "Editing an earlier question — later turns will be replaced when you send",
+    "cancelEdit": "Cancel",
+    "changeFeedback": "Change",
+    "answerActions": "Answer actions",
+    "noteLabel": "What was wrong?",
+    "notePlaceholder": "Wrong section, out of date, unclear…",
+    "sendNote": "Send",
+    "skipNote": "Skip",
+    "noteSent": "Thanks — sent for review.",
+    "contextChanged": "Now answering from {act} · {language}",
+    "sourceLabel": "Source {n}",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "jurisdictionChip": "Act",
+    "jurisdictionMenu": "Answer from",
+    "languageChip": "Language",
+    "languageMenu": "Language",
+    "stopped": "Stopped",
+    "stoppedAfter": "Stopped after",
+    "newAnswer": "New answer",
+    "sessionEnded": "Your session ended",
+    "sessionEndedBody": "Sign in again to keep asking. This conversation stays on this device.",
+    "signInAgain": "Sign in",
+    "rateLimited": "Too many questions in a short time",
+    "rateLimitedBody": "You can ask again now.",
+    "retryIn": "Try again in {seconds}s",
+    "tooLong": "The answer took too long",
+    "shorter": "Try a shorter question, or split it into two.",
+    "unreachable": "The service is not responding",
+    "unreachableBody": "The model server may still be starting. Check the status page or try again in a moment.",
+    "checkStatus": "Check status",
+    "serverBody": "Something went wrong while drafting the answer.",
+    "answerReady": "Answer ready",
+    "answerFailed": "The answer failed",
+    "answerStopped": "Answer stopped",
+    "voiceNeedsChrome": "Voice input works in Chrome and Edge on this device. Type your question instead.",
+    "voiceDenied": "Microphone access is blocked. Allow it in the browser's site settings.",
+    "voiceNoSpeech": "Nothing was heard. Try again, closer to the microphone.",
+    "voiceNoMic": "No microphone was found.",
+    "voiceNetwork": "Voice recognition needs an internet connection.",
+    "dismissNote": "Dismiss note",
+    "draftRestored": "Draft restored",
+    "charCount": "{count} characters",
+    "firstRun": "New here?",
+    "firstRunLink": "Finish setting up on Home",
+    "notice": "Information about cooperative law, not legal advice.",
+    "focusComposer": "Focus the question box",
+    "escapeStops": "Stop the answer",
+    "examplesLabel": "Example questions",
+    "browseProcedures": "Browse step-by-step procedures",
+    "unverifiedShort": "unverified"
   },
   "checklists": {
     "title": "Procedures",
@@ -261,7 +594,38 @@
     "authority": "Authority",
     "basis": "Legal basis",
     "back": "All procedures",
-    "stepCount": "{count} steps"
+    "stepCount": "{count} steps",
+    "all": "All Acts",
+    "filter": "Filter by Act",
+    "search": "Search procedures",
+    "noMatches": "No procedures match",
+    "noMatchesBody": "Try another Act or a different word.",
+    "clearFilters": "Clear filters",
+    "unavailable": "Procedures could not be loaded",
+    "unavailableBody": "The service did not answer. Try again in a moment.",
+    "retry": "Try again",
+    "progress": "Progress",
+    "doneOf": "{done} of {total} done",
+    "reset": "Reset",
+    "resetTitle": "Reset this checklist?",
+    "resetBody": "Every ticked step of this procedure will be cleared on this device.",
+    "resetDone": "Checklist reset",
+    "completed": "Completed",
+    "startOver": "Start over",
+    "askAbout": "Ask about this step",
+    "askStep": "In the procedure “{procedure}”, step {n} is “{step}”. What does this step require and what should I watch out for?",
+    "copyLink": "Copy link to this step",
+    "linkCopied": "Link copied",
+    "copyFailed": "Could not copy the link",
+    "print": "Print",
+    "previous": "Previous procedure",
+    "next": "Next procedure",
+    "navLabel": "Neighbouring procedures",
+    "continueBadge": "Continue",
+    "notFoundTitle": "Procedure not found",
+    "notFoundBody": "It may have been renamed or removed. Browse the full list instead.",
+    "groupCount": "{count, plural, one {# procedure} other {# procedures}}",
+    "markDone": "Step {n} done: {title}"
   },
   "admin": {
     "title": "Admin",
@@ -319,10 +683,261 @@
     "edit": "Edit",
     "delete": "Delete",
     "resolve": "Resolve",
-    "reopen": "Reopen"
+    "reopen": "Reopen",
+    "tabs": {
+      "label": "Admin sections",
+      "overview": "Overview",
+      "documents": "Documents",
+      "glossary": "Glossary",
+      "queries": "Review queue"
+    },
+    "errors": {
+      "loadFailed": "Couldn't reach the server",
+      "loadFailedBody": "The API did not answer. Check that the backend is running, then try again.",
+      "retry": "Try again",
+      "crashed": "Something went wrong",
+      "crashedBody": "This part of the console hit an error. Reloading usually fixes it."
+    },
+    "overview": {
+      "title": "Overview",
+      "description": "What needs attention, the state of the corpus, and the services behind the assistant.",
+      "openReviews": "Open reviews",
+      "openReviewsSub": "{count, plural, one {# waiting} other {# waiting}}",
+      "corpus": "Corpus",
+      "corpusSub": "{files, plural, one {# file} other {# files}} · {sections, plural, one {# section} other {# sections}}",
+      "glossaryTerms": "Glossary terms",
+      "glossaryTermsSub": "{count, plural, one {# translated term} other {# translated terms}}",
+      "indexStatus": "Index status",
+      "indexCurrent": "Current",
+      "indexStale": "Out of date",
+      "lastBuilt": "Last built {when}",
+      "notBuilt": "Not built yet",
+      "unavailable": "Unavailable",
+      "attention": "Needs attention",
+      "attentionBody": "The newest open reviews.",
+      "attentionEmpty": "Nothing waiting for review",
+      "attentionEmptyBody": "Answers the assistant was unsure about will show up here.",
+      "viewAll": "View all",
+      "resolve": "Resolve",
+      "resolved": "Marked as resolved",
+      "resolveFailed": "Couldn't resolve this item",
+      "systemHealth": "System health",
+      "healthBody": "Live from the API; refreshed every minute while this tab is open.",
+      "checkedAt": "Checked {when}",
+      "notChecked": "Not checked yet",
+      "rowOk": "OK",
+      "rowDown": "Unreachable",
+      "rowUnknown": "Unknown",
+      "sectionsCount": "{count, plural, one {# section} other {# sections}}",
+      "quickActions": {
+        "title": "Quick actions",
+        "upload": "Upload an Act",
+        "uploadBody": "Add a PDF, Markdown or text file to the corpus.",
+        "reindex": "Rebuild index",
+        "reindexBody": "Refresh vector search after changing files.",
+        "addTerm": "Add a term",
+        "addTermBody": "Keep wording consistent across four languages.",
+        "review": "Review open items",
+        "reviewBody": "Go through answers the assistant was unsure about."
+      }
+    },
+    "reviews": {
+      "title": "Review queue",
+      "description": "Questions where the assistant was unsure, found no citation, or a member marked the answer as not helpful.",
+      "caption": "Review queue",
+      "tabs": {
+        "label": "Review status",
+        "open": "Open",
+        "resolved": "Resolved",
+        "all": "All"
+      },
+      "filters": {
+        "reason": "Reason",
+        "language": "Language",
+        "jurisdiction": "Act"
+      },
+      "search": "Search questions and answers",
+      "columns": {
+        "question": "Question",
+        "language": "Language",
+        "jurisdiction": "Act",
+        "confidence": "Confidence",
+        "reason": "Reason",
+        "asked": "Asked"
+      },
+      "status": {
+        "open": "Open",
+        "resolved": "Resolved"
+      },
+      "resolve": "Resolve",
+      "reopen": "Reopen",
+      "bulkResolve": "Resolve",
+      "bulkReopen": "Reopen",
+      "resolved": "{count, plural, one {# item resolved} other {# items resolved}}",
+      "reopened": "{count, plural, one {# item reopened} other {# items reopened}}",
+      "failed": "Couldn't update the review",
+      "confidence": "Confidence {percent}",
+      "empty": "Nothing to review",
+      "emptyBody": "Answers with low confidence, no citation, or a thumbs-down will appear here.",
+      "emptyResolved": "No resolved items yet",
+      "emptyResolvedBody": "Items you resolve move here so the open list stays short.",
+      "drawer": {
+        "title": "Review #{id}",
+        "question": "Question",
+        "answer": "Answer",
+        "noAnswer": "No answer was recorded.",
+        "language": "Language",
+        "act": "Act",
+        "confidence": "Confidence",
+        "asked": "Asked",
+        "openInAsk": "Open in Ask",
+        "copyQuestion": "Copy question",
+        "copied": "Question copied",
+        "copyFailed": "Couldn't copy",
+        "prev": "Previous item",
+        "next": "Next item",
+        "position": "{index} of {total}"
+      },
+      "shortcuts": {
+        "next": "Next review",
+        "prev": "Previous review",
+        "toggle": "Resolve or reopen"
+      }
+    },
+    "corpus": {
+      "title": "Documents",
+      "description": "Every Act, rule and circular the assistant can cite. Upload new versions here, then rebuild the index.",
+      "caption": "Corpus files",
+      "upload": "Upload document",
+      "reindex": "Rebuild index",
+      "index": {
+        "current": "Index current",
+        "stale": "Index out of date",
+        "currentBody": "Vector search covers every section in the corpus.",
+        "staleBody": "New or changed files are not in vector search yet. Rebuild to include them.",
+        "files": "Files",
+        "sections": "Sections",
+        "untitled": "Untitled sections",
+        "lastBuilt": "Last built {when}",
+        "notBuilt": "Never built"
+      },
+      "dialog": {
+        "title": "Upload an Act",
+        "description": "PDF, Markdown or plain text. PDFs are converted into sections automatically.",
+        "file": "File",
+        "drop": "Drop a file here, or",
+        "browse": "browse",
+        "accepted": "PDF, Markdown or text · up to 25 MB",
+        "tooLarge": "This file is larger than 25 MB.",
+        "badType": "Only .pdf, .md and .txt files can be uploaded.",
+        "remove": "Remove file",
+        "chooseFile": "Choose a file to upload.",
+        "actTitle": "Act title",
+        "actTitleHint": "The full name as it should appear in citations, e.g. Maharashtra Cooperative Societies Act, 1960.",
+        "actTitleShort": "Give the Act a title of at least 3 characters.",
+        "jurisdiction": "Jurisdiction",
+        "submit": "Upload",
+        "ingesting": "Ingesting…",
+        "ingested": "Ingested in",
+        "stepUpload": "Upload",
+        "stepConvert": "Convert PDF",
+        "stepSave": "Save sections",
+        "saved": "{count, plural, one {# section} other {# sections}}",
+        "done": "Added to the corpus",
+        "doneBody": "{file} now holds {count, plural, one {# section} other {# sections}}. Rebuild the index so search can find them.",
+        "doneBodyUnknown": "{file} was saved. Rebuild the index so search can find it.",
+        "failed": "Upload failed",
+        "failedBody": "The server could not ingest this file.",
+        "retry": "Try again",
+        "rebuildNow": "Rebuild index now",
+        "close": "Done",
+        "uploadedToast": "Added {count, plural, one {# section} other {# sections}}",
+        "uploadedToastUnknown": "File saved"
+      },
+      "job": {
+        "reindexing": "Rebuilding index…",
+        "elapsed": "{seconds}s elapsed",
+        "reindexed": "Embedded {count, plural, one {# section} other {# sections}} in {seconds}s",
+        "bm25": "Embedding server not reachable — search is running on keywords only.",
+        "bm25Badge": "Keyword search only",
+        "failed": "Rebuild failed",
+        "alreadyRunning": "A rebuild is already running"
+      },
+      "columns": {
+        "title": "Title",
+        "jurisdiction": "Act",
+        "sections": "Sections",
+        "updated": "Updated",
+        "health": "Health"
+      },
+      "group": "{name} · {count, plural, one {# file} other {# files}}",
+      "titled": "Titled",
+      "untitledCount": "{count} untitled",
+      "search": "Search by title or file",
+      "neverUpdated": "Unknown",
+      "drawer": {
+        "file": "File",
+        "copyPath": "Copy path",
+        "copied": "Path copied",
+        "copyFailed": "Couldn't copy",
+        "act": "Act",
+        "sections": "Sections",
+        "untitled": "Untitled sections",
+        "untitledHint": "Sections without a heading are harder to cite. Add headings in the source file and upload it again.",
+        "updated": "Updated",
+        "rebuild": "Rebuild index",
+        "noDelete": "Files can't be deleted or replaced from this console yet. Upload a new version under the same title to supersede it, or edit the file in the corpus folder."
+      },
+      "empty": "No Acts uploaded yet",
+      "emptyBody": "Upload a PDF, Markdown or text file to start the corpus.",
+      "emptyAction": "Upload document"
+    },
+    "terms": {
+      "title": "Glossary",
+      "description": "Legal terms and their translations. The assistant uses these to keep wording consistent across languages.",
+      "caption": "Glossary terms",
+      "addTerm": "Add term",
+      "editTerm": "Edit term",
+      "search": "Search terms and translations",
+      "filter": "Translations",
+      "complete": "Complete",
+      "missing": "Missing",
+      "missingCount": "{count} missing",
+      "exportCsv": "Export CSV",
+      "exists": "This term already exists",
+      "saved": "Term saved",
+      "added": "Term added",
+      "deleted": "Term deleted",
+      "restored": "Term restored",
+      "failed": "Couldn't save the term",
+      "deleteFailed": "Couldn't delete the term",
+      "restoreFailed": "Couldn't restore the term",
+      "columns": {
+        "term": "Term",
+        "source": "Source",
+        "actions": "Actions"
+      },
+      "edit": "Edit",
+      "delete": "Delete",
+      "saving": "Saving…",
+      "empty": "No terms yet",
+      "emptyBody": "Add legal terms and their translations so the assistant uses the same wording in every language.",
+      "emptyAction": "Add term",
+      "form": {
+        "term": "Term",
+        "termHint": "The English term as it appears in the Act.",
+        "translation": "{language} translation",
+        "source": "Source",
+        "sourceHint": "Where the term is defined, e.g. MSCS Act §3(d).",
+        "save": "Save",
+        "cancel": "Cancel",
+        "required": "Enter a term.",
+        "shortcutHint": "Enter saves · Esc cancels"
+      }
+    }
   },
   "legal": {
-    "updated": "Last updated 20 September 2026",
+    "updated": "Last updated <time>{date}</time>",
     "privacy": {
       "title": "Privacy",
       "sections": [
@@ -364,6 +979,520 @@
           "body": "The service is provided as is, without warranty, and may change or be withdrawn at any time."
         }
       ]
+    },
+    "eyebrow": "Legal",
+    "onThisPage": "On this page",
+    "alsoRead": "Also read",
+    "alsoReadBody": "The two documents go together: what we store, and how you may use the service.",
+    "contact": "Questions about this page? Contact the operator of this service using the address in the footer.",
+    "anchor": "Link to this section",
+    "backToTop": "Back to top"
+  },
+  "ui": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "loading": "Loading…",
+    "retry": "Try again",
+    "undo": "Undo",
+    "dismiss": "Dismiss",
+    "copy": "Copy",
+    "copied": "Copied",
+    "more": "More",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "clear": "Clear",
+    "clearFilters": "Clear filters",
+    "noResults": "Nothing matches",
+    "selectAll": "Select all",
+    "selected": "{count} selected",
+    "pageOf": "{from}–{to} of {total}",
+    "rowsPerPage": "Rows per page",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "optional": "Optional",
+    "required": "Required",
+    "notifications": "Notifications",
+    "health": {
+      "ok": "All systems normal",
+      "degraded": "Running with reduced search",
+      "down": "Service unavailable",
+      "checking": "Checking…",
+      "database": "Database",
+      "model": "Language model",
+      "embeddings": "Embeddings",
+      "corpus": "Corpus",
+      "lastChecked": "Last checked",
+      "refresh": "Refresh"
+    },
+    "theme": {
+      "light": "Light theme",
+      "dark": "Dark theme"
+    },
+    "changelog": {
+      "title": "What's new",
+      "new": "New",
+      "improved": "Improved",
+      "fixed": "Fixed"
+    },
+    "kbdNavigate": "to navigate",
+    "kbdOpen": "to open",
+    "kbdClose": "to close",
+    "breadcrumb": "Breadcrumb",
+    "results": "{count, plural, one {{n} result} other {{n} results}}",
+    "removeFilter": "Remove filter: {label}"
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "body": "The page could not be shown. Try again, or go back to the home page.",
+    "retry": "Try again",
+    "home": "Go home",
+    "goToAsk": "Ask a question",
+    "loadFailed": "This could not be loaded.",
+    "unavailableTitle": "The service is not responding",
+    "unavailableBody": "The model server may still be starting. Wait a moment and try again.",
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The address may be wrong, or the page has moved.",
+    "unexpected": "An unexpected error occurred.",
+    "digest": "Reference: {digest}"
+  },
+  "command": {
+    "label": "Command palette",
+    "placeholder": "Search conversations, procedures, actions…",
+    "noResults": "No matches",
+    "recent": "Recent",
+    "askThis": "Ask Sahayak: “{query}”",
+    "groups": {
+      "actions": "Actions",
+      "goto": "Go to",
+      "conversations": "Conversations",
+      "procedures": "Procedures",
+      "language": "Language",
+      "jurisdiction": "Jurisdiction"
+    },
+    "actions": {
+      "newConversation": "New conversation",
+      "toggleTheme": "Switch theme",
+      "export": "Export this conversation",
+      "shortcuts": "Keyboard shortcuts",
+      "help": "Open help",
+      "whatsNew": "What's new",
+      "settings": "Settings",
+      "signOut": "Sign out"
+    },
+    "switchLanguage": "Switch interface language",
+    "answerFrom": "Answer from this Act",
+    "jurisdictionSet": "Now answering from {act}",
+    "legend": {
+      "navigate": "to navigate",
+      "open": "to open",
+      "close": "to close"
+    }
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "description": "Work anywhere in the app except inside text fields. Two-key chords are pressed one after the other.",
+    "empty": "Nothing is registered on this page yet.",
+    "scopes": {
+      "global": "Everywhere",
+      "chat": "Conversation",
+      "table": "Tables",
+      "drawer": "Panels",
+      "palette": "Command palette"
+    },
+    "palette": "Open the command palette",
+    "newConversation": "New conversation",
+    "toggleSidebar": "Show or hide the sidebar",
+    "export": "Export the conversation",
+    "settings": "Open settings",
+    "sheet": "Show keyboard shortcuts",
+    "goHome": "Go to Home",
+    "goAsk": "Go to Ask",
+    "goProcedures": "Go to Procedures",
+    "goSettings": "Go to Settings",
+    "goAdmin": "Go to Admin"
+  },
+  "user": {
+    "menu": "Account menu",
+    "role": {
+      "admin": "Admin",
+      "member": "Member"
+    },
+    "theme": "Theme",
+    "language": "Language",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "signOut": "Sign out",
+    "signOutTitle": "Sign out?",
+    "signOutBody": "You can sign back in any time with the same account.",
+    "clearDevice": "Also clear this device's history",
+    "clearDeviceHint": "Removes saved conversations, pins and procedure progress from this browser.",
+    "signedOut": "Signed out",
+    "signOutFailed": "Could not sign out. Check the connection and try again.",
+    "adminHint": "Admin tools are available to administrators."
+  },
+  "help": {
+    "title": "Help",
+    "description": "How the assistant works, common questions, shortcuts and service status.",
+    "tabs": {
+      "guide": "Guide",
+      "faq": "FAQ",
+      "shortcuts": "Shortcuts",
+      "status": "Status"
+    },
+    "guide": {
+      "intro": "Every answer goes through four steps. Watch them in the trace above each reply.",
+      "understand": {
+        "title": "Understand",
+        "body": "Reads the question, detects the language and works out whether it is about membership, meetings, elections, audits, bylaws or a dispute."
+      },
+      "search": {
+        "title": "Search",
+        "body": "Looks up the Act you selected, and its rules, for the sections that apply, using the indexed text rather than memory."
+      },
+      "verify": {
+        "title": "Verify",
+        "body": "Checks that each cited section really exists and says what the answer claims. Sections that fail are marked unverified."
+      },
+      "draft": {
+        "title": "Draft",
+        "body": "Writes the answer in your language with numbered citations, and flags disputes or deadlines that need the Registrar or a lawyer."
+      }
+    },
+    "faq": {
+      "extra": [
+        {
+          "q": "How do I switch the Act it answers from?",
+          "a": "Use the jurisdiction picker in the top bar (or the chip above the composer on the Ask page). The choice is remembered on this device."
+        },
+        {
+          "q": "Can I rename or pin a conversation?",
+          "a": "Yes. Open the menu on a conversation in the sidebar to rename, pin, export or delete it. Deleting can be undone for a few seconds."
+        },
+        {
+          "q": "Where are my conversations saved?",
+          "a": "In this browser and in your account, so they follow you to another device once you sign in. Signing out with 'Also clear this device's history' removes the local copy."
+        }
+      ]
+    },
+    "status": {
+      "overall": "Overall",
+      "unknown": "Not checked yet",
+      "openPage": "Open the status page"
+    },
+    "version": "Version",
+    "whatsNew": {
+      "description": "Recent changes to the assistant.",
+      "all": "Full changelog"
+    }
+  },
+  "auth": {
+    "validation": {
+      "required": "This field is required.",
+      "email": "Enter a valid email address.",
+      "minLength": "Use at least {min} characters.",
+      "name": "Enter your name (2–80 characters)."
+    },
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "strength": {
+      "label": "Password strength",
+      "weak": "Weak",
+      "fair": "Fair",
+      "strong": "Strong"
+    },
+    "consent": "By creating an account you agree to the <terms>Terms of use</terms> and the <privacy>Privacy Policy</privacy>.",
+    "demoContinue": "Continue with the demo account",
+    "demoDetails": "Demo account details",
+    "demoHint": "A shared account for trying the assistant. Don't keep anything private in it.",
+    "or": "or",
+    "errors": {
+      "credentials": "That email and password don't match.",
+      "network": "Couldn't reach the server. Check your connection and try again.",
+      "exists": "An account with this email already exists. Sign in instead.",
+      "invalid": "Check the name, email and password and try again."
+    },
+    "panel": {
+      "headline": "What you get",
+      "bullets": [
+        "Every answer cites the section of the Act it relies on.",
+        "Ask in English, Hindi, Marathi or Tamil, by typing or speaking.",
+        "Step-by-step procedures with the forms, fees and deadlines."
+      ],
+      "askLabel": "People ask things like"
+    },
+    "back": "Back to home"
+  },
+  "status": {
+    "title": "Service status",
+    "subtitle": "Live checks of the database, the language model, the embedding service and the indexed corpus, run from your browser.",
+    "overall": {
+      "ok": "All systems normal",
+      "degraded": "Running with reduced search",
+      "down": "Service unavailable",
+      "checking": "Checking…"
+    },
+    "components": {
+      "database": "Database",
+      "model": "Language model",
+      "embeddings": "Embeddings",
+      "corpus": "Corpus",
+      "corpusSections": "{count, plural, one {{n} section indexed} other {{n} sections indexed}}"
+    },
+    "descriptions": {
+      "database": "Accounts, conversations and the review queue.",
+      "model": "Generates the answers.",
+      "embeddings": "Finds the matching sections of the Acts.",
+      "corpus": "The indexed text of the Acts."
+    },
+    "state": {
+      "ok": "Operational",
+      "degraded": "Degraded",
+      "down": "Unavailable",
+      "unknown": "Not checked yet"
+    },
+    "checkedAt": "Checked at <at>{time}</at>",
+    "version": "Version {version}",
+    "uptime": "Started {time}",
+    "refresh": "Refresh",
+    "autoRefresh": "Refreshes every 30 seconds while this page is open.",
+    "note": "Checks run from your browser against the same server that answers questions; nothing is cached on the way."
+  },
+  "changelog": {
+    "title": "What's new",
+    "subtitle": "Changes to Sahakar Sahayak, newest first.",
+    "latest": "Latest",
+    "entries": "{count, plural, one {{n} entry} other {{n} entries}}"
+  },
+  "home": {
+    "title": "Home",
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "afternoon": "Good afternoon, {name}",
+      "evening": "Good evening, {name}"
+    },
+    "today": "Today",
+    "currentAct": "Answering from",
+    "currentLanguage": "Language",
+    "change": "Change",
+    "changeAct": "Change the Act",
+    "changeLanguage": "Change the language",
+    "quickAsk": "Ask a question",
+    "quickAskHint": "Ask about membership, elections, audits, bylaws…",
+    "quickAskLabel": "Your question",
+    "quickAskSubmit": "Ask",
+    "quickAskFocus": "Focus the question box",
+    "continueTitle": "Continue where you left off",
+    "messages": "{count, plural, one {{n} message} other {{n} messages}}",
+    "noConversations": "No conversations yet",
+    "noConversationsBody": "Questions you ask are listed here so you can pick them up again.",
+    "startFirst": "Ask your first question",
+    "openConversation": "Open",
+    "suggestionsTitle": "Try asking",
+    "suggestionsBody": "Questions the assistant answers from the {act}.",
+    "suggestions": [
+      "How many members do we need to register a society under the {act}?",
+      "What is the quorum for an annual general meeting under the {act}?",
+      "How long can the managing committee serve under the {act}?",
+      "How do I file a complaint against the committee under the {act}?"
+    ],
+    "proceduresTitle": "Procedures",
+    "proceduresBody": "Step-by-step guides for the {act}.",
+    "noProcedures": "No procedures for this Act yet",
+    "noProceduresBody": "Procedures for other Acts are listed on the Procedures page.",
+    "allProcedures": "All procedures",
+    "stepsDone": "{done} of {total} steps",
+    "statusTitle": "Service status",
+    "corpusTitle": "Corpus",
+    "checkedAt": "Checked at {time}",
+    "checking": "Checking…",
+    "statusPage": "Status page",
+    "stats": {
+      "sections": "Indexed sections",
+      "acts": "Acts",
+      "procedures": "Procedures",
+      "languages": "Languages"
+    },
+    "whatsNew": "What's new",
+    "adminTitle": "Administration",
+    "adminBody": "The review queue, documents and the glossary.",
+    "openReviews": "{count, plural, one {{n} open review} other {{n} open reviews}}",
+    "indexCurrent": "Index current",
+    "indexStale": "Index out of date",
+    "adminLinks": {
+      "overview": "Overview",
+      "documents": "Documents",
+      "glossary": "Glossary",
+      "queries": "Review queue"
+    },
+    "viewAll": "View all",
+    "loadFailed": "This could not be loaded."
+  },
+  "onboarding": {
+    "welcome": "Welcome, {name}",
+    "welcomeBody": "Three quick choices and you are set. Everything can be changed later in Settings.",
+    "planBadge": "{plan} plan",
+    "plans": {
+      "member": "Member",
+      "society": "Society",
+      "federation": "Federation"
+    },
+    "steps": {
+      "act": "Choose your Act",
+      "actBody": "Answers cite the Act you pick. Central covers societies that work across states.",
+      "language": "Choose your language",
+      "languageBody": "The interface and the answers follow this choice.",
+      "ask": "Ask your first question",
+      "askBody": "Type it above or start from a suggestion."
+    },
+    "keep": "Keep {value}",
+    "skip": "Skip for now",
+    "progress": "{done} of {total} done",
+    "done": "Done",
+    "askNow": "Ask now",
+    "gettingStarted": "Getting started",
+    "tasks": {
+      "ask": "Ask a question",
+      "procedure": "Open a procedure",
+      "act": "Set your Act",
+      "theme": "Try dark mode"
+    },
+    "dismiss": "Dismiss",
+    "allDone": "All done"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Your profile, how answers are given, and your data.",
+    "nav": {
+      "profile": "Profile",
+      "preferences": "Preferences",
+      "data": "Data"
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "How you appear in the app.",
+      "name": "Name",
+      "nameHint": "2–80 characters.",
+      "nameInvalid": "Enter a name between 2 and 80 characters.",
+      "email": "Email",
+      "emailHint": "Your email is your sign-in and cannot be changed here.",
+      "role": "Role",
+      "roles": {
+        "admin": "Administrator",
+        "member": "Member"
+      },
+      "memberSince": "Member since",
+      "save": "Save changes",
+      "saved": "Profile saved",
+      "failed": "The profile could not be saved."
+    },
+    "password": {
+      "title": "Password",
+      "description": "Use at least 6 characters.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "tooShort": "Use at least 6 characters.",
+      "mismatch": "The passwords do not match.",
+      "wrong": "The current password is incorrect.",
+      "change": "Change password",
+      "changed": "Password changed",
+      "failed": "The password could not be changed."
+    },
+    "prefs": {
+      "title": "Preferences",
+      "description": "Stored on this device.",
+      "language": "Interface language",
+      "languageHint": "Menus, buttons and answers use this language.",
+      "jurisdiction": "Answer jurisdiction",
+      "jurisdictionHint": "Which Act the assistant reads before answering.",
+      "jurisdictionSet": "Answering from the {act}",
+      "jurisdictionHints": {
+        "central": "Societies working across more than one state, registered with the Central Registrar.",
+        "maharashtra": "Societies registered with the Maharashtra Registrar of Cooperative Societies, including housing societies.",
+        "gujarat": "Societies registered with the Gujarat Registrar of Cooperative Societies.",
+        "karnataka": "Societies registered with the Karnataka Registrar of Cooperative Societies.",
+        "tamil-nadu": "Societies registered with the Tamil Nadu Registrar of Cooperative Societies.",
+        "west-bengal": "Societies registered with the West Bengal Registrar of Cooperative Societies."
+      },
+      "appearance": "Appearance",
+      "appearanceHint": "Light is the default; the system setting is ignored.",
+      "light": "Light",
+      "dark": "Dark",
+      "composer": "Composer",
+      "composerHint": "How questions are typed and answers are read.",
+      "enterSends": "Enter sends",
+      "enterSendsHint": "Off makes Enter insert a new line; Ctrl + Enter sends.",
+      "showTrace": "Show the retrieval trace",
+      "showTraceHint": "Understand → search → verify → draft, above each answer.",
+      "autoRead": "Read answers aloud",
+      "autoReadHint": "Each answer is spoken as it finishes.",
+      "motion": "Motion",
+      "reduceMotion": "Reduce motion",
+      "reduceMotionHint": "Turns off entrance and ambient animation."
+    },
+    "data": {
+      "title": "Data",
+      "export": "Export",
+      "exportBody": "Download every conversation saved to your account, with questions, answers and sources.",
+      "downloadJson": "Download JSON",
+      "downloadMarkdown": "Download Markdown",
+      "exported": "Download started",
+      "exportFailed": "The conversations could not be fetched.",
+      "nothingToExport": "There is nothing to export yet.",
+      "storage": "Storage",
+      "storageBody": "Conversations are kept on this device and on the server.",
+      "onDevice": "On this device",
+      "onServer": "On the server",
+      "conversations": "{count, plural, one {{n} conversation} other {{n} conversations}}",
+      "resync": "Re-sync now",
+      "resynced": "Synced with the server",
+      "danger": "Danger zone",
+      "deleteAll": "Delete all conversations",
+      "deleteAllBody": "Removes every conversation from the server and from this device. This cannot be undone.",
+      "typeToConfirm": "Type DELETE to confirm",
+      "deleted": "All conversations deleted",
+      "deleteFailed": "Some conversations could not be deleted."
+    }
+  },
+  "public": {
+    "skip": "Skip to content",
+    "nav": {
+      "label": "Main",
+      "product": "Product",
+      "how": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "whatsNew": "What's new"
+    },
+    "menu": {
+      "ask": "Ask the assistant",
+      "askHint": "Every answer cites the section",
+      "procedures": "Procedures",
+      "proceduresHint": "Forms, fees and deadlines",
+      "glossary": "Glossary",
+      "glossaryHint": "Legal terms in four languages",
+      "acts": "Acts covered",
+      "actsHint": "Six cooperative Acts"
+    },
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "menuTitle": "Menu",
+    "footer": {
+      "product": "Product",
+      "acts": "Acts covered",
+      "languages": "Languages",
+      "legal": "Legal",
+      "contact": "Contact",
+      "status": "Status",
+      "changelog": "Changelog",
+      "rights": "© {year} {name}"
     }
   }
 }

@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { sendFeedback, streamChat } from "@/lib/api";
+import { chatErrorFromUnknown } from "@/lib/chat-error";
 import { SESSION_STORAGE_KEY } from "@/lib/config";
 import { deleteOnServer, getConversation, pushToServer, removeConversation, saveConversation, syncFromServer } from "@/lib/history";
-import type { ChatMessage } from "@/lib/types";
+import type { ChatMessage, MessageContext } from "@/lib/types";
 
 function newId() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -37,6 +38,14 @@ function writeSession(id: string) {
 function subscribeSession(cb: () => void) {
   window.addEventListener(SESSION_EVENT, cb);
   return () => window.removeEventListener(SESSION_EVENT, cb);
+}
+
+const titleOf = (text: string) => text.replace(/\s+/g, " ").slice(0, 96);
+
+/** The user turn that produced the message at `idx` (itself, when it is a user turn). */
+function userTurnBefore(list: ChatMessage[], idx: number): number {
+  for (let i = idx; i >= 0; i--) if (list[i].role === "user") return i;
+  return -1;
 }
 
 export function useChat(language: string, jurisdiction: string) {
@@ -75,7 +84,7 @@ export function useChat(language: string, jurisdiction: string) {
     dirty.current = false;
     const conversation = {
       id: sessionId,
-      title: firstUser.text.replace(/\s+/g, " ").slice(0, 96),
+      title: titleOf(firstUser.text),
       updatedAt: Date.now(),
       messages,
     };
@@ -87,18 +96,26 @@ export function useChat(language: string, jurisdiction: string) {
     setMessages((prev) => prev.map((m) => (m.id === id ? fn(m) : m)));
   }, []);
 
-  const send = useCallback(
-    async (text: string) => {
+  /**
+   * Sends `text` as a new turn. With `from`, the transcript is first cut at
+   * that message (it and everything after are dropped) so a regenerate or an
+   * edited question replaces the old exchange instead of appending to it.
+   */
+  const run = useCallback(
+    async (text: string, from?: string) => {
       const trimmed = text.trim();
       if (!trimmed || busy) return;
 
+      const context: MessageContext = { jurisdiction, language };
+      const startedAt = Date.now();
       const userMsg: ChatMessage = {
         id: newId(),
         role: "user",
         text: trimmed,
         citations: [],
         status: "done",
-        createdAt: Date.now(),
+        createdAt: startedAt,
+        context,
       };
       const assistantId = newId();
       const assistantMsg: ChatMessage = {
@@ -107,9 +124,16 @@ export function useChat(language: string, jurisdiction: string) {
         text: "",
         citations: [],
         status: "streaming",
-        createdAt: Date.now(),
+        createdAt: startedAt,
+        context,
       };
-      setMessages((prev) => [...prev, userMsg, assistantMsg]);
+
+      const current = messagesRef.current;
+      const cut = from ? current.findIndex((m) => m.id === from) : -1;
+      const before = cut >= 0 ? current.slice(0, cut) : current;
+      const next = [...before, userMsg, assistantMsg];
+      messagesRef.current = next;
+      setMessages(next);
       setBusy(true);
       dirty.current = true;
 
@@ -120,16 +144,17 @@ export function useChat(language: string, jurisdiction: string) {
         writeSession(id);
       }
       // List it in the sidebar right away; the settled transcript is saved later.
-      const before = messagesRef.current;
       saveConversation({
         id,
-        title: (before.find((m) => m.role === "user") ?? userMsg).text.replace(/\s+/g, " ").slice(0, 96),
+        title: titleOf((before.find((m) => m.role === "user") ?? userMsg).text),
         updatedAt: Date.now(),
         messages: [...before, userMsg],
       });
 
       const controller = new AbortController();
       abortRef.current = controller;
+      const elapsed = () => Date.now() - startedAt;
+      const withDuration = (m: ChatMessage): MessageContext => ({ ...(m.context ?? context), durationMs: elapsed() });
 
       try {
         for await (const ev of streamChat(
@@ -155,19 +180,30 @@ export function useChat(language: string, jurisdiction: string) {
               }));
               break;
             case "done":
-              patch(assistantId, (m) => ({ ...m, id: ev.data.message_id || m.id, status: "done" }));
+              patch(assistantId, (m) => ({
+                ...m,
+                id: ev.data.message_id || m.id,
+                status: "done",
+                context: withDuration(m),
+              }));
               break;
             case "error":
-              throw new Error(ev.data.message);
+              // streamChat already throws for error frames; kept for older mocks.
+              throw chatErrorFromUnknown(new Error(ev.data.message));
           }
         }
         // Stream ended without an explicit done frame
-        patch(assistantId, (m) => (m.status === "streaming" ? { ...m, status: "done" } : m));
+        patch(assistantId, (m) => (m.status === "streaming" ? { ...m, status: "done", context: withDuration(m) } : m));
       } catch (err) {
         if ((err as Error).name === "AbortError") {
-          patch(assistantId, (m) => ({ ...m, status: "done" }));
+          patch(assistantId, (m) => ({ ...m, status: "stopped", context: withDuration(m) }));
         } else {
-          patch(assistantId, (m) => ({ ...m, status: "error" }));
+          const failure = chatErrorFromUnknown(err);
+          patch(assistantId, (m) => ({
+            ...m,
+            status: "error",
+            context: { ...withDuration(m), error: failure.toInfo() },
+          }));
         }
       } finally {
         setBusy(false);
@@ -177,14 +213,41 @@ export function useChat(language: string, jurisdiction: string) {
     [busy, language, jurisdiction, patch, sessionId],
   );
 
+  const send = useCallback((text: string) => run(text), [run]);
+
+  /** Aborts the stream; the answer keeps what arrived and is marked "stopped". */
   const stop = useCallback(() => abortRef.current?.abort(), []);
 
+  /** Re-asks the question behind `id` (an assistant or user message), replacing that exchange. */
+  const regenerate = useCallback(
+    (id: string) => {
+      const list = messagesRef.current;
+      const idx = list.findIndex((m) => m.id === id);
+      const userIdx = userTurnBefore(list, idx);
+      if (userIdx < 0) return;
+      void run(list[userIdx].text, list[userIdx].id);
+    },
+    [run],
+  );
+
+  /** Replaces the user message `id` (and every later turn) with `text` and asks again. */
+  const editAndResend = useCallback(
+    (id: string, text: string) => {
+      const list = messagesRef.current;
+      const idx = list.findIndex((m) => m.id === id);
+      if (idx < 0) return void run(text);
+      void run(text, list[userTurnBefore(list, idx)]?.id ?? id);
+    },
+    [run],
+  );
+
+  /** Asks the last question again. */
   const retry = useCallback(() => {
-    const lastUser = [...messages].reverse().find((m) => m.role === "user");
+    const list = messagesRef.current;
+    const lastUser = [...list].reverse().find((m) => m.role === "user");
     if (!lastUser) return;
-    setMessages((prev) => prev.slice(0, prev.findIndex((m) => m.id === lastUser.id)));
-    void send(lastUser.text);
-  }, [messages, send]);
+    void run(lastUser.text, lastUser.id);
+  }, [run]);
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
@@ -216,17 +279,24 @@ export function useChat(language: string, jurisdiction: string) {
   );
 
   const feedback = useCallback(
-    (id: string, value: "up" | "down") => {
+    (id: string, value: "up" | "down", note?: string) => {
       dirty.current = true;
       patch(id, (m) => ({ ...m, feedback: value }));
       // Send the exchange along so a thumbs-down can open a review item.
       const list = messagesRef.current;
       const idx = list.findIndex((m) => m.id === id);
       const question = [...list.slice(0, Math.max(0, idx))].reverse().find((m) => m.role === "user")?.text;
-      void sendFeedback(id, value, { question, answer: list[idx]?.text, language, jurisdiction });
+      const ctx = list[idx]?.context;
+      void sendFeedback(id, value, {
+        question,
+        answer: list[idx]?.text,
+        language: ctx?.language ?? language,
+        jurisdiction: ctx?.jurisdiction ?? jurisdiction,
+        note: note?.trim() || undefined,
+      });
     },
     [patch, language, jurisdiction],
   );
 
-  return { messages, busy, sessionId, send, stop, retry, reset, open, remove, feedback };
+  return { messages, busy, sessionId, send, stop, retry, reset, open, remove, feedback, regenerate, editAndResend };
 }

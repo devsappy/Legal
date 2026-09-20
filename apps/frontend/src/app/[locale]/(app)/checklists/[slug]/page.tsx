@@ -1,102 +1,107 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft, CalendarClock, FileText, IndianRupee } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { type Checklist, JURISDICTIONS, pick } from "@sahayak/shared";
-import { backend } from "@/lib/backend";
+import { backendResult } from "@/lib/backend";
+import { buttonClasses } from "@/components/ui/Button";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { PrintButton } from "@/components/checklists/PrintButton";
+import { ProcedureNav, type Neighbour } from "@/components/checklists/ProcedureNav";
+import { ProcedureProgress } from "@/components/checklists/ProcedureProgress";
+import { ProceduresUnavailable } from "@/components/checklists/ProcedureFilters";
+import { StepList, type StepView } from "@/components/checklists/StepList";
 
 type Params = Promise<{ locale: string; slug: string }>;
 
-const findProcedure = async (slug: string) =>
-  (await backend<{ procedure: Checklist }>(`/api/procedures/${encodeURIComponent(slug)}`))?.procedure ?? null;
+const fetchProcedure = (slug: string) => backendResult<{ procedure: Checklist }>(`/api/procedures/${encodeURIComponent(slug)}`);
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { locale, slug } = await params;
-  const c = await findProcedure(slug);
-  return { title: c ? pick(c.title, locale) : undefined };
+  const res = await fetchProcedure(slug);
+  return { title: res.ok ? pick(res.data.procedure.title, locale) : undefined };
 }
 
 export default async function ChecklistPage({ params }: { params: Params }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("checklists");
-  const c = await findProcedure(slug);
-  if (!c) notFound();
+
+  // The siblings list gives prev/next within the same Act; it is optional.
+  const [res, all] = await Promise.all([fetchProcedure(slug), backendResult<{ procedures: Checklist[] }>("/api/procedures")]);
+  if (!res.ok && res.status === 404) notFound();
+  if (!res.ok) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+        <ProceduresUnavailable title={t("unavailable")} description={t("unavailableBody")} />
+      </div>
+    );
+  }
+
+  const c = res.data.procedure;
   const j = JURISDICTIONS.find((x) => x.id === c.jurisdiction);
+  const title = pick(c.title, locale);
+  const steps: StepView[] = c.steps.map((s) => ({
+    title: pick(s.title, locale),
+    detail: pick(s.detail, locale),
+    forms: s.forms,
+    deadline: s.deadline ? pick(s.deadline, locale) : undefined,
+    fee: s.fee ? pick(s.fee, locale) : undefined,
+  }));
+
+  let prev: Neighbour | undefined;
+  let next: Neighbour | undefined;
+  if (all.ok) {
+    const siblings = (all.data.procedures ?? []).filter((p) => p.jurisdiction === c.jurisdiction);
+    const at = siblings.findIndex((p) => p.slug === c.slug);
+    const toNeighbour = (p: Checklist | undefined) => (p ? { slug: p.slug, title: pick(p.title, locale) } : undefined);
+    if (at >= 0) {
+      prev = toNeighbour(siblings[at - 1]);
+      next = toNeighbour(siblings[at + 1]);
+    }
+  }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 sm:py-10">
-      <Link
-        href="/checklists"
-        className="inline-flex items-center gap-1 text-[13px] text-ink-2 hover:text-ink mb-6"
-      >
-        <ArrowLeft size={14} aria-hidden /> {t("back")}
-      </Link>
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+      <PageHeader
+        title={title}
+        description={pick(c.summary, locale)}
+        eyebrow={`${j?.short ?? c.jurisdiction} · ${t("stepCount", { count: c.steps.length })}`}
+        breadcrumbs={[
+          { label: t("title"), href: "/checklists" },
+          { label: j?.short ?? c.jurisdiction, href: `/checklists?act=${encodeURIComponent(c.jurisdiction)}` },
+          { label: title },
+        ]}
+        actions={
+          <>
+            <Link href="/checklists" className={buttonClasses("ghost", "sm")} data-print="hide">
+              <ArrowLeft size={14} aria-hidden /> {t("back")}
+            </Link>
+            <PrintButton />
+          </>
+        }
+        className="mb-8"
+      />
 
-      <div className="grid gap-8 lg:gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div>
-          <header className="max-w-[62ch] mb-8">
-            <p className="font-mono text-[11px] text-ink-3 tracking-wide mb-2">{j?.short}</p>
-            <h1 className="text-[clamp(26px,4vw,36px)] mb-2">{pick(c.title, locale)}</h1>
-            <p className="text-ink-2 text-[15.5px]">{pick(c.summary, locale)}</p>
-          </header>
-
-          {/* Steps are a real sequence, so they are numbered. */}
-          <ol className="relative border-l border-rule ml-3 space-y-8">
-            {c.steps.map((s, i) => (
-              <li key={i} className="pl-7 relative">
-                <span
-                  aria-hidden
-                  className="absolute -left-[13px] top-0.5 w-6 h-6 rounded-full bg-sheet border border-rule-strong font-mono text-[11px] text-ink flex items-center justify-center"
-                >
-                  {i + 1}
-                </span>
-                <h2 className="font-sans font-medium text-[16px] text-ink mb-1">
-                  {pick(s.title, locale)}
-                </h2>
-                <p className="text-[14.5px] text-ink-2 max-w-[62ch]">{pick(s.detail, locale)}</p>
-                {(s.forms || s.deadline || s.fee) && (
-                  <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5 text-[13px]">
-                    {s.forms && (
-                      <div className="flex items-center gap-1.5">
-                        <dt className="sr-only">{t("forms")}</dt>
-                        <FileText size={13} className="text-ink-3" aria-hidden />
-                        <dd className="font-mono text-ink">{s.forms.join(", ")}</dd>
-                      </div>
-                    )}
-                    {s.deadline && (
-                      <div className="flex items-center gap-1.5">
-                        <dt className="sr-only">{t("deadline")}</dt>
-                        <CalendarClock size={13} className="text-seal" aria-hidden />
-                        <dd className="text-ink">{pick(s.deadline, locale)}</dd>
-                      </div>
-                    )}
-                    {s.fee && (
-                      <div className="flex items-center gap-1.5">
-                        <dt className="sr-only">{t("fee")}</dt>
-                        <IndianRupee size={13} className="text-ink-3" aria-hidden />
-                        <dd className="text-ink">{pick(s.fee, locale)}</dd>
-                      </div>
-                    )}
-                  </dl>
-                )}
-              </li>
-            ))}
-          </ol>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10">
+        <div className="min-w-0">
+          <StepList slug={c.slug} procedureTitle={title} jurisdiction={c.jurisdiction} steps={steps} />
+          <ProcedureNav prev={prev} next={next} className="mt-10" />
         </div>
 
-        <aside className="lg:sticky lg:top-20 self-start rounded-lg border border-rule bg-sheet p-4 text-[13.5px]">
-          <dl className="space-y-4">
+        <aside className="self-start rounded-lg border border-rule bg-sheet p-4 text-sm lg:sticky lg:top-4">
+          <ProcedureProgress slug={c.slug} total={c.steps.length} />
+          <dl className="mt-5 space-y-4 border-t border-rule pt-4">
             <div>
-              <dt className="text-[11px] uppercase tracking-[0.08em] text-ink-3 mb-1">{t("authority")}</dt>
+              <dt className="mb-1 text-2xs uppercase tracking-[0.08em] text-ink-3">{t("authority")}</dt>
               <dd className="text-ink">{pick(c.authority, locale)}</dd>
             </div>
             <div>
-              <dt className="text-[11px] uppercase tracking-[0.08em] text-ink-3 mb-1">{t("basis")}</dt>
+              <dt className="mb-1 text-2xs uppercase tracking-[0.08em] text-ink-3">{t("basis")}</dt>
               <dd>
                 <ul className="ledger -mx-4 px-4 pt-[6px]">
                   {c.basis.map((b) => (
-                    <li key={b} className="ledger-line font-mono text-[12.5px] text-ink">
+                    <li key={b} className="ledger-line font-mono text-xs text-ink">
                       {b}
                     </li>
                   ))}

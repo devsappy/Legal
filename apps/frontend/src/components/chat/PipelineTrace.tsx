@@ -14,11 +14,15 @@ type Props = {
 /**
  * What the assistant is doing, told from the stream itself:
  * meta → language understood, citations → sections found and checked,
- * first token → drafting. Settles into "Answered in Ns" when the stream ends.
+ * first token → drafting. Settles into "Answered in Ns" when the stream
+ * ends, or "Stopped after Ns" when the reader cut it short. The Act comes
+ * from the message's own context, so an old answer keeps naming the Act it
+ * was answered from even after the chip has moved on.
  */
 export function PipelineTrace({ message, onRetry }: Props) {
   const t = useTranslations("chat");
-  const { jurisdiction } = useJurisdiction();
+  const { jurisdiction: current } = useJurisdiction();
+  const jurisdiction = message.context?.jurisdiction ?? current;
   const act = JURISDICTIONS.find((j) => j.id === jurisdiction)?.short ?? jurisdiction;
 
   const hasMeta = !!message.meta;
@@ -26,6 +30,7 @@ export function PipelineTrace({ message, onRetry }: Props) {
   const hasText = message.text.length > 0;
   const streaming = message.status === "streaming";
   const failed = message.status === "error";
+  const stopped = message.status === "stopped";
   const allVerified = hasCitations && message.citations.every((c) => c.verified);
 
   const langName =
@@ -65,20 +70,25 @@ export function PipelineTrace({ message, onRetry }: Props) {
     showTimer: false,
   } as const;
 
+  // A settled answer shows its real duration, not a timer restarted on reopen.
+  const durationMs = message.context?.durationMs;
+  const elapsed = !streaming && durationMs !== undefined ? durationMs / 1000 : undefined;
+
   return (
-    <div className="mb-3 space-y-2">
+    <div className="mb-3 space-y-2" data-print="hide">
       <ThoughtLine
         working={streaming}
         steps={steps}
         label={t("thinking")}
-        doneLabel={t("answeredIn")}
+        doneLabel={stopped ? t("stoppedAfter") : failed ? t("answerFailed") : t("answeredIn")}
         glyph="dot"
         fontSize={13}
         color="var(--ink-2)"
-        glyphColor="var(--brand)"
+        glyphColor="var(--ink)"
         collapsible
         collapseOnSettle
-        showTimer
+        showTimer={!failed}
+        elapsed={elapsed}
       />
 
       {(streaming || failed) && (

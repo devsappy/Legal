@@ -1,10 +1,17 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CornerDownRight } from "lucide-react";
 import { Link, redirect } from "@/i18n/navigation";
 import { DEMO_ACCOUNT, getSessionUser } from "@/lib/auth";
+import { safeNext } from "@/lib/next-path";
+import { AuthShell } from "@/components/auth/AuthShell";
 import { LoginForm } from "@/components/auth/LoginForm";
-import { BrandMark } from "@/components/ui/BrandMark";
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { DemoSignIn } from "@/components/auth/DemoSignIn";
+
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function first(v: string | string[] | undefined): string | null {
+  return Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -12,50 +19,63 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: t("title") };
 }
 
-export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+/**
+ * Sign in. `?next=` (validated by safeNext) is where a deep link from the
+ * marketing site wanted to go; `?demo=1` puts the focus on the one-click
+ * demo button. A visitor who is already signed in is sent straight on.
+ */
+export default async function LoginPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: SearchParams }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  if (await getSessionUser()) redirect({ href: "/ask", locale });
+  const sp = await searchParams;
+  const next = safeNext(first(sp.next)) ?? "/home";
+  const demo = first(sp.demo) === "1";
+
+  if (await getSessionUser()) redirect({ href: next, locale });
 
   const t = await getTranslations();
 
   return (
-    <main className="flex-1 flex flex-col bg-paper">
-      <header className="nav-dark bg-ink/75 backdrop-blur-md text-paper">
-        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 h-[68px] flex items-center gap-3">
-          <Link href="/" className="min-w-0 flex items-center gap-3 font-semibold tracking-tight text-[16px] text-paper">
-            <BrandMark size={30} className="!bg-paper !text-ink" />
-            <span className="truncate">{t("app.name")}</span>
-          </Link>
-          <div className="ml-auto">
-            <LanguageSwitcher size="md" />
-          </div>
-        </div>
-      </header>
-
-      <div className="flex-1 flex items-center justify-center px-4 py-10">
-        <div className="rise w-full max-w-[420px]">
-          <div className="rounded-2xl border border-rule bg-sheet p-6 sm:p-8">
-            <BrandMark size={40} className="mb-6" />
-            <h1 className="text-[28px] font-medium tracking-[-0.03em] text-ink mb-1.5">{t("login.title")}</h1>
-            <p className="text-[14.5px] text-ink-2 mb-7">{t("login.subtitle")}</p>
-            <LoginForm demo={{ email: DEMO_ACCOUNT.email, password: DEMO_ACCOUNT.password }} />
-          </div>
-          <p className="mt-5 text-center text-[13px] text-ink-2">
+    <AuthShell
+      title={t("login.title")}
+      subtitle={t("login.subtitle")}
+      footer={
+        <>
+          <p>
             {t("login.noAccount")}{" "}
-            <Link href="/register" className="text-ink underline underline-offset-2">
+            <Link href="/register" className="font-medium text-ink underline underline-offset-2 hover:text-ink-2">
               {t("register.title")}
             </Link>
           </p>
-          <p className="mt-2 text-center text-[13px]">
-            <Link href="/" className="inline-flex items-center gap-1.5 text-ink-2 hover:text-ink">
-              <ArrowLeft size={14} aria-hidden /> {t("login.back")}
-            </Link>
+          <Link href="/" className="inline-flex items-center gap-1.5 text-ink-2 hover:text-ink">
+            <ArrowLeft size={14} aria-hidden /> {t("auth.back")}
+          </Link>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-5">
+        {next !== "/home" && (
+          <p className="flex items-start gap-2 rounded-lg border border-rule bg-muted/50 px-3 py-2 text-xs text-ink-2">
+            <CornerDownRight size={14} className="mt-0.5 shrink-0 text-ink-3" aria-hidden />
+            <span className="min-w-0 break-words">
+              {t.rich("login.continueTo", {
+                path: next,
+                code: (chunks) => <code className="font-mono text-ink">{chunks}</code>,
+              })}
+            </span>
           </p>
-        </div>
-      </div>
+        )}
 
-      <p className="px-4 py-4 text-center text-[11.5px] text-ink-3">{t("app.notice")}</p>
-    </main>
+        <LoginForm next={next} autoFocus={!demo} />
+
+        <div className="flex items-center gap-3 text-xs text-ink-3" aria-hidden>
+          <span className="h-px flex-1 bg-rule" />
+          {t("auth.or")}
+          <span className="h-px flex-1 bg-rule" />
+        </div>
+
+        <DemoSignIn demo={{ email: DEMO_ACCOUNT.email, password: DEMO_ACCOUNT.password }} next={next} autoFocus={demo} />
+      </div>
+    </AuthShell>
   );
 }

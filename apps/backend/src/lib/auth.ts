@@ -13,7 +13,14 @@ export type { SessionUser };
 
 export const DEMO_ACCOUNT = { email: "test@gmail.com", password: "1234", name: "Test User" } as const;
 
-const toUser = (u: UserRow): SessionUser => ({ id: u.id, name: u.name, email: u.email, role: u.role });
+const toUser = (u: UserRow): SessionUser => ({
+  id: u.id,
+  name: u.name,
+  email: u.email,
+  role: u.role,
+  // SQLite's datetime('now') is UTC without a zone marker; say so.
+  ...(u.created_at ? { createdAt: u.created_at.replace(" ", "T") + (u.created_at.endsWith("Z") ? "" : "Z") } : {}),
+});
 
 export function verify(email: string, password: string): SessionUser | null {
   const row = db()

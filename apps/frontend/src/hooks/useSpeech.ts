@@ -5,18 +5,44 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 /* Minimal typings for the Web Speech API (not in lib.dom for all targets) */
 type RecognitionResult = { isFinal: boolean; 0: { transcript: string } };
 type RecognitionEvent = { resultIndex: number; results: ArrayLike<RecognitionResult> };
+type RecognitionErrorEvent = { error?: string };
 type Recognition = {
   lang: string;
   interimResults: boolean;
   continuous: boolean;
   onresult: ((e: RecognitionEvent) => void) | null;
   onend: (() => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((e: RecognitionErrorEvent) => void) | null;
   start: () => void;
   stop: () => void;
   abort: () => void;
 };
 type RecognitionCtor = new () => Recognition;
+
+/**
+ * Why listening ended on its own. "not-allowed" is a denied microphone
+ * permission, "no-speech" a silent take, "network" the recogniser's own
+ * service being unreachable (Chrome sends audio to Google), "other" the rest.
+ */
+export type SpeechErrorKind = "not-allowed" | "no-speech" | "audio-capture" | "network" | "aborted" | "other";
+
+function toKind(error: string | undefined): SpeechErrorKind {
+  switch (error) {
+    case "not-allowed":
+    case "service-not-allowed":
+      return "not-allowed";
+    case "no-speech":
+      return "no-speech";
+    case "audio-capture":
+      return "audio-capture";
+    case "network":
+      return "network";
+    case "aborted":
+      return "aborted";
+    default:
+      return "other";
+  }
+}
 
 function getCtor(): RecognitionCtor | null {
   if (typeof window === "undefined") return null;
@@ -27,11 +53,14 @@ function getCtor(): RecognitionCtor | null {
 /**
  * Browser speech-to-text. Chrome/Edge support Indian English, Hindi, Marathi and Tamil.
  * The backend's Whisper path replaces this for WhatsApp / low-end devices.
+ *
+ * `onEnd` fires whenever the recogniser stops by itself, with the error
+ * kind when there was one, so the composer can fold its pill and say why.
  */
 export function useSpeech(
   lang: string,
   onTranscript: (text: string, final: boolean) => void,
-  onEnd?: () => void,
+  onEnd?: (error?: SpeechErrorKind) => void,
 ) {
   const supported = useSyncExternalStore(
     () => () => undefined,
@@ -43,6 +72,8 @@ export function useSpeech(
   const cbRef = useRef(onTranscript);
   const endRef = useRef(onEnd);
   const cancelledRef = useRef(false);
+  // The error event arrives before `end`; remember it so `end` reports once with the reason.
+  const errorRef = useRef<SpeechErrorKind | undefined>(undefined);
 
   useEffect(() => {
     cbRef.current = onTranscript;
@@ -71,6 +102,7 @@ export function useSpeech(
     // Keep listening until the pill is released; silence alone does not end it.
     rec.continuous = true;
     cancelledRef.current = false;
+    errorRef.current = undefined;
     rec.onresult = (e) => {
       if (cancelledRef.current) return;
       let interim = "";
@@ -83,17 +115,24 @@ export function useSpeech(
       if (final) cbRef.current(final, true);
       else if (interim) cbRef.current(interim, false);
     };
+    rec.onerror = (e) => {
+      errorRef.current = toKind(e?.error);
+    };
     rec.onend = () => {
       setListening(false);
-      endRef.current?.();
-    };
-    rec.onerror = () => {
-      setListening(false);
-      endRef.current?.();
+      const error = errorRef.current;
+      errorRef.current = undefined;
+      // A cancel from our side is not worth reporting.
+      endRef.current?.(cancelledRef.current || error === "aborted" ? undefined : error);
     };
     recRef.current = rec;
     setListening(true);
-    rec.start();
+    try {
+      rec.start();
+    } catch {
+      setListening(false);
+      endRef.current?.("other");
+    }
   }, [lang]);
 
   useEffect(() => () => recRef.current?.abort(), []);

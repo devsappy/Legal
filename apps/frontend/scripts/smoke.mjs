@@ -54,13 +54,34 @@ check("stream has meta, citations, token and done", ["meta", "citations", "token
 const tokens = events.filter((e) => e === "token").length;
 check("answer has content", tokens > 10, `${tokens} tokens`);
 
-const pages = ["/en", "/en/login", "/en/register", "/en/privacy", "/en/terms"];
-for (const p of pages) {
+// Pages: public ones render; private ones redirect to sign-in when anonymous
+// (Next.js answers 307 for a redirect() in a layout) and render when signed in.
+const expectStatus = (r, want) => (Array.isArray(want) ? want : [want]).includes(r.status);
+const pages = [
+  ["/en", 200],
+  ["/en/login", 200],
+  ["/en/register", 200],
+  ["/en/privacy", 200],
+  ["/en/terms", 200],
+  ["/en/status", 200],
+  ["/en/changelog", 200],
+  ["/en/home", 307],
+  ["/en/ask", 307],
+  ["/en/settings", 307],
+  ["/en/does-not-exist", 404],
+  ["/sitemap.xml", 200],
+  ["/robots.txt", 200],
+];
+for (const [p, want] of pages) {
   const r = await fetch(`${BASE}${p}`, { redirect: "manual" });
-  check(`GET ${p}`, r.status === 200 || r.status === 307, String(r.status));
+  check(`GET ${p} -> ${want}`, expectStatus(r, want), String(r.status));
 }
-const ask = await fetch(`${BASE}/en/ask`, { headers: { Cookie: cookie } });
-check("GET /en/ask signed in", ask.ok, String(ask.status));
+for (const p of ["/en/home", "/en/ask", "/en/settings", "/en/admin", "/en/checklists"]) {
+  const r = await fetch(`${BASE}${p}`, { headers: { Cookie: cookie } });
+  check(`GET ${p} signed in`, r.status === 200, String(r.status));
+}
+const health = await fetch(`${BASE}/api/health`);
+check("GET /api/health answers", health.status === 200 || health.status === 503, String(health.status));
 
 console.log(failed ? `\n${failed} check(s) failed` : "\nall checks passed");
 process.exit(failed ? 1 : 0);

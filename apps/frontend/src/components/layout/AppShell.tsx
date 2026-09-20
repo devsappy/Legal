@@ -1,173 +1,236 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
-import { Menu, PanelLeftOpen, Download } from "lucide-react";
-import clsx from "clsx";
-import { usePathname } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { motion, useReducedMotion } from "motion/react";
+import { CircleHelp, Download, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { pick, type SessionUser } from "@sahayak/shared";
+import { Link, usePathname } from "@/i18n/navigation";
 import { useChatContext } from "@/components/chat/ChatProvider";
-import { JURISDICTIONS } from "@/lib/config";
-import { useJurisdiction } from "./JurisdictionProvider";
+import { CommandPalette } from "@/components/command/CommandPalette";
+import { SIDEBAR_KEY, useCommandApi, type SidebarMode } from "@/components/command/CommandProvider";
+import { useHelp } from "@/components/help/HelpProvider";
+import { Breadcrumbs, type Crumb } from "@/components/ui/Breadcrumbs";
+import { Button } from "@/components/ui/Button";
+import { IconButton } from "@/components/ui/IconButton";
+import { usePersisted } from "@/hooks/usePersisted";
+import { usePrefs } from "@/lib/prefs";
+import { loadProcedures, useProcedures } from "@/lib/procedures-client";
+import { routeFor } from "@/lib/routes";
+import { ConversationCrumb } from "./ConversationCrumb";
 import { JurisdictionSelect } from "./JurisdictionSelect";
 import { LanguageSwitcher } from "./LanguageSwitcher";
-import { ThemeToggle } from "./ThemeToggle";
+import { MobileDrawer } from "./MobileDrawer";
 import { Sidebar } from "./Sidebar";
-import type { SessionUser } from "@sahayak/shared";
-import { Button } from "@/components/ui/Button";
+import { SidebarRail } from "./SidebarRail";
+import { StatusIndicator } from "./StatusIndicator";
+import { SyncStatus } from "./SyncStatus";
+import { ThemeToggle } from "./ThemeToggle";
+import { TopBarOverflow } from "./TopBarOverflow";
+import { UserMenu } from "./UserMenu";
+
+const RAIL_W = 56;
+const SIDEBAR_W = 272;
+
+/** Admin sub-pages whose labels already exist in the admin namespace. */
+const ADMIN_SECTIONS = new Set(["documents", "glossary", "queries"]);
+const SETTINGS_SECTIONS = new Set(["preferences", "data"]);
 
 /**
- * Sidebar on the left, everything else on an inset white card.
- * Desktop can hide the sidebar; below `lg` it becomes a drawer.
+ * Sidebar (or the 56px rail) on the left, everything else on an inset
+ * sheet: a top bar with breadcrumbs, the Act picker, health, help and the
+ * account, then the page. Below `lg` the sidebar is a drawer behind the
+ * hamburger. The sidebar mode is remembered per device (coop.sidebar) and
+ * toggled with Ctrl/⌘ B.
  */
 export function AppShell({ user, children }: { user: SessionUser; children: React.ReactNode }) {
   const t = useTranslations();
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [mode] = usePersisted<SidebarMode>(SIDEBAR_KEY, "expanded");
+  const { toggleSidebar } = useCommandApi();
   const [drawer, setDrawer] = useState(false);
+  const prefs = usePrefs();
+  const reduce = Boolean(useReducedMotion()) || prefs.reduceMotion;
+  const rail = mode === "rail";
 
-  // Route change closes the drawer; Escape does too.
+  // Navigating closes the drawer (the Drawer primitive handles Escape and the backdrop).
   const [prevPath, setPrevPath] = useState(pathname);
   if (pathname !== prevPath) {
     setPrevPath(pathname);
     setDrawer(false);
   }
-  useEffect(() => {
-    if (!drawer) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDrawer(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [drawer]);
 
   return (
     <>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-sheet focus:px-3 focus:py-2 focus:rounded-md focus:shadow"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-(--z-skip) focus:rounded-md focus:bg-sheet focus:px-3 focus:py-2 focus:shadow-popover"
       >
         {t("nav.skip")}
       </a>
 
-      <div className="flex-1 flex min-h-0">
-        {/* Desktop sidebar */}
-        <aside
-          className={clsx(
-            "hidden shrink-0 w-[272px] h-full",
-            !collapsed && "lg:flex lg:flex-col",
-          )}
+      <div className="flex min-h-0 flex-1">
+        {/* Desktop sidebar / rail */}
+        <motion.aside
+          data-print="hide"
+          data-motion
+          initial={false}
+          animate={{ width: rail ? RAIL_W : SIDEBAR_W }}
+          transition={reduce ? { duration: 0 } : { duration: 0.2, ease: [0.2, 0.7, 0.2, 1] }}
+          className="hidden h-full shrink-0 overflow-hidden lg:flex lg:flex-col"
         >
-          <Sidebar user={user} hotkey onCollapse={() => setCollapsed(true)} />
-        </aside>
-
-        {/* Mobile drawer */}
-        {drawer && (
-          <div className="fixed inset-0 z-40 lg:hidden">
-            <button
-              type="button"
-              aria-label={t("shell.close")}
-              onClick={() => setDrawer(false)}
-              className="absolute inset-0 bg-ink/30 backdrop-blur-[2px]"
-            />
-            <aside className="rise absolute inset-y-0 left-0 w-[min(88vw,300px)] bg-shell flex flex-col shadow-2xl">
-              <Sidebar user={user} onCollapse={() => setDrawer(false)} onNavigate={() => setDrawer(false)} />
-            </aside>
+          <div className="h-full" style={{ width: rail ? RAIL_W : SIDEBAR_W }}>
+            {rail ? (
+              <SidebarRail user={user} onExpand={toggleSidebar} />
+            ) : (
+              <Sidebar user={user} onCollapse={toggleSidebar} />
+            )}
           </div>
-        )}
+        </motion.aside>
 
-        {/* Content card */}
-        <div
-          className={clsx(
-            "flex-1 flex flex-col min-w-0 min-h-0 p-2 lg:p-2.5",
-            !collapsed && "lg:pl-0",
-          )}
-        >
-          <div className="flex-1 flex flex-col min-h-0 rounded-2xl border border-rule bg-sheet overflow-hidden shadow-[0_1px_2px_rgba(9,9,11,0.04)]">
-            <TopBar
-              collapsed={collapsed}
-              onExpand={() => setCollapsed(false)}
-              onMenu={() => setDrawer(true)}
-            />
-            <main id="main" className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+        {/* Tablet / phone drawer */}
+        <MobileDrawer open={drawer} onOpenChange={setDrawer} user={user} />
+
+        {/* Content sheet */}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col p-2 lg:p-2.5 lg:pl-0">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-rule bg-sheet shadow-raised">
+            <TopBar user={user} rail={rail} onToggleRail={toggleSidebar} onMenu={() => setDrawer(true)} />
+            <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               {children}
             </main>
-            <p className="shrink-0 px-4 py-2 text-center text-[11.5px] text-ink-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-              {t("app.notice")}
-            </p>
           </div>
         </div>
       </div>
+
+      <CommandPalette user={user} />
     </>
   );
 }
 
+/* ---- breadcrumbs from the route map --------------------------------------- */
+
+function useCrumbs(pathname: string): Crumb[] {
+  const t = useTranslations();
+  const locale = useLocale();
+  const { procedures } = useProcedures();
+  const route = routeFor(pathname);
+  const segments = pathname.split("/").filter(Boolean);
+  const slug = route?.key === "checklists" && segments[1] ? decodeURIComponent(segments[1]) : null;
+
+  // A checklist page needs the procedure's title; the list is cached per page load.
+  useEffect(() => {
+    if (slug) void loadProcedures();
+  }, [slug]);
+
+  if (!route) return [];
+  const items: Crumb[] = [{ label: t(`nav.${route.navKey}`), href: route.href }];
+  if (slug) {
+    const p = procedures.find((x) => x.slug === slug);
+    if (p) items.push({ label: pick(p.title, locale) });
+  }
+  if (route.key === "admin" && segments[1] && ADMIN_SECTIONS.has(segments[1])) {
+    items.push({ label: t(`admin.${segments[1]}`) });
+  }
+  if (route.key === "settings" && segments[1] && SETTINGS_SECTIONS.has(segments[1])) {
+    items.push({ label: t(`settings.nav.${segments[1]}`) });
+  }
+  return items;
+}
+
+/* ---- top bar --------------------------------------------------------------- */
+
 function TopBar({
-  collapsed,
-  onExpand,
+  user,
+  rail,
+  onToggleRail,
   onMenu,
 }: {
-  collapsed: boolean;
-  onExpand: () => void;
+  user: SessionUser;
+  rail: boolean;
+  onToggleRail: () => void;
   onMenu: () => void;
 }) {
   const t = useTranslations();
   const pathname = usePathname();
-  const chat = useChatContext();
-  const { jurisdiction } = useJurisdiction();
   const onAsk = pathname === "/ask";
-  const hasChat = chat.messages.length > 0;
-
-  const exportChat = () => {
-    const act = JURISDICTIONS.find((j) => j.id === jurisdiction)?.act ?? jurisdiction;
-    const lines: string[] = [`# ${t("app.name")}`, "", `${t("chat.answeringFrom")} ${act}`, ""];
-    for (const m of chat.messages) {
-      const who = m.role === "user" ? t("chat.you") : t("chat.assistant");
-      lines.push(`**${who}:** ${m.text.trim()}`, "");
-      if (m.citations.length) {
-        lines.push(`${t("chat.sources")}:`);
-        for (const c of m.citations) lines.push(`- [${c.id}] ${c.act} §${c.section} — ${c.title}`);
-        lines.push("");
-      }
-    }
-    lines.push(`_${t("app.notice")}_`);
-    const blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `sahayak-${new Date().toISOString().slice(0, 10)}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const crumbs = useCrumbs(pathname);
+  const chat = useChatContext();
+  const { canExport, exportCurrent } = useCommandApi();
+  const { openHelp, unread } = useHelp();
 
   return (
-    <header className="shrink-0 h-14 px-3 sm:px-4 flex items-center gap-2 border-b border-rule/70">
-      <button
-        type="button"
-        onClick={onMenu}
-        aria-label={t("shell.menu")}
-        className="lg:hidden h-8 w-8 inline-flex items-center justify-center rounded-md text-ink-2 hover:bg-muted"
-      >
+    <header
+      data-print="hide"
+      className="flex h-14 shrink-0 items-center gap-1.5 border-b border-rule/70 px-2.5 sm:gap-2 sm:px-4"
+    >
+      <IconButton label={t("shell.menu")} size="sm" onClick={onMenu} className="lg:hidden" tooltip={false}>
         <Menu size={18} />
-      </button>
-      {collapsed && (
-        <button
-          type="button"
-          onClick={onExpand}
-          aria-label={t("shell.expand")}
-          className="hidden lg:inline-flex h-8 w-8 items-center justify-center rounded-md text-ink-2 hover:bg-muted"
-        >
-          <PanelLeftOpen size={18} />
-        </button>
+      </IconButton>
+      <IconButton
+        label={rail ? t("shell.expand") : t("shell.rail")}
+        size="sm"
+        onClick={onToggleRail}
+        className="text-ink-3 max-lg:hidden"
+      >
+        {rail ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+      </IconButton>
+
+      {/* Breadcrumbs; on /ask the trail ends in the editable conversation title. */}
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
+        {onAsk ? (
+          <>
+            <nav aria-label={t("ui.breadcrumb")} className="min-w-0">
+              <ol className="flex min-w-0 items-center gap-1 text-xs text-ink-3">
+                <li className="flex min-w-0 items-center">
+                  <Link href="/ask" className="truncate rounded-sm transition-colors hover:text-ink">
+                    {t("nav.chat")}
+                  </Link>
+                </li>
+                <li className="flex min-w-0 items-center gap-1 empty:hidden">
+                  <ConversationCrumb separator />
+                </li>
+              </ol>
+            </nav>
+            {chat.messages.length > 0 && <SyncStatus className="max-sm:hidden" />}
+          </>
+        ) : (
+          crumbs.length > 0 && <Breadcrumbs items={crumbs} />
+        )}
+      </div>
+
+      {!onAsk && (
+        <div className="hidden sm:block">
+          <JurisdictionSelect />
+        </div>
       )}
 
-      <JurisdictionSelect />
-
-      <div className="ml-auto flex items-center gap-2">
-        <ThemeToggle />
-        <LanguageSwitcher />
-        {onAsk && (
-          <Button size="sm" variant="outline" onClick={exportChat} disabled={!hasChat} className="h-8 rounded-full px-3">
-            <Download size={13} /> <span className="hidden sm:inline">{t("shell.export")}</span>
-          </Button>
-        )}
+      <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
+        <StatusIndicator />
+        <IconButton label={t("shell.help")} size="sm" onClick={() => openHelp()} className="text-ink-2">
+          <CircleHelp size={17} />
+          {unread && (
+            <span aria-hidden className="absolute right-1 top-1 size-1.5 rounded-full bg-ink ring-2 ring-sheet" />
+          )}
+        </IconButton>
+        <div className="hidden items-center gap-1 sm:flex">
+          <ThemeToggle />
+          <LanguageSwitcher />
+          {onAsk && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={exportCurrent}
+              disabled={!canExport}
+              aria-label={t("shell.export")}
+              className="rounded-full px-3"
+            >
+              <Download size={13} aria-hidden />
+              <span className="hidden md:inline">{t("shell.export")}</span>
+            </Button>
+          )}
+        </div>
+        <TopBarOverflow showExport={onAsk} showJurisdiction={!onAsk} className="sm:hidden" />
+        <UserMenu user={user} variant="avatar" align="end" side="bottom" className="lg:hidden" />
       </div>
     </header>
   );

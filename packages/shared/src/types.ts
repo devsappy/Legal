@@ -21,15 +21,39 @@ export type MessageMeta = {
   escalate?: boolean;
 };
 
+/** Why an answer failed; the UI renders a different card per kind. */
+export type ChatErrorKind = "unauthorized" | "rate_limited" | "timeout" | "server" | "network";
+
+export type ChatErrorInfo = {
+  kind: ChatErrorKind;
+  /** Seconds to wait before trying again (429 Retry-After). */
+  retryAfter?: number;
+  /** The backend's own words, when it sent any. */
+  message?: string;
+  /** When the failure happened, so a countdown survives a reload. */
+  at?: number;
+};
+
+/** What the assistant was asked to answer from, stamped on both turns of a send. */
+export type MessageContext = {
+  jurisdiction: string;
+  language: string;
+  /** Wall-clock time from send to the last frame (done, stopped or failed). */
+  durationMs?: number;
+  error?: ChatErrorInfo;
+};
+
 export type ChatMessage = {
   id: string;
   role: Role;
   text: string;
   citations: Citation[];
   meta?: MessageMeta;
-  status: "streaming" | "done" | "error";
+  status: "streaming" | "done" | "error" | "stopped";
   createdAt: number;
   feedback?: "up" | "down";
+  /** Absent on messages saved before contexts were recorded. */
+  context?: MessageContext;
 };
 
 export type ChatRequest = {
@@ -49,7 +73,14 @@ export type StreamEvent =
 
 /* ---- accounts ---- */
 export type UserRole = "member" | "admin";
-export type SessionUser = { id: number; name: string; email: string; role: UserRole };
+export type SessionUser = {
+  id: number;
+  name: string;
+  email: string;
+  role: UserRole;
+  /** ISO timestamp of the account's creation, when the backend includes it. */
+  createdAt?: string;
+};
 
 /* ---- procedures ---- */
 /** Text with per-locale variants; falls back to English. */

@@ -2,17 +2,9 @@
 
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import {
-  ArrowUpRight,
-  CalendarClock,
-  FilePlus2,
-  Scale,
-  ShieldAlert,
-  Users,
-} from "lucide-react";
+import { ArrowUpRight, CalendarClock, FilePlus2, ShieldAlert, Users } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { JURISDICTIONS } from "@/lib/config";
-import { useJurisdiction } from "@/components/layout/JurisdictionProvider";
+import { FirstRunStrip } from "./FirstRunStrip";
 
 type Example = { topic: string; question: string };
 
@@ -21,52 +13,28 @@ const ICONS = [FilePlus2, Users, CalendarClock, ShieldAlert];
 
 type Props = {
   onPick: (q: string) => void;
-  /** The composer, rendered in the hero rather than docked at the bottom. */
+  /** The composer (with its context line), rendered in the hero rather than docked at the bottom. */
   composer: ReactNode;
 };
 
 export function EmptyState({ onPick, composer }: Props) {
   const t = useTranslations();
-  const { jurisdiction } = useJurisdiction();
   const examples = t.raw("chat.examples") as Example[];
-  const j = JURISDICTIONS.find((x) => x.id === jurisdiction);
 
   return (
-    <div className="rise flex-1 flex flex-col w-full max-w-[760px] mx-auto px-4 py-6 sm:py-8">
+    <div className="rise mx-auto flex w-full max-w-[760px] flex-1 flex-col px-4 py-6 sm:py-8" data-motion>
       {/* my-auto centres the hero on tall screens and degrades to a normal scroll on short ones */}
-      <div className="my-auto flex flex-col items-center w-full">
+      <div className="my-auto flex w-full flex-col items-center">
         <div className="orb mb-7 sm:mb-8" aria-hidden />
 
-        <p className="greeting px-2 text-[22px] sm:text-[26px] font-medium tracking-tight leading-snug">
-          {t("chat.greeting")}
-        </p>
-        <h1 className="text-[clamp(26px,4.5vw,34px)] text-ink text-center mt-2 mb-7 sm:mb-8">
-          {t("chat.emptyTitle")}
-        </h1>
+        <p className="greeting px-2 text-[22px] font-medium leading-snug tracking-tight sm:text-[26px]">{t("chat.greeting")}</p>
+        <h1 className="mb-7 mt-2 text-center text-[clamp(26px,4.5vw,34px)] text-ink sm:mb-8">{t("chat.emptyTitle")}</h1>
 
-        <div className="w-full">
-          {composer}
-          {/* Attached strip: which Act the answer will come from. */}
-          <div className="mx-2 -mt-2 pt-4 pb-1.5 px-3 rounded-b-xl border border-t-0 border-rule bg-muted/60 flex items-center gap-2 text-[12.5px] text-ink-2 min-h-11">
-            <Scale size={13} className="text-brand shrink-0" aria-hidden />
-            <span className="truncate">
-              {t("chat.answeringFrom")}{" "}
-              <span className="text-ink font-medium sm:hidden">{j?.short}</span>
-              <span className="text-ink font-medium hidden sm:inline">
-                {j?.act}
-              </span>
-            </span>
-            <Link
-              href="/checklists"
-              className="ml-auto shrink-0 inline-flex items-center gap-1 h-7 px-2 rounded-md border border-rule bg-sheet text-[12px] font-medium text-ink hover:border-brand/50 transition-colors"
-            >
-              {t("nav.checklists")}
-              <ArrowUpRight size={12} aria-hidden />
-            </Link>
-          </div>
-        </div>
+        <div className="w-full">{composer}</div>
 
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 w-full mt-8">
+        <FirstRunStrip />
+
+        <ul className="mt-8 grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label={t("chat.examplesLabel")}>
           {examples.map((ex, i) => {
             const Icon = ICONS[i % ICONS.length];
             return (
@@ -74,22 +42,26 @@ export function EmptyState({ onPick, composer }: Props) {
                 <button
                   type="button"
                   onClick={() => onPick(ex.question)}
-                  className="group w-full h-full flex flex-col items-start text-left rounded-xl border border-rule bg-sheet p-4 hover:border-brand/50 hover:shadow-[0_10px_30px_-18px_color-mix(in_srgb,var(--brand)_55%,transparent)] transition-[border-color,box-shadow]"
+                  className="group flex h-full w-full flex-col items-start rounded-xl border border-rule bg-sheet p-4 text-left transition-[border-color,box-shadow,background-color] duration-(--dur-2) hover:border-rule-strong hover:bg-muted/40 hover:shadow-raised active:translate-y-px"
                 >
-                  <span className="h-8 w-8 rounded-lg bg-muted text-ink-2 group-hover:bg-brand-soft group-hover:text-brand flex items-center justify-center mb-3 transition-colors">
+                  <span className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-ink-2 transition-colors duration-(--dur-2) group-hover:bg-ink group-hover:text-paper">
                     <Icon size={16} strokeWidth={1.75} aria-hidden />
                   </span>
-                  <span className="block text-[13.5px] font-medium text-ink mb-1">
-                    {ex.topic}
-                  </span>
-                  <span className="block text-[12.5px] text-ink-3 leading-snug">
-                    {ex.question}
-                  </span>
+                  <span className="mb-1 block text-sm font-medium text-ink">{ex.topic}</span>
+                  <span className="block text-xs leading-snug text-ink-3">{ex.question}</span>
                 </button>
               </li>
             );
           })}
         </ul>
+
+        <Link
+          href="/checklists"
+          className="mt-6 inline-flex h-8 items-center gap-1 rounded-md px-2.5 text-xs font-medium text-ink-2 transition-colors hover:bg-muted hover:text-ink"
+        >
+          {t("chat.browseProcedures")}
+          <ArrowUpRight size={12} aria-hidden />
+        </Link>
       </div>
     </div>
   );

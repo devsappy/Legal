@@ -12,6 +12,25 @@ import { getIndex, hasIndex, resetIndex } from "../lib/rag/embeddings";
 const run = promisify(execFile);
 export const admin = new Hono();
 
+/** Where lib/rag/embeddings writes `<stamp>.bin`; read-only here, for the "last built" time. */
+const INDEX_DIR = path.join(process.cwd(), "data", "index");
+
+/**
+ * When the vector index was last written, as an ISO string, or undefined
+ * when no index file exists. The stamp is private to lib/rag, so the newest
+ * `.bin` under data/index stands in for "the" index file.
+ */
+async function indexedAt(): Promise<string | undefined> {
+  const names = await fs.readdir(INDEX_DIR).catch(() => [] as string[]);
+  let latest = 0;
+  for (const name of names) {
+    if (!name.endsWith(".bin")) continue;
+    const st = await fs.stat(path.join(INDEX_DIR, name)).catch(() => null);
+    if (st && st.mtimeMs > latest) latest = st.mtimeMs;
+  }
+  return latest ? new Date(latest).toISOString() : undefined;
+}
+
 // Every route here is admin-only.
 admin.use("*", async (c, next) => {
   const gate = requireUser(c, "admin");
@@ -36,7 +55,8 @@ admin.get("/documents", async (c) => {
     }),
   );
   rows.sort((a, b) => a.jurisdiction.localeCompare(b.jurisdiction) || b.sections - a.sections);
-  return c.json({ ok: true, rows, sections: sections.length, indexed: await hasIndex(sections) });
+  const [indexed, builtAt] = await Promise.all([hasIndex(sections), indexedAt()]);
+  return c.json({ ok: true, rows, sections: sections.length, indexed, ...(builtAt ? { indexedAt: builtAt } : {}) });
 });
 
 /**
@@ -88,12 +108,14 @@ admin.post("/reindex", async (c) => {
   resetIndex();
   const sections = await loadCorpus();
   const index = await getIndex(sections);
+  const builtAt = await indexedAt();
   return c.json({
     ok: true,
     sections: sections.length,
     embedded: index?.ids.length ?? 0,
     seconds: Math.round((Date.now() - started) / 1000),
     note: index ? null : "embedding server not reachable; BM25 only",
+    ...(builtAt ? { indexedAt: builtAt } : {}),
   });
 });
 
@@ -119,8 +141,14 @@ admin.post("/glossary", async (c) => {
 admin.put("/glossary", async (c) => {
   const b = (await c.req.json().catch(() => ({}))) as GlossaryBody;
   if (!b.id || !b.term?.trim()) return c.json({ ok: false }, 400);
-  db().prepare("UPDATE glossary SET term = ?, hi = ?, mr = ?, ta = ?, source = ? WHERE id = ?").run(b.term.trim(), b.hi ?? "", b.mr ?? "", b.ta ?? "", b.source ?? "", b.id);
-  return c.json({ ok: true });
+  try {
+    const info = db().prepare("UPDATE glossary SET term = ?, hi = ?, mr = ?, ta = ?, source = ? WHERE id = ?").run(b.term.trim(), b.hi ?? "", b.mr ?? "", b.ta ?? "", b.source ?? "", b.id);
+    if (info.changes === 0) return c.json({ ok: false, error: "not_found" }, 404);
+    return c.json({ ok: true });
+  } catch {
+    // The UNIQUE index on term: renaming onto another entry's term.
+    return c.json({ ok: false, error: "exists" }, 409);
+  }
 });
 
 admin.delete("/glossary", (c) => {
@@ -138,9 +166,23 @@ admin.get("/reviews", (c) => {
   return c.json({ ok: true, rows });
 });
 
+/**
+ * Flip one or many reviews: `{ id, status }` (the original shape) or
+ * `{ ids: [...], status }` for the bulk bar. All rows change in one
+ * transaction; `updated` is how many actually existed.
+ */
 admin.patch("/reviews", async (c) => {
-  const b = (await c.req.json().catch(() => ({}))) as { id?: number; status?: "open" | "resolved" };
-  if (!b.id || (b.status !== "open" && b.status !== "resolved")) return c.json({ ok: false }, 400);
-  db().prepare("UPDATE reviews SET status = ? WHERE id = ?").run(b.status, b.id);
-  return c.json({ ok: true });
+  const b = (await c.req.json().catch(() => ({}))) as { id?: number; ids?: number[]; status?: "open" | "resolved" };
+  const ids = [...new Set([...(Array.isArray(b.ids) ? b.ids : []), ...(b.id !== undefined ? [b.id] : [])])].filter(
+    (n): n is number => Number.isInteger(n) && n > 0,
+  );
+  if (ids.length === 0 || ids.length > 500 || (b.status !== "open" && b.status !== "resolved")) return c.json({ ok: false }, 400);
+  const status = b.status;
+  const stmt = db().prepare("UPDATE reviews SET status = ? WHERE id = ?");
+  const updated = db().transaction((list: number[]) => {
+    let n = 0;
+    for (const id of list) n += stmt.run(status, id).changes;
+    return n;
+  })(ids);
+  return c.json({ ok: true, updated });
 });

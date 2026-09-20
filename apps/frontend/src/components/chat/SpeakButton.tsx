@@ -1,56 +1,50 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Square, Volume2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import clsx from "clsx";
+import { IconButton } from "@/components/ui/IconButton";
+import { getSpeakingId, stopSpeaking, toggleSpeech, useSpeakingId, useSpeechSupported } from "@/lib/speech-store";
+
+type Props = {
+  /** The message id; only the button whose id is playing shows "Stop reading". */
+  id: string;
+  text: string;
+  lang: string;
+  className?: string;
+};
 
 /**
- * Reads an answer aloud with the browser's speech synthesis. Picks a voice
+ * Reads an answer aloud with the browser's speech synthesis through the
+ * shared speech store, so starting one answer stops another. Picks a voice
  * for the answer's language when the OS has one; otherwise the default
- * voice speaks it, which is still useful for English and Hindi on most
- * systems. Hidden entirely where the API is missing.
+ * voice speaks it. Hidden entirely where the API is missing.
  */
-export function SpeakButton({ text, lang }: { text: string; lang: string }) {
+export function SpeakButton({ id, text, lang, className }: Props) {
   const t = useTranslations("chat");
-  const [speaking, setSpeaking] = useState(false);
-  // Server renders nothing; the client decides once it knows the browser.
-  const supported = useSyncExternalStore(
-    () => () => {},
-    () => "speechSynthesis" in window,
-    () => false,
-  );
+  const supported = useSpeechSupported();
+  const speaking = useSpeakingId() === id;
 
-  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+  // Leaving the transcript mid-sentence should not keep talking.
+  useEffect(
+    () => () => {
+      if (getSpeakingId() === id) stopSpeaking();
+    },
+    [id],
+  );
 
   if (!supported) return null;
 
-  const bcp47: Record<string, string> = { en: "en-IN", hi: "hi-IN", mr: "mr-IN", ta: "ta-IN" };
-
-  const toggle = () => {
-    const synth = window.speechSynthesis;
-    if (speaking) {
-      synth.cancel();
-      setSpeaking(false);
-      return;
-    }
-    // Strip citation markers so "[2]" is not read out.
-    const u = new SpeechSynthesisUtterance(text.replace(/\[\d+\]/g, ""));
-    const want = bcp47[lang] ?? "en-IN";
-    const voice = synth.getVoices().find((v) => v.lang === want) ?? synth.getVoices().find((v) => v.lang.startsWith(want.slice(0, 2)));
-    if (voice) u.voice = voice;
-    u.lang = want;
-    u.rate = 0.95;
-    u.onend = () => setSpeaking(false);
-    u.onerror = () => setSpeaking(false);
-    setSpeaking(true);
-    synth.speak(u);
-  };
-
   return (
-    <Button size="sm" variant="ghost" onClick={toggle} aria-label={speaking ? t("stopSpeaking") : t("speak")} title={speaking ? t("stopSpeaking") : t("speak")}>
-      {speaking ? <Square size={13} /> : <Volume2 size={13} />}
-      <span className="hidden sm:inline">{speaking ? t("stopSpeaking") : t("speak")}</span>
-    </Button>
+    <IconButton
+      size="sm"
+      label={speaking ? t("stopSpeaking") : t("speak")}
+      aria-pressed={speaking}
+      onClick={() => toggleSpeech(id, text, lang)}
+      className={clsx(speaking && "bg-muted text-ink", className)}
+    >
+      {speaking ? <Square size={14} aria-hidden /> : <Volume2 size={15} aria-hidden />}
+    </IconButton>
   );
 }

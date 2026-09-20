@@ -1,8 +1,28 @@
+import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowRight } from "lucide-react";
-import { Link } from "@/i18n/navigation";
-import { type Checklist, JURISDICTIONS, pick } from "@sahayak/shared";
-import { backend } from "@/lib/backend";
+import type { Checklist } from "@sahayak/shared";
+import { backendResult } from "@/lib/backend";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Skeleton, SkeletonCard } from "@/components/ui/Skeleton";
+import { ProcedureFilters, ProceduresUnavailable } from "@/components/checklists/ProcedureFilters";
+
+/** Shown while the client filters hydrate under Suspense (useSearchParams). */
+function GridSkeleton() {
+  return (
+    <div className="flex flex-col gap-6" aria-busy>
+      <div className="flex flex-wrap gap-1.5">
+        {Array.from({ length: 7 }, (_, i) => (
+          <Skeleton key={i} className="h-7 w-24 rounded-full" />
+        ))}
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 6 }, (_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -14,40 +34,27 @@ export default async function ChecklistsPage({ params }: { params: Promise<{ loc
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("checklists");
-  const CHECKLISTS = (await backend<{ procedures: Checklist[] }>("/api/procedures"))?.procedures ?? [];
+  const tNav = await getTranslations("nav");
+  const result = await backendResult<{ procedures: Checklist[] }>("/api/procedures");
+  const procedures = result.ok ? (result.data.procedures ?? []) : [];
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 sm:py-10">
-      <header className="max-w-[62ch] mb-8">
-        <h1 className="text-[clamp(28px,4vw,38px)] mb-2">{t("title")}</h1>
-        <p className="text-ink-2 text-[15.5px]">{t("subtitle")}</p>
-      </header>
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+      <PageHeader
+        title={t("title")}
+        description={t("subtitle")}
+        count={result.ok ? procedures.length : undefined}
+        breadcrumbs={[{ label: tNav("home"), href: "/home" }, { label: t("title") }]}
+        className="mb-8"
+      />
 
-      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {CHECKLISTS.map((c) => {
-          const j = JURISDICTIONS.find((x) => x.id === c.jurisdiction);
-          return (
-            <li key={c.slug}>
-              <Link
-                href={`/checklists/${c.slug}`}
-                className="group flex flex-col h-full rounded-lg border border-rule bg-sheet p-4 hover:border-brand transition-colors"
-              >
-                <span className="font-mono text-[11px] text-ink-3 tracking-wide mb-2">
-                  {j?.short} · {t("stepCount", { count: c.steps.length })}
-                </span>
-                <span className="text-[17px] font-medium text-ink leading-snug mb-1.5">
-                  {pick(c.title, locale)}
-                </span>
-                <span className="text-[13.5px] text-ink-2 flex-1">{pick(c.summary, locale)}</span>
-                <span className="mt-4 inline-flex items-center gap-1 text-[13px] text-ink-2 group-hover:text-ink">
-                  {t("steps")}
-                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {result.ok ? (
+        <Suspense fallback={<GridSkeleton />}>
+          <ProcedureFilters procedures={procedures} />
+        </Suspense>
+      ) : (
+        <ProceduresUnavailable title={t("unavailable")} description={t("unavailableBody")} />
+      )}
     </div>
   );
 }

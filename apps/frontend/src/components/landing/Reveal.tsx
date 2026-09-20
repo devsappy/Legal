@@ -10,20 +10,28 @@ type Props = {
   className?: string;
   as?: "div" | "section" | "ul" | "ol" | "dl" | "figure";
   style?: CSSProperties;
+  /**
+   * Above-the-fold content: rendered already visible (`is-in`) with the
+   * server-side `.reveal-eager` keyframe entrance instead of waiting for the
+   * IntersectionObserver, so the hero reads before JavaScript arrives and
+   * stays the LCP element.
+   */
+  eager?: boolean;
+  id?: string;
 };
 
 /**
  * Fades and lifts its content in the first time it scrolls into view.
  * Direct children of any [data-stagger] element inside follow one by one.
  */
-export function Reveal({ children, delay = 0, className, as = "div", style }: Props) {
+export function Reveal({ children, delay = 0, className, as = "div", style, eager = false, id }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   // Every allowed tag accepts the same props; narrow to one for the JSX type.
   const Tag = as as "div";
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || eager) return;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -34,12 +42,13 @@ export function Reveal({ children, delay = 0, className, as = "div", style }: Pr
     );
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [eager]);
 
   return (
     <Tag
       ref={ref as RefObject<HTMLDivElement>}
-      className={clsx("reveal", className)}
+      id={id}
+      className={clsx("reveal", eager && "is-in reveal-eager", className)}
       style={{ "--reveal-d": `${delay}ms`, ...style } as CSSProperties}
     >
       {children}
