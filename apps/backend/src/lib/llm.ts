@@ -5,7 +5,7 @@
  */
 export const LLM_URL = (process.env.LLM_URL ?? "http://127.0.0.1:8080").replace(/\/$/, "");
 export const LLM_MODEL = process.env.LLM_MODEL ?? "sahayak";
-const LLM_API_KEY = process.env.LLM_API_KEY;
+export const LLM_API_KEY = process.env.LLM_API_KEY;
 
 export type Message = { role: "system" | "user" | "assistant"; content: string };
 

@@ -2,8 +2,8 @@ import { createRequire } from "node:module";
 import { Hono } from "hono";
 import { JURISDICTIONS } from "@sahayak/shared";
 import { db } from "../lib/db";
-import { LLM_URL } from "../lib/llm";
-import { EMBED_URL } from "../lib/rag/embeddings";
+import { LLM_API_KEY, LLM_URL } from "../lib/llm";
+import { EMBED_API_KEY, EMBED_URL } from "../lib/rag/embeddings";
 import { loadCorpus } from "../lib/rag/corpus";
 import { findProcedure, loadProcedures } from "../lib/procedures";
 
@@ -35,15 +35,30 @@ let healthCache: { payload: HealthPayload; status: 200 | 503; at: number } | nul
 let healthInflight: Promise<{ payload: HealthPayload; status: 200 | 503 }> | null = null;
 
 async function probeHealth(): Promise<{ payload: HealthPayload; status: 200 | 503 }> {
-  const probe = async (url: string) => {
+  // llama.cpp exposes /health; hosted OpenAI-compatible APIs (Groq, Cloudflare Workers AI, …)
+  // usually don't, so a 404 there doesn't mean the server is down — fall back to the one
+  // endpoint every such API does support, GET /v1/models, before calling it unreachable.
+  const probe = async (url: string, apiKey?: string) => {
+    const headers = apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined;
     try {
-      const res = await fetch(`${url}/health`, { signal: AbortSignal.timeout(3000) });
+      const res = await fetch(`${url}/health`, { signal: AbortSignal.timeout(3000), headers });
+      if (res.ok) return "ok";
+      if (res.status !== 404) return `http ${res.status}`;
+    } catch {
+      return "unreachable";
+    }
+    try {
+      const res = await fetch(`${url}/v1/models`, { signal: AbortSignal.timeout(3000), headers });
       return res.ok ? "ok" : `http ${res.status}`;
     } catch {
       return "unreachable";
     }
   };
-  const [llm, embed, corpus] = await Promise.all([probe(LLM_URL), probe(EMBED_URL), loadCorpus().then((s) => s.length).catch(() => 0)]);
+  const [llm, embed, corpus] = await Promise.all([
+    probe(LLM_URL, LLM_API_KEY),
+    probe(EMBED_URL, EMBED_API_KEY),
+    loadCorpus().then((s) => s.length).catch(() => 0),
+  ]);
   let database = "ok";
   try {
     await db()`SELECT 1`;
