@@ -78,6 +78,12 @@ Latest run on an RTX 3060 Laptop (6 GB) with Qwen3.5-4B Q4_K_M:
 |---|---|---|---|---|
 | English | 100% | 97% | 100% | ~13 s |
 | Hindi | 95% | 89% | 100% | ~19 s |
+| Marathi | 89% | 87% | 100% | ~22 s |
+| Tamil | 93% | 97% | 100% | ~23 s |
+
+"Cited correctly" means one of the expected sections is among the sources the answer
+actually cites. The verification pass flags a further 15–25% of citations as not fully
+supporting their sentence; those show as unverified in the UI and land in the review queue.
 
 ## Tests and CI
 
