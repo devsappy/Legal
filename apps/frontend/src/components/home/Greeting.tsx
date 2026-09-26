@@ -16,7 +16,7 @@ type Props = {
 };
 
 /**
- * The dashboard's header tile: the time-of-day greeting, today's date and
+ * The dashboard's page header: the time-of-day greeting, today's date and
  * the two choices every answer depends on (the Act and the language), each
  * with a link into Settings. Client-side because the greeting follows the
  * visitor's clock and the Act comes from the device store.
@@ -34,7 +34,7 @@ export function Greeting({ name, serverNow }: Props) {
   const language = LANGUAGES.find((l) => l.code === locale);
 
   return (
-    <div className="flex h-full flex-col justify-between gap-6">
+    <div className="flex flex-col gap-4">
       <div>
         <p className="font-mono text-2xs uppercase tracking-[0.12em] text-ink-3">
           <span className="sr-only">{t("today")}: </span>

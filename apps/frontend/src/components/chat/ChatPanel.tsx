@@ -218,7 +218,8 @@ function ChatPanelInner() {
 
       <StreamStatus messages={chat.messages} />
 
-      <div className="relative shrink-0 bg-sheet pb-2 pt-3">
+      {/* The dock clears the iOS home indicator, like the dialogs and toasts do. */}
+      <div className="relative shrink-0 bg-sheet pt-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <JumpToLatest visible={away && chat.busy} onClick={jumpToLatest} className="-top-11" />
         <div className="mx-auto w-full max-w-3xl px-4">{composer}</div>
       </div>

@@ -222,7 +222,8 @@ export function Composer({ busy, speechLang, sessionId, onSend, onStop, seed, au
         }}
         placeholder={speech.listening ? t("listening") : t("placeholder")}
         aria-describedby="composer-hint"
-        className="focus-quiet scroll-thin block min-h-[52px] max-h-[180px] w-full resize-none bg-transparent px-4 pb-1 pt-2.5 text-base text-ink placeholder:text-ink-3"
+        /* 16px below sm: a smaller focused field makes iOS Safari zoom the page. */
+        className="focus-quiet scroll-thin block min-h-[52px] max-h-[180px] w-full resize-none bg-transparent px-4 pb-1 pt-2.5 text-[16px] text-ink placeholder:text-ink-3 sm:text-base"
       />
 
       {voiceNoteOpen && (

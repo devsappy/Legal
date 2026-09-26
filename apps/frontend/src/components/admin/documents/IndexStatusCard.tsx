@@ -49,7 +49,7 @@ export function IndexStatusCard({ files, sections, untitled, indexed, indexedAt 
         </div>
         <ReindexButton variant={indexed ? "outline" : "primary"} size="sm" className="shrink-0" />
       </div>
-      <div className="grid grid-cols-3 gap-px border-t border-rule bg-rule">
+      <div className="grid grid-cols-1 gap-px border-t border-rule bg-rule sm:grid-cols-3">
         <Stat label={t("files")} value={formatNumber(files, locale)} />
         <Stat label={t("sections")} value={formatNumber(sections, locale)} />
         <Stat label={t("untitled")} value={formatNumber(untitled, locale)} />

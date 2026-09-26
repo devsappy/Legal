@@ -41,7 +41,9 @@ export function Input({ icon, trailing, invalid, size = "md", className, ...rest
         className={clsx(
           "w-full min-w-0 rounded-lg border bg-sheet text-ink placeholder:text-ink-3 outline-none transition-colors",
           "hover:border-rule-strong focus:border-brand/60 disabled:cursor-not-allowed disabled:opacity-45",
-          sm ? "h-8 text-xs" : "h-9 text-sm",
+          /* 16px below sm: anything smaller makes iOS Safari zoom the page on focus. */
+          "text-[16px]",
+          sm ? "h-8 sm:text-xs" : "h-9 sm:text-sm",
           icon ? (sm ? "pl-8" : "pl-9") : sm ? "pl-2.5" : "pl-3",
           trailing ? (sm ? "pr-8" : "pr-9") : sm ? "pr-2.5" : "pr-3",
           invalid ? "border-seal/60 hover:border-seal/60" : "border-rule",

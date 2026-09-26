@@ -36,17 +36,13 @@ const KEY = "coop.welcome";
 const EMPTY: WelcomeState = { startLocale: null, startAct: null, keptLocale: false, keptAct: false };
 const TOTAL = 3;
 
-type Props = {
-  name: string;
-  /** Grid placement and entrance classes from the page; the tile chrome is added here so nothing renders while hidden. */
-  className?: string;
-};
+type Props = { name: string };
 
-export function WelcomeCard({ name, className }: Props) {
+export function WelcomeCard({ name }: Props) {
   // useSearchParams needs a boundary; the tree is dynamic, so the fallback never shows.
   return (
     <Suspense fallback={null}>
-      <WelcomeCardInner name={name} className={className} />
+      <WelcomeCardInner name={name} />
     </Suspense>
   );
 }
@@ -57,7 +53,7 @@ export function WelcomeCard({ name, className }: Props) {
  * onboarded nor asked anything. Nothing renders before hydration, so the
  * server never guesses at device state.
  */
-function WelcomeCardInner({ name, className }: Props) {
+function WelcomeCardInner({ name }: Props) {
   const t = useTranslations("onboarding");
   const locale = useLocale();
   const router = useRouter();
@@ -103,7 +99,10 @@ function WelcomeCardInner({ name, className }: Props) {
   };
 
   return (
-    <section aria-labelledby="welcome-title" className={clsx("tile flex min-w-0 flex-col gap-5 p-5 sm:p-6", className)} data-motion>
+    <section
+      aria-labelledby="welcome-title"
+      className="flex min-w-0 flex-col gap-5 rounded-lg border border-rule bg-sheet p-4 sm:p-5"
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 id="welcome-title" className="text-xl font-medium text-ink">

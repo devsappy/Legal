@@ -90,7 +90,7 @@ export async function ProceduresGlossary({ procedures, locale }: Props) {
             <tbody>
               {terms.map((g) => (
                 <tr key={g.term} className="border-b border-rule align-top">
-                  <th scope="row" className="whitespace-nowrap py-2.5 pr-3 text-left font-semibold text-ink">
+                  <th scope="row" className="w-[38%] py-2.5 pr-3 text-left font-semibold text-ink sm:w-auto sm:whitespace-nowrap">
                     {g.term}
                   </th>
                   <td className="py-2.5 text-ink-2">

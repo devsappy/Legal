@@ -207,6 +207,12 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* clip, not hidden: a stray wide child cannot scroll the page sideways, and
+     sticky headers keep working because clip makes no scroll container. */
+  overflow-x: clip;
+  /* Pasted URLs, statute references and long Devanagari/Tamil compounds wrap
+     instead of pushing a narrow column wider than the phone. */
+  overflow-wrap: break-word;
 }
 
 h1,
@@ -520,6 +526,19 @@ html[lang="ta"] h2 {
   cursor: pointer;
   transition: background 120ms ease;
 }
+/* The marker is sized to the line, which is far under a finger. On touch it
+   keeps its size and grows an invisible hit area instead, so the text does not reflow. */
+@media (pointer: coarse) {
+  .cite {
+    position: relative;
+  }
+  .cite::after {
+    content: "";
+    position: absolute;
+    inset: -10px -5px;
+  }
+}
+
 .cite:hover,
 .cite[data-active="true"] {
   background: var(--brand);

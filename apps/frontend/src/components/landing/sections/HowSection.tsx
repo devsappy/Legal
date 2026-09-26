@@ -38,7 +38,7 @@ export async function HowSection({ stats }: { stats: StatItem[] }) {
           {stats.map((s) => (
             <div key={s.key} className={clsx(CELL, "flex flex-col-reverse justify-end py-4 sm:py-5")}>
               <dt className="mt-1.5 text-xs font-medium text-ink-2">{s.label}</dt>
-              <dd className="text-[34px] font-semibold leading-none tracking-[-0.03em] text-brand tabular-nums">
+              <dd className="text-[clamp(24px,7vw,34px)] font-semibold leading-none tracking-[-0.03em] text-brand tabular-nums">
                 {s.value === null ? (
                   <>
                     <span className="font-mono" aria-hidden>

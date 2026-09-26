@@ -52,12 +52,17 @@ export async function CompareTable() {
   // `relative` keeps the cells' sr-only labels (absolutely positioned) inside
   // this scroll box, so they cannot widen the page on phones.
   return (
-    <div className="scroll-thin relative overflow-x-auto rounded-md border border-rule-strong bg-sheet">
-      <table className="w-full min-w-[600px] border-collapse text-sm">
+    <div
+      role="region"
+      aria-label={t("title")}
+      tabIndex={0}
+      className="scroll-thin relative overflow-x-auto rounded-md border border-rule-strong bg-sheet"
+    >
+      <table className="w-full min-w-[520px] border-collapse text-sm sm:min-w-[600px]">
         <caption className="sr-only">{t("title")}</caption>
         <thead>
           <tr className="border-b border-rule-strong">
-            <th scope="col" className="sticky left-0 z-10 w-[200px] min-w-[180px] border-r border-rule bg-sheet px-4 py-3 text-left sm:w-[280px] sm:px-5">
+            <th scope="col" className="sticky left-0 z-10 w-[140px] min-w-[132px] border-r border-rule bg-sheet px-3 py-3 text-left sm:w-[280px] sm:min-w-[180px] sm:px-5">
               <span className="sr-only">{t("title")}</span>
             </th>
             {columns.map((c, i) => (
@@ -65,7 +70,7 @@ export async function CompareTable() {
                 key={c}
                 scope="col"
                 className={clsx(
-                  "px-4 py-3 text-left text-sm font-semibold text-ink sm:px-5",
+                  "px-3 py-3 text-left text-sm font-semibold text-ink sm:px-5",
                   i === 0 ? "bg-brand-soft" : "text-ink-2",
                 )}
               >
@@ -77,11 +82,11 @@ export async function CompareTable() {
         <tbody>
           {rows.map((r) => (
             <tr key={r.label} className="border-b border-rule last:border-b-0">
-              <th scope="row" className="sticky left-0 z-10 border-r border-rule bg-sheet px-4 py-3 text-left text-sm font-medium leading-snug text-ink sm:px-5">
+              <th scope="row" className="sticky left-0 z-10 border-r border-rule bg-sheet px-3 py-3 text-left text-sm font-medium leading-snug text-ink sm:px-5">
                 {r.label}
               </th>
               {r.cells.map((cell, i) => (
-                <td key={i} className={clsx("px-4 py-3 align-middle sm:px-5", i === 0 && "bg-brand-soft")}>
+                <td key={i} className={clsx("px-3 py-3 align-middle sm:px-5", i === 0 && "bg-brand-soft")}>
                   <Mark value={cell} labels={labels} />
                 </td>
               ))}

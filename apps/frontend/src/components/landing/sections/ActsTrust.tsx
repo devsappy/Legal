@@ -26,10 +26,10 @@ export async function ActsTrust() {
             {JURISDICTIONS.map((j) => (
               <li
                 key={j.id}
-                className="-mx-2 grid grid-cols-[7.5rem_1fr] items-baseline gap-x-4 rounded-sm border-b border-rule px-2 py-3 text-base hover:bg-muted/50 sm:grid-cols-[8.5rem_1fr_auto]"
+                className="-mx-2 grid grid-cols-1 gap-x-4 rounded-sm border-b border-rule px-2 py-3 text-base hover:bg-muted/50 sm:grid-cols-[8.5rem_1fr_auto] sm:items-baseline"
               >
                 <span className="font-mono text-xs text-brand">{j.short}</span>
-                <span className="font-semibold text-ink">{j.name}</span>
+                <span className="min-w-0 font-semibold text-ink">{j.name}</span>
                 <span className="hidden truncate text-sm text-ink-3 sm:block">{j.act}</span>
               </li>
             ))}

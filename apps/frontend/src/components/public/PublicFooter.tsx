@@ -24,7 +24,6 @@ export async function PublicFooter() {
   const product = [
     { label: t("menu.ask"), href: "/#ask" },
     { label: t("menu.procedures"), href: "/#procedures" },
-    { label: t("nav.pricing"), href: "/#pricing" },
     { label: t("nav.faq"), href: "/#faq" },
     { label: t("nav.whatsNew"), href: "/changelog" },
   ];

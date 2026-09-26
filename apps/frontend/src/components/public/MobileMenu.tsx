@@ -13,7 +13,6 @@ import { PRODUCT_LINKS } from "./NavMenu";
 
 const TOP_LINKS = [
   { key: "how", href: "/#how" },
-  { key: "pricing", href: "/#pricing" },
   { key: "faq", href: "/#faq" },
   { key: "whatsNew", href: "/changelog" },
 ] as const;

@@ -41,7 +41,7 @@ export function QuickAsk() {
       <label htmlFor={id} className="text-base font-medium text-ink">
         {t("quickAsk")}
       </label>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
         <Input
           ref={inputRef}
           id={id}
@@ -59,7 +59,7 @@ export function QuickAsk() {
             </span>
           }
         />
-        <Button type="submit" variant="primary" disabled={!trimmed} className="shrink-0">
+        <Button type="submit" variant="primary" disabled={!trimmed} className="shrink-0 justify-center">
           {t("quickAskSubmit")}
           <ArrowRight size={14} aria-hidden />
         </Button>

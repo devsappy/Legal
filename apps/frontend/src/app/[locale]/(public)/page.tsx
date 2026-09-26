@@ -11,7 +11,6 @@ import { AskSection } from "@/components/landing/sections/AskSection";
 import { ProceduresGlossary } from "@/components/landing/sections/ProceduresGlossary";
 import { CompareTable } from "@/components/landing/CompareTable";
 import { ActsTrust } from "@/components/landing/sections/ActsTrust";
-import { Pricing } from "@/components/landing/Pricing";
 import { FaqAccordion, type FaqItem } from "@/components/landing/FaqAccordion";
 import { CtaBand } from "@/components/landing/sections/CtaBand";
 import { JsonLd } from "@/components/landing/JsonLd";
@@ -36,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 /**
  * The marketing page: hero and product preview, Acts strip, benefits, how
  * it works with live numbers, personas, procedures and glossary, the
- * comparison, Acts and trust lists, pilot pricing, FAQ and the closing
+ * comparison, Acts and trust lists, FAQ and the closing
  * call to action. Live numbers come from the backend; when it does not
  * answer the page still renders, with dashes and an empty state instead
  * of invented figures.
@@ -84,15 +83,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
       <ActsTrust />
 
-      <section id="pricing" className={SECTION}>
-        <Reveal>
-          <h2 className={KICKER}>{t("pricing.title")}</h2>
-          <p className={LEAD}>{t("pricing.body")}</p>
-        </Reveal>
-        <Reveal delay={100} className="mt-6">
-          <Pricing />
-        </Reveal>
-      </section>
+      {/* Pricing is off the page while billing is not live; components/landing/Pricing.tsx puts it back. */}
 
       <section id="faq" className={SECTION}>
         <Reveal>

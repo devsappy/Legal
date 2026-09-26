@@ -14,7 +14,7 @@ function Wordmarks({ track, copy }: { track?: boolean; copy?: boolean }) {
         <Link
           key={j.id}
           href="/#acts"
-          className={clsx(TILE, track ? "w-[220px]" : "min-w-0")}
+          className={clsx(TILE, track ? "w-[180px] sm:w-[220px]" : "min-w-0")}
           tabIndex={copy ? -1 : undefined}
           aria-hidden={copy || undefined}
         >
@@ -48,7 +48,8 @@ export async function ActsStrip() {
             <div className="flex gap-1 pr-1">
               <Wordmarks track />
             </div>
-            <div className="flex gap-1 pr-1">
+            {/* The seam copy only exists for the loop; hand-scrolling must not repeat the six Acts. */}
+            <div className="flex gap-1 pr-1 motion-reduce:hidden [html[data-motion=reduced]_&]:hidden">
               <Wordmarks track copy />
             </div>
           </div>

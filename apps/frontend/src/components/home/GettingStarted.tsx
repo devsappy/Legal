@@ -19,17 +19,12 @@ import { Meter } from "@/components/ui/Meter";
 
 const KEY = "coop.gettingStarted.dismissed";
 
-type Props = {
-  /** Grid placement and entrance classes from the page; the tile chrome is added here so nothing renders while hidden. */
-  className?: string;
-};
-
 /**
  * Four tasks that tick themselves off as the app is used. It steps aside
  * while the first-run WelcomeCard is up, and disappears for good once
  * every task is done or the visitor dismisses it.
  */
-export function GettingStarted({ className }: Props) {
+export function GettingStarted() {
   const t = useTranslations("onboarding");
   const locale = useLocale();
   const hydrated = useHydrated();
@@ -54,8 +49,7 @@ export function GettingStarted({ className }: Props) {
   return (
     <section
       aria-labelledby="getting-started-title"
-      className={clsx("tile flex min-w-0 flex-col gap-4 p-5 sm:p-6", className)}
-      data-motion
+      className="flex min-w-0 flex-col gap-4 rounded-lg border border-rule bg-sheet p-4 sm:p-5"
     >
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
         <h2 id="getting-started-title" className="text-base font-medium text-ink">

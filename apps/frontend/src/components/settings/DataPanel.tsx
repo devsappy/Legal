@@ -146,7 +146,7 @@ export function DataPanel({ serverCount }: { serverCount: number | null }) {
           </Button>
         }
       >
-        <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-rule-strong bg-rule-strong">
+        <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-rule-strong bg-rule-strong sm:grid-cols-2">
           {counts.map(({ key, value }) => (
             <div key={key} className="flex flex-col bg-sheet p-4">
               <dt className="text-2xs font-medium uppercase tracking-[0.08em] text-ink-3">{t(key)}</dt>

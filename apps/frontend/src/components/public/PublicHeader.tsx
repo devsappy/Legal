@@ -21,7 +21,6 @@ const PILL = "h-9 items-center whitespace-nowrap rounded-full px-4 text-sm font-
 
 const NAV_LINKS = [
   { key: "how", href: "/#how" },
-  { key: "pricing", href: "/#pricing" },
   { key: "faq", href: "/#faq" },
   { key: "whatsNew", href: "/changelog" },
 ] as const;
